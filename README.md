@@ -1,1 +1,1 @@
-All source code & document composed by Jack Zhu are under GPLv3 License.
+All source code & document composed by Jack Zhu are under LGPL License.
