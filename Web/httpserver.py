@@ -62,9 +62,11 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
       if motorid.lower() == 'v':
         ControlPackage.motorV.setSpeed(speed)
         ControlPackage.motorV.step(steps, dir.upper(), 'DOUBLE')
+        ControlPackage.motorV.release()
       else:
         ControlPackage.motorH.setSpeed(speed)
         ControlPackage.motorH.step(steps, dir.upper(), 'DOUBLE')
+        ControlPackage.motorH.release()
  
       status = True	# move success
 
