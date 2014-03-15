@@ -38,7 +38,7 @@ $( "#btn_refresh" ).click(function() {
 	img.src = "data:image/jpeg;base64," + msg['image'];
         context.drawImage(img, 0, 0);
 
-        v_updimage = setTimeout(updateImage, 5000); // 5 * 1000 miliseconds
+        v_updimage = setTimeout(updateImage, 2000); // 2 * 1000 miliseconds
     })
     .fail(function() {
       alert( "camera controll error!" );
