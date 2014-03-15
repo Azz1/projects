@@ -9,10 +9,29 @@ jQuery(document).ready(function() {
               foo.html(val); 
   	    });
 	});
+        //$( "#btn_refresh" ).click();
     }
   
     updateTime();
     setInterval(updateTime, 5000); // 5 * 1000 miliseconds
+});
+
+$( "#btn_refresh" ).click(function() {
+    $.post("/api/refresh", {}, function(msg) {
+    })
+    .done(function(msg) {
+	var canvas = $('#canvas')[0];
+        var context = canvas.getContext('2d');
+
+        var img = new Image();
+	img.src = "data:image/jpeg;base64," + msg['image'];
+        context.drawImage(img, 0, 0);
+    })
+    .fail(function() {
+      alert( "camera controll error!" );
+    })
+    .always(function() {
+  });
 });
 
 $( "#btn_up" ).click(function() {

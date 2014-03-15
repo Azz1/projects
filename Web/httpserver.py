@@ -10,11 +10,25 @@ import re
 import os
 import cgi
 import sys
+import Image
+import base64
+from cStringIO import StringIO
+
+import picamera
 motorlib_path = os.path.abspath('../Adafruit')
 sys.path.append(motorlib_path)
 from Adafruit_Motor_Driver import StepMotor
  
 class ControlPackage :
+
+  # initialize the camera 
+  camera = picamera.PiCamera()
+  width = 800
+  height = 600
+  camera.vflip = False
+  camera.hflip = False
+  camera.brightness = 60
+
   # initialize vertical step motor
   motorV = StepMotor(0x60, debug=False)
   motorV.setFreq(1600)
@@ -29,26 +43,34 @@ class ControlPackage :
   def release():
     ControlPackage.motorV.release()
     ControlPackage.motorH.release()
+    ControlPackage.camera.close()
+    del ControlPackage.camera
 
-class LocalData(object):
-  records = {'Alice': '2341', 'Beth': '9102', 'Cecil': '3258' }
- 
 class HTTPRequestHandler(BaseHTTPRequestHandler):
  
   def do_POST(self):
-    if None != re.search('/api/v1/addrecord/*', self.path):
-      ctype, pdict = cgi.parse_header(self.headers.getheader('content-type'))
-      if ctype == 'application/json':
-        length = int(self.headers.getheader('content-length'))
-        data = cgi.parse_qs(self.rfile.read(length), keep_blank_values=1)
-        recordID = self.path.split('/')[-1]
-        LocalData.records[recordID] = data
-        print "record %s is added successfully" % recordID
-      else:
-        data = {}
- 
+    if None != re.search('/api/refresh$', self.path):
+      try:
+        # TAKE A PHOTO
+        ControlPackage.camera.start_preview()
+        time.sleep(0.5)
+        ControlPackage.camera.capture('temp/image.jpg', format='jpeg', resize=(ControlPackage.width,ControlPackage.height))
+      finally:
+        ControlPackage.camera.stop_preview()
+
+      #READ IMAGE AND PUT ON SCREEN
+      img = Image.open('temp/image.jpg')
+      img = img.transpose(Image.ROTATE_180)
+      output = StringIO()
+      img.save(output, format='JPEG')
+      imgstr = base64.b64encode(output.getvalue()) 
+      del img
+      os.remove('temp/image.jpg')
+
       self.send_response(200)
+      self.send_header('Content-Type', 'application/json')
       self.end_headers()
+      self.wfile.write('{"image": "' + imgstr + '"}')
 
     elif None != re.search('/api/motor/*', self.path): # motor control
       length = int(self.headers.getheader('content-length'))
@@ -83,19 +105,7 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
     return
  
   def do_GET(self):
-    if None != re.search('/api/v1/getrecord/*', self.path):
-      recordID = self.path.split('/')[-1]
-      if LocalData.records.has_key(recordID):
-        self.send_response(200)
-        self.send_header('Content-Type', 'application/json')
-        self.end_headers()
-        self.wfile.write(LocalData.records[recordID])
-      else:
-        self.send_response(400, 'Bad Request: record does not exist')
-        self.send_header('Content-Type', 'application/json')
-        self.end_headers()
-
-    elif None != re.search('/api/gettime$', self.path):	# get server time
+    if None != re.search('/api/gettime$', self.path):	# get server time
       mytz="%+4.4d" % (time.timezone / -(60*60) * 100) # time.timezone counts westwards!
       dt  = datetime.datetime.now()
       dts = dt.strftime('%Y-%m-%d %H:%M:%S')  # %Z (timezone) would be empty
