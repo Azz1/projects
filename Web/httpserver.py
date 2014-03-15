@@ -10,11 +10,12 @@ import re
 import os
 import cgi
 import sys
-import Image
+import PIL
+from PIL import Image
 import base64
 from cStringIO import StringIO
 
-import picamera
+#import picamera
 motorlib_path = os.path.abspath('../Adafruit')
 sys.path.append(motorlib_path)
 from Adafruit_Motor_Driver import StepMotor
@@ -22,12 +23,13 @@ from Adafruit_Motor_Driver import StepMotor
 class ControlPackage :
 
   # initialize the camera 
-  camera = picamera.PiCamera()
+  #camera = picamera.PiCamera()
   width = 800
   height = 600
-  camera.vflip = False
-  camera.hflip = False
-  camera.brightness = 60
+  brightness = 60
+  #camera.vflip = False
+  #camera.hflip = False
+  #camera.brightness = 60
 
   # initialize vertical step motor
   motorV = StepMotor(0x60, debug=False)
@@ -43,24 +45,33 @@ class ControlPackage :
   def release():
     ControlPackage.motorV.release()
     ControlPackage.motorH.release()
-    ControlPackage.camera.close()
-    del ControlPackage.camera
+    #ControlPackage.camera.close()
+    #del ControlPackage.camera
 
 class HTTPRequestHandler(BaseHTTPRequestHandler):
  
   def do_POST(self):
     if None != re.search('/api/refresh$', self.path):
+      print 'POST /api/refresh'
       try:
         # TAKE A PHOTO
-        ControlPackage.camera.start_preview()
-        time.sleep(0.5)
-        ControlPackage.camera.capture('temp/image.jpg', format='jpeg', resize=(ControlPackage.width,ControlPackage.height))
+        #ControlPackage.camera.start_preview()
+        #time.sleep(0.5)
+        #ControlPackage.camera.capture('temp/image.jpg', format='jpeg', resize=(ControlPackage.width,ControlPackage.height))
+
+        os.system('raspistill -o temp/image.jpg -w ' + str(ControlPackage.width) + ' -h ' + str(ControlPackage.height) + ' -br ' + str(ControlPackage.brightness))
       finally:
-        ControlPackage.camera.stop_preview()
+        pass
+        #ControlPackage.camera.stop_preview()
 
       #READ IMAGE AND PUT ON SCREEN
       img = Image.open('temp/image.jpg')
+      basewidth = 800
+      wpercent = (basewidth/float(img.size[0]))
+      hsize = int((float(img.size[1])*float(wpercent)))
+      img = img.resize((basewidth,hsize), PIL.Image.ANTIALIAS)
       img = img.transpose(Image.ROTATE_180)
+
       output = StringIO()
       img.save(output, format='JPEG')
       imgstr = base64.b64encode(output.getvalue()) 

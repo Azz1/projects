@@ -1,3 +1,9 @@
+var v_updimage;
+
+function updateImage() {
+    $( "#btn_refresh" ).click();
+}
+
 jQuery(document).ready(function() {
     var foo = jQuery('#time_id');
   
@@ -12,20 +18,27 @@ jQuery(document).ready(function() {
         //$( "#btn_refresh" ).click();
     }
   
+
     updateTime();
     setInterval(updateTime, 5000); // 5 * 1000 miliseconds
+    updateImage();
 });
 
 $( "#btn_refresh" ).click(function() {
     $.post("/api/refresh", {}, function(msg) {
     })
     .done(function(msg) {
+        if( v_updimage != null )
+	    clearTimeout(v_updimage);
+
 	var canvas = $('#canvas')[0];
         var context = canvas.getContext('2d');
 
         var img = new Image();
 	img.src = "data:image/jpeg;base64," + msg['image'];
         context.drawImage(img, 0, 0);
+
+        v_updimage = setTimeout(updateImage, 5000); // 5 * 1000 miliseconds
     })
     .fail(function() {
       alert( "camera controll error!" );
