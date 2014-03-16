@@ -54,7 +54,9 @@ $( "#btn_refresh" ).click(function() {
 $( "#btn_up" ).click(function() {
     $.post("/api/motor/v/forward", {"speed": $( "#vspeed" ).val(), "steps": $("#vsteps").val()}, function(data) {
     })
-    .done(function() {
+    .done(function(data) {
+	if( data["detai"] != "")
+	    $("#status_id").html(data["detail"]);	
     })
     .fail(function() {
       alert( "motor controll error!" );
@@ -66,7 +68,9 @@ $( "#btn_up" ).click(function() {
 $( "#btn_down" ).click(function() {
     $.post("/api/motor/v/backward", {"speed": $( "#vspeed" ).val(), "steps": $("#vsteps").val()}, function(data) {
     })
-    .done(function() {
+    .done(function(data) {
+	if( data["detai"] != "")
+	    $("#status_id").html(data["detail"]);	
     })
     .fail(function() {
       alert( "motor controll error!" );
@@ -78,7 +82,9 @@ $( "#btn_down" ).click(function() {
 $( "#btn_left" ).click(function() {
     $.post("/api/motor/h/forward", {"speed": $( "#hspeed" ).val(), "steps": $("#hsteps").val()}, function(data) {
     })
-    .done(function() {
+    .done(function(data) {
+	if( data["detai"] != "")
+	    $("#status_id").html(data["detail"]);	
     })
     .fail(function() {
       alert( "motor controll error!" );
@@ -90,7 +96,9 @@ $( "#btn_left" ).click(function() {
 $( "#btn_right" ).click(function() {
     $.post("/api/motor/h/backward", {"speed": $( "#hspeed" ).val(), "steps": $("#hsteps").val()}, function(data) {
     })
-    .done(function() {
+    .done(function(data) {
+	if( data["detai"] != "")
+	    $("#status_id").html(data["detail"]);	
     })
     .fail(function() {
       alert( "motor controll error!" );

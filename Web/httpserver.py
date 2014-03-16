@@ -15,6 +15,8 @@ from PIL import Image
 import base64
 from cStringIO import StringIO
 
+import RPi.GPIO as GPIO
+
 #import picamera
 motorlib_path = os.path.abspath('../Adafruit')
 sys.path.append(motorlib_path)
@@ -23,6 +25,19 @@ from Adafruit_Motor_Driver import StepMotor
 camera_lock = threading.Lock()
 
 class ControlPackage :
+
+  # Touch sensor GPIO pins
+  VL_pin = 24
+  VH_pin = 23
+  HL_pin = 17
+  HR_pin = 4
+
+  GPIO.setmode(GPIO.BCM)
+
+  GPIO.setup(VL_pin, GPIO.IN)
+  GPIO.setup(VH_pin, GPIO.IN)
+  GPIO.setup(HL_pin, GPIO.IN)
+  GPIO.setup(HR_pin, GPIO.IN)
 
   # initialize the camera 
   #camera = picamera.PiCamera()
@@ -37,11 +52,13 @@ class ControlPackage :
   motorV = StepMotor(0x60, debug=False)
   motorV.setFreq(1600)
   motorV.setPort("M3M4")
+  motorV.setSensor(VH_pin, VL_pin)
 
   # initialize horizontal step motor
   motorH = StepMotor(0x60, debug=False)
   motorH.setFreq(1600)
   motorH.setPort("M1M2")
+  motorH.setSensor(HL_pin, HR_pin)
 
   @staticmethod
   def release():
@@ -96,21 +113,39 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
       dir = self.path.split('/')[-1]
       print "motor %s move: [%s %s]" % (motorid, dir, speed)
 
+      status = True	# move success
+      statstr = 'Motor move complete.'
+
       if motorid.lower() == 'v':
         ControlPackage.motorV.setSpeed(speed)
         ControlPackage.motorV.step(steps, dir.upper(), 'DOUBLE')
         ControlPackage.motorV.release()
+
+        if dir.upper() == 'FORWARD' and GPIO.input(ControlPackage.VH_pin):
+          status = False
+          statstr = 'Vertical highest limit reached!'
+
+        if dir.upper() == 'BACKWARD' and GPIO.input(ControlPackage.VL_pin):
+          status = False
+          statstr = 'Vertical lowest limit reached!'
+
       else:
         ControlPackage.motorH.setSpeed(speed)
         ControlPackage.motorH.step(steps, dir.upper(), 'DOUBLE')
         ControlPackage.motorH.release()
  
-      status = True	# move success
+        if dir.upper() == 'FORWARD' and GPIO.input(ControlPackage.HL_pin):
+          status = False
+          statstr = 'Horizontal leftmost limit reached!'
+
+        if dir.upper() == 'BACKWARD' and GPIO.input(ControlPackage.HR_pin):
+          status = False
+          statstr = 'Horizontal rightmost limit reached!'
 
       self.send_response(200)
       self.send_header('Content-Type', 'application/json')
       self.end_headers()
-      self.wfile.write('{"status": "' + str(status) + '"}')
+      self.wfile.write('{"status": "' + str(status) + '", "detail": "' + statstr + '"}')
 
     else:
       self.send_response(403)

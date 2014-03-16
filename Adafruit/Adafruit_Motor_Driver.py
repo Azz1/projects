@@ -2,6 +2,7 @@
 
 import time
 import math
+import RPi.GPIO as GPIO
 from Adafruit_I2C import Adafruit_I2C
 
 # ============================================================================
@@ -169,6 +170,10 @@ class StepMotor :
     else:
       self.microstepcurve = [0, 25, 50, 74, 98, 120, 141, 162, 180, 197, 212, 225, 236, 244, 250, 253, 255]
 
+  def setSensor(self, fpin, bpin) :
+    self.FWD_pin = fpin
+    self.BKWD_pin = bpin
+
   def setPort(self, port):
     "Select Motor Shield port"
     if port == 'M1M2':
@@ -292,6 +297,19 @@ class StepMotor :
     ocra = 255
     ocrb = 255
     
+    #check sensor if reaching the limit
+    if dir == 'FORWARD' and self.FWD_pin > 0:
+      #print 'FORWARD pin %s check ...' % str(self.FWD_pin)
+      if GPIO.input(self.FWD_pin) :
+        #print 'FORWARD pin %s raised!' % str(self.FWD_pin)
+        return self.currentstep 
+
+    elif dir == 'BACKWARD' and self.BKWD_pin > 0:
+      #print 'BACKWARD pin %s check ...' % str(self.BKWD_pin)
+      if GPIO.input(self.BKWD_pin) :
+        #print 'BACKWARD pin %s raised!' % str(self.BKWD_pin)
+        return self.currentstep 
+
     # next determine what sort of stepping procedure we're up to
     if style == 'SINGLE' :
       if (self.currentstep/(self.MICROSTEPS/2)) % 2 : # we're at an odd step, weird
