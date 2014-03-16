@@ -24,6 +24,10 @@ jQuery(document).ready(function() {
     updateImage();
 });
 
+$( "#btn_snapshot" ).click(function() {
+    popImage('/api/snapshot','Snapshot Image');
+});
+
 $( "#btn_refresh" ).click(function() {
     $.post("/api/refresh", {}, function(msg) {
     })

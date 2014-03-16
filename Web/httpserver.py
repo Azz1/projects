@@ -20,6 +20,8 @@ motorlib_path = os.path.abspath('../Adafruit')
 sys.path.append(motorlib_path)
 from Adafruit_Motor_Driver import StepMotor
  
+camera_lock = threading.Lock()
+
 class ControlPackage :
 
   # initialize the camera 
@@ -55,11 +57,13 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
       print 'POST /api/refresh'
       try:
         # TAKE A PHOTO
-        #ControlPackage.camera.start_preview()
-        #time.sleep(0.5)
-        #ControlPackage.camera.capture('temp/image.jpg', format='jpeg', resize=(ControlPackage.width,ControlPackage.height))
+        with camera_lock :
+          #ControlPackage.camera.start_preview()
+          #time.sleep(0.5)
+          #ControlPackage.camera.capture('temp/image.jpg', format='jpeg', resize=(ControlPackage.width,ControlPackage.height))
 
-        os.system('raspistill -o temp/image.jpg -w ' + str(ControlPackage.width) + ' -h ' + str(ControlPackage.height) + ' -br ' + str(ControlPackage.brightness))
+          os.system('raspistill -o temp/image.jpg -w ' + str(ControlPackage.width) + ' -h ' + str(ControlPackage.height) + ' -br ' + str(ControlPackage.brightness))
+
       finally:
         pass
         #ControlPackage.camera.stop_preview()
@@ -126,6 +130,34 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
       self.send_header('Content-Type', 'application/json')
       self.end_headers()
       self.wfile.write('{"time": "' + nowstring + '"}')
+
+    elif None != re.search('/api/snapshot$', self.path):
+      print 'GET /api/snapshot'
+      try:
+        # TAKE A PHOTO OF HIGH RESOLUTION
+        with camera_lock :
+
+          #ControlPackage.camera.start_preview()
+          #time.sleep(0.5)
+          #ControlPackage.camera.capture('temp/image.jpg', format='jpeg', resize=(ControlPackage.width,ControlPackage.height))
+
+          os.system('raspistill -o temp/simage.jpg -br ' + str(ControlPackage.brightness))
+      finally:
+        pass
+        #ControlPackage.camera.stop_preview()
+
+      #READ IMAGE AND PUT ON SCREEN
+      img = Image.open('temp/simage.jpg')
+      img = img.transpose(Image.ROTATE_180)
+
+      img.save('temp/snapimg.jpg', format='JPEG')
+
+      self.send_response(200)
+      self.send_header('Content-Type', 'application/jpeg')
+      self.end_headers()
+      with open('temp/snapimg.jpg', 'r') as content_file:
+        content = content_file.read()
+        self.wfile.write(content)
 
     elif None != re.search('/*.htm*', self.path):	# content html files
       filename = self.path.split('/')[-1]
