@@ -192,8 +192,7 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
 
       self.send_response(200)
       self.send_header('Content-Type', 'application/jpeg')
-      self.send_header('Content-Disposition', 'inline')
-      self.send_header('filename', 'snapshot.jpg')
+      self.send_header('Content-Disposition', 'inline;filename="snapshot.jpg"')
       self.end_headers()
       with open('temp/snapimg.jpg', 'r') as content_file:
         content = content_file.read()
