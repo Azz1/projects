@@ -79,7 +79,9 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
           #time.sleep(0.5)
           #ControlPackage.camera.capture('temp/image.jpg', format='jpeg', resize=(ControlPackage.width,ControlPackage.height))
 
-          os.system('raspistill -o temp/image.jpg -w ' + str(ControlPackage.width) + ' -h ' + str(ControlPackage.height) + ' -br ' + str(ControlPackage.brightness))
+          os.system('raspistill -o temp/image.jpg -w ' + str(ControlPackage.width) \
+                     + ' -h ' + str(ControlPackage.height) \
+                     + ' -sh 50 -hf -vf -br ' + str(ControlPackage.brightness))
 
       finally:
         pass
@@ -87,11 +89,11 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
 
       #READ IMAGE AND PUT ON SCREEN
       img = Image.open('temp/image.jpg')
-      basewidth = 800
-      wpercent = (basewidth/float(img.size[0]))
-      hsize = int((float(img.size[1])*float(wpercent)))
-      img = img.resize((basewidth,hsize), PIL.Image.ANTIALIAS)
-      img = img.transpose(Image.ROTATE_180)
+      #basewidth = 800
+      #wpercent = (basewidth/float(img.size[0]))
+      #hsize = int((float(img.size[1])*float(wpercent)))
+      #img = img.resize((basewidth,hsize), PIL.Image.ANTIALIAS)
+      #img = img.transpose(Image.ROTATE_180)
 
       output = StringIO()
       img.save(output, format='JPEG')
@@ -176,19 +178,22 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
           #time.sleep(0.5)
           #ControlPackage.camera.capture('temp/image.jpg', format='jpeg', resize=(ControlPackage.width,ControlPackage.height))
 
-          os.system('raspistill -o temp/simage.jpg -br ' + str(ControlPackage.brightness))
+          os.system('raspistill -o temp/simage.jpg -hf -vf -br ' \
+                                + str(ControlPackage.brightness))
       finally:
         pass
         #ControlPackage.camera.stop_preview()
 
       #READ IMAGE AND PUT ON SCREEN
       img = Image.open('temp/simage.jpg')
-      img = img.transpose(Image.ROTATE_180)
+      #img = img.transpose(Image.ROTATE_180)
 
       img.save('temp/snapimg.jpg', format='JPEG')
 
       self.send_response(200)
       self.send_header('Content-Type', 'application/jpeg')
+      self.send_header('Content-Disposition', 'inline')
+      self.send_header('filename', 'snapshot.jpg')
       self.end_headers()
       with open('temp/snapimg.jpg', 'r') as content_file:
         content = content_file.read()
