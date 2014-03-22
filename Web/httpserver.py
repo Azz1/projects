@@ -81,7 +81,7 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
 
           os.system('raspistill -o temp/image.jpg -w ' + str(ControlPackage.width) \
                      + ' -h ' + str(ControlPackage.height) \
-                     + ' -sh 50 -hf -vf -br ' + str(ControlPackage.brightness))
+                     + ' -hf -vf -br ' + str(ControlPackage.brightness))
 
       finally:
         pass
@@ -133,7 +133,7 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
 
       else:
         ControlPackage.motorH.setSpeed(speed)
-        ControlPackage.motorH.step(steps, dir.upper(), 'DOUBLE')
+        ControlPackage.motorH.step(steps, dir.upper(), 'MICROSTEP')
         ControlPackage.motorH.release()
  
         if dir.upper() == 'FORWARD' and GPIO.input(ControlPackage.HL_pin):
@@ -185,16 +185,16 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
         #ControlPackage.camera.stop_preview()
 
       #READ IMAGE AND PUT ON SCREEN
-      img = Image.open('temp/simage.jpg')
+      #img = Image.open('temp/simage.jpg')
       #img = img.transpose(Image.ROTATE_180)
 
-      img.save('temp/snapimg.jpg', format='JPEG')
+      #img.save('temp/snapimg.jpg', format='JPEG')
 
       self.send_response(200)
       self.send_header('Content-Type', 'application/jpeg')
       self.send_header('Content-Disposition', 'inline;filename="snapshot.jpg"')
       self.end_headers()
-      with open('temp/snapimg.jpg', 'r') as content_file:
+      with open('temp/simage.jpg', 'r') as content_file:
         content = content_file.read()
         self.wfile.write(content)
 
