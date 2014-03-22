@@ -1,0 +1,99 @@
+body
+{
+  font-family: "宋体";
+  font-weight: normal;
+  font-size: 1em;
+  color: #999999;
+  background-color: #052030; 
+}
+
+.heading 
+{
+  font-weight: bold;
+  font-size: large;
+}
+
+.panel 
+{
+}
+
+.panel canvas
+{
+  border-style: solid;
+  border-width: 1px;
+}
+
+.panel table
+{
+  border-style: solid;
+  border-width: 1px;
+}
+
+.buttons 
+{
+}
+
+.button:hover {
+  background: -webkit-gradient( linear, left top, left bottom, color-stop(0.05, #378de5), color-stop(1, #79bbff) );
+  background: -moz-linear-gradient( center top, #378de5 5%, #79bbff 100% );
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#378de5', endColorstr='#79bbff');
+  background-color: #378de5;
+}
+
+.button {
+  -moz-box-shadow: inset 0px 1px 0px 0px #bbdaf7;
+  -webkit-box-shadow: inset 0px 1px 0px 0px #bbdaf7;
+  box-shadow: inset 0px 1px 0px 0px #bbdaf7;
+  background: -webkit-gradient( linear, left top, left bottom, color-stop(0.05, #79bbff), color-stop(1, #378de5) );
+  background: -moz-linear-gradient( center top, #79bbff 5%, #378de5 100% );
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#79bbff', endColorstr='#378de5');
+  background-color: #79bbff;
+  -webkit-border-top-left-radius: 20px;
+  -moz-border-radius-topleft: 20px;
+  border-top-left-radius: 20px;
+  -webkit-border-top-right-radius: 20px;
+  -moz-border-radius-topright: 20px;
+  border-top-right-radius: 20px;
+  -webkit-border-bottom-right-radius: 20px;
+  -moz-border-radius-bottomright: 20px;
+  border-bottom-right-radius: 20px;
+  -webkit-border-bottom-left-radius: 20px;
+  -moz-border-radius-bottomleft: 20px;
+  border-bottom-left-radius: 20px;
+  text-indent: 0;
+  border: 1px solid #84bbf3;
+  display: inline-block;
+  color: #222222;
+  font-size: 12px;
+  font-weight: bold;
+  font-style: normal;
+  height: 65px;
+  line-height: 65px;
+  width: 86px;
+  text-decoration: none;
+  text-align: center;
+  text-shadow: 1px 1px 0px #528ecc;
+}
+
+.foot 
+{
+  color: #000000;
+  background-color: #a0a0a0;
+}
+
+.params
+{
+  vertical-align: top;
+}
+
+.param_name
+{
+}
+
+.param_value
+{
+}
+
+.param_time
+{
+}

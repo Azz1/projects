@@ -2,15 +2,15 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>My Telescope Project</title>
+  <title>天文望远镜自动化项目</title>
   <meta name="viewport" content="user-scalable=yes, initial-scale=1.0, maximum-scale=1.0, width=device-width" />
-  <link rel="stylesheet" href="default.css" />
+  <link rel="stylesheet" href="default_zh.css" />
   <script type="text/javascript" src="jquery-1.6.js"></script>
   <script type="text/javascript" src="popupimage.js"></script>
 </head>
 <body>
   <form action="/" method="post" id="form_id">
-    <div class="heading">My Motorized Telescope</div>
+    <div class="heading">我的天文望远镜</div>
     <div class="panel">
       <table>
 	<tr>
@@ -22,11 +22,11 @@
 	  <td class="params">
 	      <table>
 	  	 <tr>
-	    	   <td><span class="param_name">Language: </span></td>
-	    	   <td><span class="param_value"><a href="index_zh.html">中文</a></span></td>
+	    	   <td><span class="param_name">语言: </span></td>
+	    	   <td><span class="param_value"><a href="index.html">English</a></span></td>
 	  	 </tr>
 	  	 <tr>
-	    	   <td><span class="param_name">Time: </span></td>
+	    	   <td><span class="param_name">时间: </span></td>
 	    	   <td><span id="time_id" class="param_time"></span></td>
 	  	 </tr>
 	  	 <tr>
@@ -34,19 +34,19 @@
 	    	   <td><span class="param_value">&nbsp;</span></td>
 	  	 </tr>
 	  	 <tr>
-	    	   <td><span class="param_name">V-Speed(rpm): </span></td>
+	    	   <td><span class="param_name">垂直步进速度(rpm): </span></td>
 	    	   <td><span class="param_value"><input type="text" name="vspeed" id="vspeed" tabindex="1" value="30" /></span></td>
 	  	 </tr>
 	  	 <tr>
-	    	   <td><span class="param_name">V-Steps(steps): </span></td>
+	    	   <td><span class="param_name">垂直步进步数(步): </span></td>
 	    	   <td><span class="param_value"><input type="text" name="vsteps" id="vsteps" tabindex="2" value="100" /></span></td>
 	  	 </tr>
 	  	 <tr>
-	    	   <td><span class="param_name">H-Speed(rpm): </span></td>
+	    	   <td><span class="param_name">水平步进速度(rpm): </span></td>
 	    	   <td><span class="param_value"><input type="text" name="hspeed" id="hspeed" tabindex="3" value="5" /></span></td>
 	  	 </tr>
 	  	 <tr>
-	    	   <td><span class="param_name">H-Steps(steps): </span></td>
+	    	   <td><span class="param_name">水平步进步数(步): </span></td>
 	    	   <td><span class="param_value"><input type="text" name="hsteps" id="hsteps" tabindex="4" value="5" /></span></td>
 	  	 </tr>
 	  	 <tr>
@@ -60,13 +60,13 @@
 	  <td colspan="2" class="buttons">
 	      <table>
 	  	 <tr>
-	    	   <td><span id="btn_up" class="button">Up</span></td>
-	    	   <td><span id="btn_down" class="button">Down</span></td>
-	    	   <td><span id="btn_left" class="button">Left</span></td>
-	    	   <td><span id="btn_right" class="button">Right</span></td>
+	    	   <td><span id="btn_up" class="button">上移</span></td>
+	    	   <td><span id="btn_down" class="button">下移</span></td>
+	    	   <td><span id="btn_left" class="button">左移</span></td>
+	    	   <td><span id="btn_right" class="button">右移</span></td>
 	    	   <td>&nbsp;</td>
-	    	   <td><span id="btn_refresh" class="button">Refresh</span></td>
-	    	   <td><span id="btn_snapshot" class="button">Snapshot</span></td>
+	    	   <td><span id="btn_refresh" class="button">刷新</span></td>
+	    	   <td><span id="btn_snapshot" class="button">快照</span></td>
 	  	 </tr>
 	      </table>
 	  </td>
@@ -74,7 +74,7 @@
       </table> 
     </div>
     <div class="foot">
-	<b>Status:</b>
+	<b>状态:</b>
 	<span id="status_id" ></span>
     </div>
   </form>
