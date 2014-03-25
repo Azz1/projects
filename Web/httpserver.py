@@ -81,7 +81,7 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
 
           os.system('raspistill -o temp/image.jpg -w ' + str(ControlPackage.width) \
                      + ' -h ' + str(ControlPackage.height) \
-                     + ' -hf -vf -br ' + str(ControlPackage.brightness))
+                     + ' -ex night -hf -vf -br ' + str(ControlPackage.brightness))
 
       finally:
         pass

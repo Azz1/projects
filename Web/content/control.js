@@ -29,6 +29,7 @@ $( "#btn_snapshot" ).click(function() {
 });
 
 $( "#btn_refresh" ).click(function() {
+    $("#status_id").html("Refreshing ...");	
     $.post("/api/refresh", {}, function(msg) {
     })
     .done(function(msg) {
@@ -41,6 +42,7 @@ $( "#btn_refresh" ).click(function() {
         var img = new Image();
 	img.src = "data:image/jpeg;base64," + msg['image'];
         img.onload = function() {
+            $("#status_id").html("Refreshed");	
             context.drawImage(this, 0, 0);
             v_updimage = setTimeout(updateImage, 2000); // 2 * 1000 miliseconds
         }
