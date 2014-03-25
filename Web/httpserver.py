@@ -81,7 +81,9 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
 
           os.system('raspistill -o temp/image.jpg -w ' + str(ControlPackage.width) \
                      + ' -h ' + str(ControlPackage.height) \
-                     + ' -ex night -hf -vf -br ' + str(ControlPackage.brightness))
+                     + ' -ss 2500000 -ISO 800 -hf -vf -br ' + str(ControlPackage.brightness))
+                    # + ' -ss 2500000 -ISO 800 -hf -vf -br ' + str(ControlPackage.brightness)) #night long exposure mode
+                    # + ' -hf -vf -br ' + str(ControlPackage.brightness)) #normal mode
 
       finally:
         pass
