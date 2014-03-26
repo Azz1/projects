@@ -15,7 +15,7 @@
       <table>
 	<tr>
 	  <td>
-      	    <canvas id='canvas' width='800' height='600'>
+      	    <canvas id='canvas' width='800' height='600' >
         	    Canvas not supported
       	    </canvas>
 	  </td>
@@ -32,6 +32,9 @@
 	  	 <tr>
 	    	   <td><span class="param_name">&nbsp;</span></td>
 	    	   <td><span class="param_value">&nbsp;</span></td>
+	  	 </tr>
+	  	 <tr>
+	    	   <td colspan="2"><span class="param_name"><b>马达参数</b></span></td>
 	  	 </tr>
 	  	 <tr>
 	    	   <td><span class="param_name">垂直步进速度(rpm): </span></td>
@@ -52,6 +55,40 @@
 	  	 <tr>
 	    	   <td><span class="param_name">&nbsp;</span></td>
 	    	   <td><span class="param_value">&nbsp;</span></td>
+	  	 </tr>
+	  	 <tr>
+	    	   <td colspan="2"><span class="param_name"><b>光学参数</b></span></td>
+	  	 </tr>
+	  	 <tr>
+	    	   <td><span class="param_name">曝光数间(毫秒): </span></td>
+	    	   <td><span class="param_value"><input type="text" name="ss" id="ss" tabindex="5" value="1" /></span></td>
+	  	 </tr>
+	  	 <tr>
+	    	   <td><span class="param_name">ISO: </span></td>
+	    	   <td><span class="param_value"><input type="text" name="iso" id="iso" tabindex="6" value="400" /></span></td>
+	  	 </tr>
+	  	 <tr>
+	    	   <td><span class="param_name">亮度(0-100): </span></td>
+	    	   <td><span class="param_value"><input type="text" name="br" id="br" tabindex="7" value="60" /></span></td>
+	  	 </tr>
+	  	 <tr>
+	    	   <td><span class="param_name">锐度(-100-100): </span></td>
+	    	   <td><span class="param_value"><input type="text" name="sh" id="sh" tabindex="8" value="0" /></span></td>
+	  	 </tr>
+	  	 <tr>
+	    	   <td><span class="param_name">对比度(-100-100): </span></td>
+	    	   <td><span class="param_value"><input type="text" name="co" id="co" tabindex="9" value="0" /></span></td>
+	  	 </tr>
+	  	 <tr>
+	    	   <td><span class="param_name">饱和度(-100-100): </span></td>
+	    	   <td><span class="param_value"><input type="text" name="sa" id="sa" tabindex="10" value="0" /></span></td>
+	  	 </tr>
+	  	 <tr>
+	    	   <td colspan='2'><span class="param_name" ><br />
+			<input type="radio" name="cmode" value="day" checked>白昼/明亮物体&nbsp;
+			<input type="radio" name="cmode" value="night">夜间
+                       </span>
+		   </td>
 	  	 </tr>
 	      </table>
 	  </td>

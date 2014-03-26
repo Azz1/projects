@@ -43,22 +43,28 @@ class ControlPackage :
   #camera = picamera.PiCamera()
   width = 800
   height = 600
-  brightness = 60
-  #camera.vflip = False
-  #camera.hflip = False
-  #camera.brightness = 60
+  brightness = 50	#0-100 50 default
+  sharpness = 0		#-100-100 0 default
+  contrast = 0		#-100-100 0 default
+  saturation = 0	#-100-100 0 default
+  ss = 1000		#microsecond
+  iso = 400		#100-800 400 default
 
   # initialize vertical step motor
   motorV = StepMotor(0x60, debug=False)
   motorV.setFreq(1600)
   motorV.setPort("M3M4")
   motorV.setSensor(VH_pin, VL_pin)
+  vspeed = 30
+  vsteps = 100
 
   # initialize horizontal step motor
   motorH = StepMotor(0x60, debug=False)
   motorH.setFreq(1600)
   motorH.setPort("M1M2")
   motorH.setSensor(HL_pin, HR_pin)
+  hspeed = 5
+  hsteps = 5
 
   @staticmethod
   def release():
@@ -67,23 +73,57 @@ class ControlPackage :
     #ControlPackage.camera.close()
     #del ControlPackage.camera
 
+  @staticmethod
+  def Validate():
+    if ControlPackage.brightness < 0: ControlPackage.brightness = 0
+    elif ControlPackage.brightness > 100: ControlPackage.brightness = 100
+    if ControlPackage.sharpness < -100: ControlPackage.sharpness = -100
+    elif ControlPackage.sharpness > 100: ControlPackage.sharpness = 100
+    if ControlPackage.contrast < -100: ControlPackage.contrast = -100
+    elif ControlPackage.contrast > 100: ControlPackage.contrast = 100
+    if ControlPackage.saturation < -100: ControlPackage.saturation = -100
+    elif ControlPackage.saturation > 100: ControlPackage.saturation = 100
+    if ControlPackage.iso < 100: ControlPackage.iso = 100
+    elif ControlPackage.iso > 800: ControlPackage.iso = 800
+    if ControlPackage.ss < 100 : ControlPackage.ss = 100
+
+    if ControlPackage.vspeed <= 0 : ControlPackage.vspeed = 1
+    if ControlPackage.vsteps <= 0 : ControlPackage.vsteps = 1
+    if ControlPackage.hspeed <= 0 : ControlPackage.hspeed = 1
+    if ControlPackage.hsteps <= 0 : ControlPackage.vsteps = 1
+
+
 class HTTPRequestHandler(BaseHTTPRequestHandler):
  
   def do_POST(self):
     if None != re.search('/api/refresh$', self.path):
       print 'POST /api/refresh'
       try:
+        length = int(self.headers.getheader('content-length'))
+        data = cgi.parse_qs(self.rfile.read(length), keep_blank_values=1)
+        ControlPackage.ss = int(float(data['ss'][0]) * 1000)
+        ControlPackage.iso = int(data['iso'][0])
+        ControlPackage.brightness = int(data['br'][0])
+        ControlPackage.sharpness = int(data['sh'][0])
+        ControlPackage.contrast = int(data['co'][0])
+        ControlPackage.saturation = int(data['sa'][0])
+	ControlPackage.Validate()
+
         # TAKE A PHOTO
         with camera_lock :
           #ControlPackage.camera.start_preview()
           #time.sleep(0.5)
           #ControlPackage.camera.capture('temp/image.jpg', format='jpeg', resize=(ControlPackage.width,ControlPackage.height))
 
-          os.system('raspistill -o temp/image.jpg -w ' + str(ControlPackage.width) \
+	  # to enable -ss option, which is shutter speed, update the firmware sudo rpi-update
+          cmdstr = 'raspistill -o temp/image.jpg -w ' + str(ControlPackage.width) \
                      + ' -h ' + str(ControlPackage.height) \
-                     + ' -ss 2500000 -ISO 800 -hf -vf -br ' + str(ControlPackage.brightness))
-                    # + ' -ss 2500000 -ISO 800 -hf -vf -br ' + str(ControlPackage.brightness)) #night long exposure mode
-                    # + ' -hf -vf -br ' + str(ControlPackage.brightness)) #normal mode
+                     + ' -hf -vf -br ' + str(ControlPackage.brightness) \
+                     + ' -ss ' + str(ControlPackage.ss) + ' -ISO ' + str(ControlPackage.iso) \
+                     + ' -sh ' + str(ControlPackage.sharpness) + ' -co ' + str(ControlPackage.contrast) \
+                     + ' -sa ' + str(ControlPackage.saturation) 
+          print cmdstr
+          os.system( cmdstr )
 
       finally:
         pass
@@ -121,6 +161,8 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
       statstr = 'Motor move complete.'
 
       if motorid.lower() == 'v':
+	ControlPackage.vspeed = speed
+	ControlPackage.vsteps = steps
         ControlPackage.motorV.setSpeed(speed)
         ControlPackage.motorV.step(steps, dir.upper(), 'DOUBLE')
         ControlPackage.motorV.release()
@@ -134,6 +176,8 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
           statstr = 'Vertical lowest limit reached!'
 
       else:
+	ControlPackage.hspeed = speed
+	ControlPackage.hsteps = steps
         ControlPackage.motorH.setSpeed(speed)
         ControlPackage.motorH.step(steps, dir.upper(), 'MICROSTEP')
         ControlPackage.motorH.release()
@@ -170,9 +214,35 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
       self.end_headers()
       self.wfile.write('{"time": "' + nowstring + '"}')
 
-    elif None != re.search('/api/snapshot$', self.path):
+    if None != re.search('/api/init$', self.path):	# load initial params
+      self.send_response(200)
+      self.send_header('Content-Type', 'application/json')
+      self.end_headers()
+      self.wfile.write('{' \
+		        + '"vspeed": "' + str(ControlPackage.vspeed) + '",' \
+		        + '"vsteps": "' + str(ControlPackage.vsteps) + '",' \
+		        + '"hspeed": "' + str(ControlPackage.hspeed) + '",' \
+		        + '"hsteps": "' + str(ControlPackage.hsteps) + '",' \
+		        + '"ss": "' + str(ControlPackage.ss/1000.0) + '",' \
+		        + '"iso": "' + str(ControlPackage.iso) + '",' \
+		        + '"br": "' + str(ControlPackage.brightness) + '",' \
+		        + '"sh": "' + str(ControlPackage.sharpness) + '",' \
+		        + '"co": "' + str(ControlPackage.contrast) + '",' \
+		        + '"sa": "' + str(ControlPackage.saturation) + '"' \
+			+ '}')
+
+    elif None != re.search('/api/snapshot', self.path):
       print 'GET /api/snapshot'
       try:
+        ControlPackage.ss = int(float(self.path.split('/')[-6]) * 1000)
+        ControlPackage.iso = int(self.path.split('/')[-5])
+        ControlPackage.brightness = int(self.path.split('/')[-4])
+        ControlPackage.sharpness = int(self.path.split('/')[-3])
+        ControlPackage.contrast = int(self.path.split('/')[-2])
+        ControlPackage.saturation = int(self.path.split('/')[-1])
+
+	ControlPackage.Validate()
+
         # TAKE A PHOTO OF HIGH RESOLUTION
         with camera_lock :
 
@@ -180,8 +250,13 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
           #time.sleep(0.5)
           #ControlPackage.camera.capture('temp/image.jpg', format='jpeg', resize=(ControlPackage.width,ControlPackage.height))
 
-          os.system('raspistill -o temp/simage.jpg -hf -vf -br ' \
-                                + str(ControlPackage.brightness))
+	  cmdstr = 'raspistill -o temp/simage.jpg -hf -vf -br ' \
+                     + str(ControlPackage.brightness) \
+                     + ' -ss ' + str(ControlPackage.ss) + ' -ISO ' + str(ControlPackage.iso) \
+                     + ' -sh ' + str(ControlPackage.sharpness) + ' -co ' + str(ControlPackage.contrast) \
+                     + ' -sa ' + str(ControlPackage.saturation) 
+	  print cmdstr
+          os.system( cmdstr )
       finally:
         pass
         #ControlPackage.camera.stop_preview()

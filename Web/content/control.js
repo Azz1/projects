@@ -18,6 +18,11 @@ jQuery(document).ready(function() {
         //$( "#btn_refresh" ).click();
     }
   
+    $.getJSON( "/api/init", function( data ) {
+  	    $.each( data, function( key, val ) {
+              $("#"+ key ).val(val); 
+  	    });
+	});
 
     updateTime();
     setInterval(updateTime, 5000); // 5 * 1000 miliseconds
@@ -25,12 +30,17 @@ jQuery(document).ready(function() {
 });
 
 $( "#btn_snapshot" ).click(function() {
-    popImage('/api/snapshot','Snapshot Image');
+    popImage('/api/snapshot/' + $("#ss").val() + '/' + $("#iso").val() + '/' + $("#br").val() + '/'
+	                      + $("#sh").val() + '/' + $("#co").val() + '/' + $("#sa").val()
+		,'Snapshot Image');
 });
 
 $( "#btn_refresh" ).click(function() {
     $("#status_id").html("Refreshing ...");	
-    $.post("/api/refresh", {}, function(msg) {
+    $.post("/api/refresh", {
+			   "ss": $( "#ss" ).val(), "iso": $("#iso").val(), "br": $("#br").val(),
+			   "sh": $( "#sh" ).val(), "co": $("#co").val(), "sa": $("#sa").val() 
+			   }, function(msg) {
     })
     .done(function(msg) {
         if( v_updimage != null )
@@ -49,7 +59,7 @@ $( "#btn_refresh" ).click(function() {
 
     })
     .fail(function() {
-      alert( "camera controll error!" );
+      $("#status_id").html("camera control error!" );
     })
     .always(function() {
   });
@@ -63,7 +73,7 @@ $( "#btn_up" ).click(function() {
 	    $("#status_id").html(data["detail"]);	
     })
     .fail(function() {
-      alert( "motor controll error!" );
+      $("#status_id").html("motor control error!" );
     })
     .always(function() {
   });
@@ -77,7 +87,7 @@ $( "#btn_down" ).click(function() {
 	    $("#status_id").html(data["detail"]);	
     })
     .fail(function() {
-      alert( "motor controll error!" );
+      $("#status_id").html("motor control error!" );
     })
     .always(function() {
   });
@@ -91,7 +101,7 @@ $( "#btn_left" ).click(function() {
 	    $("#status_id").html(data["detail"]);	
     })
     .fail(function() {
-      alert( "motor controll error!" );
+      $("#status_id").html("motor control error!" );
     })
     .always(function() {
   });
@@ -105,8 +115,19 @@ $( "#btn_right" ).click(function() {
 	    $("#status_id").html(data["detail"]);	
     })
     .fail(function() {
-      alert( "motor controll error!" );
+      $("#status_id").html("motor control error!" );
     })
     .always(function() {
   });
+});
+
+$('input[type=radio][name=cmode]').change(function() {
+        if (this.value == 'day') {
+	    $("#ss").val('1');
+	    $("#iso").val('400');
+        }
+        else {
+	    $("#ss").val('1000');
+	    $("#iso").val('400');
+        }
 });
