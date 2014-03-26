@@ -22,11 +22,11 @@ jQuery(document).ready(function() {
   	    $.each( data, function( key, val ) {
               $("#"+ key ).val(val); 
   	    });
+    	    updateImage();
 	});
 
     updateTime();
     setInterval(updateTime, 5000); // 5 * 1000 miliseconds
-    updateImage();
 });
 
 $( "#btn_snapshot" ).click(function() {
