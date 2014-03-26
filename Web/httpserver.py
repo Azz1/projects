@@ -214,7 +214,7 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
       self.end_headers()
       self.wfile.write('{"time": "' + nowstring + '"}')
 
-    if None != re.search('/api/init$', self.path):	# load initial params
+    elif None != re.search('/api/init$', self.path):	# load initial params
       self.send_response(200)
       self.send_header('Content-Type', 'application/json')
       self.end_headers()
