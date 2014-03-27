@@ -5,6 +5,7 @@ from SocketServer import ThreadingMixIn
 import threading
 import argparse
 import json
+import Cookie
 import time, datetime
 import re
 import os
@@ -95,7 +96,21 @@ class ControlPackage :
 
 class HTTPRequestHandler(BaseHTTPRequestHandler):
  
+  def __getCookie(self):
+    if "Cookie" in self.headers:
+      self.cookie = Cookie.SimpleCookie(self.headers["Cookie"])
+    else:
+      self.cookie = Cookie.SimpleCookie()
+      self.cookie['refined'] = 'false'
+      self.cookie['cmode'] = 'day'
+
+  def __sendCookie(self):
+    for c in self.cookie.values():
+      self.send_header('Set-Cookie', c.output(header='').lstrip())
+
   def do_POST(self):
+    self.__getCookie()
+
     if None != re.search('/api/refresh$', self.path):
       print 'POST /api/refresh'
       try:
@@ -145,6 +160,7 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
 
       self.send_response(200)
       self.send_header('Content-Type', 'application/json')
+      self.__sendCookie()
       self.end_headers()
       self.wfile.write('{"image": "' + imgstr + '"}')
 
@@ -160,11 +176,15 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
       status = True	# move success
       statstr = 'Motor move complete.'
 
+      move_method = 'DOUBLE'
       if motorid.lower() == 'v':
+        if self.cookie['refined'].value == 'true':
+      	  move_method = 'MICROSTEP'
+
 	ControlPackage.vspeed = speed
 	ControlPackage.vsteps = steps
         ControlPackage.motorV.setSpeed(speed)
-        ControlPackage.motorV.step(steps, dir.upper(), 'DOUBLE')
+        ControlPackage.motorV.step(steps, dir.upper(), move_method)
         ControlPackage.motorV.release()
 
         if dir.upper() == 'FORWARD' and GPIO.input(ControlPackage.VH_pin):
@@ -192,17 +212,21 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
 
       self.send_response(200)
       self.send_header('Content-Type', 'application/json')
+      self.__sendCookie()
       self.end_headers()
       self.wfile.write('{"status": "' + str(status) + '", "detail": "' + statstr + '"}')
 
     else:
       self.send_response(403)
       self.send_header('Content-Type', 'application/json')
+      self.__sendCookie()
       self.end_headers()
  
     return
  
   def do_GET(self):
+    self.__getCookie()
+
     if None != re.search('/api/gettime$', self.path):	# get server time
       mytz="%+4.4d" % (time.timezone / -(60*60) * 100) # time.timezone counts westwards!
       dt  = datetime.datetime.now()
@@ -211,12 +235,14 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
  
       self.send_response(200)
       self.send_header('Content-Type', 'application/json')
+      self.__sendCookie()
       self.end_headers()
       self.wfile.write('{"time": "' + nowstring + '"}')
 
     elif None != re.search('/api/init$', self.path):	# load initial params
       self.send_response(200)
       self.send_header('Content-Type', 'application/json')
+      self.__sendCookie()
       self.end_headers()
       self.wfile.write('{' \
 		        + '"vspeed": "' + str(ControlPackage.vspeed) + '",' \
@@ -270,6 +296,7 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
       self.send_response(200)
       self.send_header('Content-Type', 'application/jpeg')
       self.send_header('Content-Disposition', 'inline;filename="snapshot.jpg"')
+      self.__sendCookie()
       self.end_headers()
       with open('temp/simage.jpg', 'r') as content_file:
         content = content_file.read()
@@ -310,6 +337,7 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
     else:
       self.send_response(403)
       self.send_header('Content-Type', 'application/json')
+      self.__sendCookie()
       self.end_headers()
  
     return
@@ -322,6 +350,7 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
     if os.path.isfile(filepath) :
       self.send_response(200)
       self.send_header('Content-Type', contenttype)
+      self.__sendCookie()
       self.end_headers()
       with open(filepath, 'r') as content_file:
         content = content_file.read()
@@ -330,6 +359,7 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
     else :
       self.send_response(403)
       self.send_header('Content-Type', contenttype)
+      self.__sendCookie()
       self.end_headers()
       return False
  

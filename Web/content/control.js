@@ -25,6 +25,18 @@ jQuery(document).ready(function() {
     	    updateImage();
 	});
 
+    if( $.cookie("refined") == "true" )
+        $('input[type=checkbox][name=refined]').prop("checked", true);
+    else
+        $('input[type=checkbox][name=refined]').prop("checked", false);
+
+    if( $.cookie("cmode") == "night" )
+        $('input[type=radio][name=cmode]')[0].checked = false;
+    else
+        $('input[type=radio][name=cmode]')[0].checked = true;
+
+    $('input[type=radio][name=cmode]').change();
+
     updateTime();
     setInterval(updateTime, 5000); // 5 * 1000 miliseconds
 });
@@ -123,11 +135,20 @@ $( "#btn_right" ).click(function() {
 
 $('input[type=radio][name=cmode]').change(function() {
         if (this.value == 'day') {
+	    $.cookie("cmode", "day");
 	    $("#ss").val('1');
 	    $("#iso").val('400');
         }
         else {
+	    $.cookie("cmode", "night");
 	    $("#ss").val('1000');
 	    $("#iso").val('400');
         }
+});
+
+$('input[type=checkbox][name=refined]').click( function(){
+    if( $(this).is(':checked') ) 
+	$.cookie("refined", "true");
+    else
+	$.cookie("refined", "false");
 });
