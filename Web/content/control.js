@@ -30,10 +30,13 @@ jQuery(document).ready(function() {
     else
         $('input[type=checkbox][name=refined]').prop("checked", false);
 
-    if( $.cookie("cmode") == "night" )
+    if( $.cookie("cmode") == "night" ) {
         $('input[type=radio][name=cmode]')[0].checked = false;
-    else
+        $('input[type=radio][name=cmode]')[1].checked = true;
+    } else {
         $('input[type=radio][name=cmode]')[0].checked = true;
+        $('input[type=radio][name=cmode]')[1].checked = false;
+    }
 
     $('input[type=radio][name=cmode]').change();
 
