@@ -42,8 +42,8 @@ class ControlPackage :
 
   # initialize the camera 
   #camera = picamera.PiCamera()
-  width = 800
-  height = 600
+  width = 700
+  height = 525
   brightness = 50	#0-100 50 default
   sharpness = 0		#-100-100 0 default
   contrast = 0		#-100-100 0 default

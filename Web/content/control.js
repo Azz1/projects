@@ -41,7 +41,7 @@ jQuery(document).ready(function() {
     $('input[type=radio][name=cmode]').change();
 
     updateTime();
-    setInterval(updateTime, 5000); // 5 * 1000 miliseconds
+    setInterval(updateTime, 5000); // 2 * 1000 miliseconds
 });
 
 $( "#btn_snapshot" ).click(function() {
@@ -145,7 +145,7 @@ $('input[type=radio][name=cmode]').change(function() {
         else {
 	    $.cookie("cmode", "night");
 	    $("#ss").val('1000');
-	    $("#iso").val('400');
+	    $("#iso").val('800');
         }
 });
 
