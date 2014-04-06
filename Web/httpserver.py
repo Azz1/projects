@@ -178,8 +178,11 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
 
       move_method = 'DOUBLE'
       if motorid.lower() == 'v':
-        if self.cookie['refined'].value == 'true':
-      	  move_method = 'MICROSTEP'
+        try:
+          if self.cookie['refined'].value == 'true':
+      	    move_method = 'MICROSTEP'
+        except:
+      	    move_method = 'DOUBLE'
 
 	ControlPackage.vspeed = speed
 	ControlPackage.vsteps = steps
