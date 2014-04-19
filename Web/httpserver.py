@@ -30,8 +30,10 @@ class ControlPackage :
   # Touch sensor GPIO pins
   VL_pin = 24
   VH_pin = 23
-  HL_pin = 17
-  HR_pin = 4
+  HL_pin = 7
+  HR_pin = 8
+  #HL_pin = 17
+  #HR_pin = 4
 
   GPIO.setmode(GPIO.BCM)
 
