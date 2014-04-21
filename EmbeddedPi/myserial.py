@@ -16,7 +16,10 @@ class EmbeddedPi:
     def ReadMR(self):
         cmd = './main m'
         ret = Popen(cmd, shell=True, stdout=PIPE).communicate()[0]
-        return float(ret)
+        val = float(ret) - 169.4;
+	if(val < 0):
+	    val += 360;
+        return val
 
     def ReadDistance(self):
         cmd = './main d'

@@ -30,17 +30,17 @@ class ControlPackage :
   # Touch sensor GPIO pins
   VL_pin = 24
   VH_pin = 23
-  HL_pin = 7
+  HL_pin = 25
   HR_pin = 8
   #HL_pin = 17
   #HR_pin = 4
 
   GPIO.setmode(GPIO.BCM)
 
-  GPIO.setup(VL_pin, GPIO.IN)
-  GPIO.setup(VH_pin, GPIO.IN)
-  GPIO.setup(HL_pin, GPIO.IN)
-  GPIO.setup(HR_pin, GPIO.IN)
+  GPIO.setup(VL_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+  GPIO.setup(VH_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+  GPIO.setup(HL_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+  GPIO.setup(HR_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
   # initialize the camera 
   #camera = picamera.PiCamera()

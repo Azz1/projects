@@ -137,9 +137,7 @@ double ReadMR()
             average += MeasureValue;
             TransReceProcess(pCmd,&len,RxBuf);
         }
-        MeasureValue = average / N - 160;
-	if(MeasureValue < 0)
-	    MeasureValue += 360;
+        MeasureValue = average / N;
     }
 
     // Stop MR
