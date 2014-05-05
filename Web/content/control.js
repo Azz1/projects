@@ -86,6 +86,7 @@ $( "#btn_refresh" ).click(function() {
     })
     .fail(function() {
       $("#status_id").html("camera control error!" );
+      v_updimage = setTimeout(updateImage, 5000); // 5 * 1000 miliseconds
     })
     .always(function() {
   });
