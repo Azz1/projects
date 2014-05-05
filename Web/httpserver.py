@@ -23,7 +23,8 @@ motorlib_path = os.path.abspath('../Adafruit')
 sys.path.append(motorlib_path)
 from Adafruit_Motor_Driver import StepMotor
  
-camera_lock = threading.Lock()
+camera_lock = threading.Semaphore()
+
 
 class ControlPackage :
 
@@ -37,10 +38,10 @@ class ControlPackage :
 
   GPIO.setmode(GPIO.BCM)
 
-  GPIO.setup(VL_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-  GPIO.setup(VH_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-  GPIO.setup(HL_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-  GPIO.setup(HR_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+  GPIO.setup(VL_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+  GPIO.setup(VH_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+  GPIO.setup(HL_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+  GPIO.setup(HR_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
   # initialize the camera 
   #camera = picamera.PiCamera()
@@ -50,8 +51,9 @@ class ControlPackage :
   sharpness = 0		#-100-100 0 default
   contrast = 0		#-100-100 0 default
   saturation = 0	#-100-100 0 default
-  ss = 1000		#microsecond
+  ss = 4000		#microsecond
   iso = 400		#100-800 400 default
+  videolen = 10		#video length
 
   # initialize vertical step motor
   motorV = StepMotor(0x60, debug=False)
@@ -127,23 +129,23 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
 	ControlPackage.Validate()
 
         # TAKE A PHOTO
-        with camera_lock :
-          #ControlPackage.camera.start_preview()
-          #time.sleep(0.5)
-          #ControlPackage.camera.capture('temp/image.jpg', format='jpeg', resize=(ControlPackage.width,ControlPackage.height))
+        camera_lock.acquire(); 
+        #ControlPackage.camera.start_preview()
+        #time.sleep(0.5)
+        #ControlPackage.camera.capture('temp/image.jpg', format='jpeg', resize=(ControlPackage.width,ControlPackage.height))
 
-	  # to enable -ss option, which is shutter speed, update the firmware sudo rpi-update
-          cmdstr = 'raspistill -o temp/image.jpg -w ' + str(ControlPackage.width) \
+	# to enable -ss option, which is shutter speed, update the firmware sudo rpi-update
+        cmdstr = 'raspistill -o temp/image.jpg -w ' + str(ControlPackage.width) \
                      + ' -h ' + str(ControlPackage.height) \
-                     + ' -hf -vf -br ' + str(ControlPackage.brightness) \
+                     + ' -br ' + str(ControlPackage.brightness) \
                      + ' -ss ' + str(ControlPackage.ss) + ' -ISO ' + str(ControlPackage.iso) \
                      + ' -sh ' + str(ControlPackage.sharpness) + ' -co ' + str(ControlPackage.contrast) \
                      + ' -sa ' + str(ControlPackage.saturation) 
-          print cmdstr
-          os.system( cmdstr )
+        print cmdstr
+        os.system( cmdstr )
 
       finally:
-        pass
+        camera_lock.release(); 
         #ControlPackage.camera.stop_preview()
 
       #READ IMAGE AND PUT ON SCREEN
@@ -275,21 +277,22 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
 	ControlPackage.Validate()
 
         # TAKE A PHOTO OF HIGH RESOLUTION
-        with camera_lock :
+        camera_lock.acquire(); 
 
-          #ControlPackage.camera.start_preview()
-          #time.sleep(0.5)
-          #ControlPackage.camera.capture('temp/image.jpg', format='jpeg', resize=(ControlPackage.width,ControlPackage.height))
+        #ControlPackage.camera.start_preview()
+        #time.sleep(0.5)
+        #ControlPackage.camera.capture('temp/image.jpg', format='jpeg', resize=(ControlPackage.width,ControlPackage.height))
 
-	  cmdstr = 'raspistill -o temp/simage.jpg -hf -vf -br ' \
+	cmdstr = 'raspistill -o temp/simage.jpg -br ' \
                      + str(ControlPackage.brightness) \
                      + ' -ss ' + str(ControlPackage.ss) + ' -ISO ' + str(ControlPackage.iso) \
                      + ' -sh ' + str(ControlPackage.sharpness) + ' -co ' + str(ControlPackage.contrast) \
                      + ' -sa ' + str(ControlPackage.saturation) 
-	  print cmdstr
-          os.system( cmdstr )
+	print cmdstr
+        os.system( cmdstr )
+
       finally:
-        pass
+        camera_lock.release(); 
         #ControlPackage.camera.stop_preview()
 
       #READ IMAGE AND PUT ON SCREEN
@@ -300,10 +303,50 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
 
       self.send_response(200)
       self.send_header('Content-Type', 'application/jpeg')
-      self.send_header('Content-Disposition', 'inline;filename="snapshot.jpg"')
+      dts  = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
+      self.send_header('Content-Disposition', 'inline;filename="snapshot-' + dts + '.jpg"')
+
       self.__sendCookie()
       self.end_headers()
       with open('temp/simage.jpg', 'r') as content_file:
+        content = content_file.read()
+        self.wfile.write(content)
+
+    elif None != re.search('/api/videoshot', self.path):
+      print 'GET /api/videoshot'
+      try:
+        ControlPackage.ss = int(float(self.path.split('/')[-7]) * 1000)
+        ControlPackage.iso = int(self.path.split('/')[-6])
+        ControlPackage.brightness = int(self.path.split('/')[-5])
+        ControlPackage.sharpness = int(self.path.split('/')[-4])
+        ControlPackage.contrast = int(self.path.split('/')[-3])
+        ControlPackage.saturation = int(self.path.split('/')[-2])
+        ControlPackage.videolen = int(self.path.split('/')[-1])
+
+	ControlPackage.Validate()
+
+        # TAKE A PHOTO OF HIGH RESOLUTION
+        camera_lock.acquire(); 
+
+	cmdstr = 'raspivid -o temp/svideo.h264 -br ' \
+                     + str(ControlPackage.brightness) \
+                     + ' -ss ' + str(ControlPackage.ss) + ' -ISO ' + str(ControlPackage.iso) \
+                     + ' -sh ' + str(ControlPackage.sharpness) + ' -co ' + str(ControlPackage.contrast) \
+                     + ' -sa ' + str(ControlPackage.saturation) + ' -t ' + str(ControlPackage.videolen*1000)
+	print cmdstr
+        os.system( cmdstr )
+    
+      finally:
+        camera_lock.release(); 
+
+      self.send_response(200)
+      self.send_header('Content-Type', 'application/octet-stream')
+      dts  = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
+      self.send_header('Content-Disposition', 'attachment;filename="videoshot-' + dts + '.h264"')
+
+      self.__sendCookie()
+      self.end_headers()
+      with open('temp/svideo.h264', 'r') as content_file:
         content = content_file.read()
         self.wfile.write(content)
 

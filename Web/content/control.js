@@ -44,6 +44,17 @@ jQuery(document).ready(function() {
     setInterval(updateTime, 5000); // 2 * 1000 miliseconds
 });
 
+$( "#btn_videoshot" ).click(function() {
+    $("#status_id").html("Refreshing ...");	
+
+    var urls = "/api/videoshot/" + $("#ss").val() + '/' + $("#iso").val() + '/' + $("#br").val() + '/'
+	                      + $("#sh").val() + '/' + $("#co").val() + '/' + $("#sa").val() + '/'
+			      + $("#videolen").val();
+
+    window.location.href = urls;
+
+});
+
 $( "#btn_snapshot" ).click(function() {
     popImage('/api/snapshot/' + $("#ss").val() + '/' + $("#iso").val() + '/' + $("#br").val() + '/'
 	                      + $("#sh").val() + '/' + $("#co").val() + '/' + $("#sa").val()
