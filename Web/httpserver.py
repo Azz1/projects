@@ -106,6 +106,7 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
     else:
       self.cookie = Cookie.SimpleCookie()
       self.cookie['refined'] = 'false'
+      self.cookie['norefresh'] = 'false'
       self.cookie['cmode'] = 'day'
 
   def __sendCookie(self):

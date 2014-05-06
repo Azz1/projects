@@ -80,13 +80,15 @@ $( "#btn_refresh" ).click(function() {
         img.onload = function() {
             $("#status_id").html("Refreshed");	
             context.drawImage(this, 0, 0);
-            v_updimage = setTimeout(updateImage, 2000); // 2 * 1000 miliseconds
+            if( $.cookie("norefresh") != "true" )
+                v_updimage = setTimeout(updateImage, 1000); // 1 * 1000 miliseconds
         }
 
     })
     .fail(function() {
       $("#status_id").html("camera control error!" );
-      v_updimage = setTimeout(updateImage, 5000); // 5 * 1000 miliseconds
+      if( $.cookie("norefresh") != "true" )
+          v_updimage = setTimeout(updateImage, 5000); // 5 * 1000 miliseconds
     })
     .always(function() {
   });
@@ -166,4 +168,11 @@ $('input[type=checkbox][name=refined]').click( function(){
 	$.cookie("refined", "true");
     else
 	$.cookie("refined", "false");
+});
+
+$('input[type=checkbox][name=norefresh]').click( function(){
+    if( $(this).is(':checked') ) 
+	$.cookie("norefresh", "true");
+    else
+	$.cookie("norefresh", "false");
 });
