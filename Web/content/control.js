@@ -52,13 +52,14 @@ $( "#btn_videoshot" ).click(function() {
 			      + $("#videolen").val();
 
     window.location.href = urls;
-
+    return false;
 });
 
 $( "#btn_snapshot" ).click(function() {
     popImage('/api/snapshot/' + $("#ss").val() + '/' + $("#iso").val() + '/' + $("#br").val() + '/'
 	                      + $("#sh").val() + '/' + $("#co").val() + '/' + $("#sa").val()
 		,'Snapshot Image');
+    return false;
 });
 
 $( "#btn_refresh" ).click(function() {
@@ -91,7 +92,8 @@ $( "#btn_refresh" ).click(function() {
           v_updimage = setTimeout(updateImage, 5000); // 5 * 1000 miliseconds
     })
     .always(function() {
-  });
+    });
+    return false;
 });
 
 $( "#btn_up" ).click(function() {
@@ -105,7 +107,8 @@ $( "#btn_up" ).click(function() {
       $("#status_id").html("motor control error!" );
     })
     .always(function() {
-  });
+    });
+    return false;
 });
 
 $( "#btn_down" ).click(function() {
@@ -119,7 +122,8 @@ $( "#btn_down" ).click(function() {
       $("#status_id").html("motor control error!" );
     })
     .always(function() {
-  });
+    });
+    return false;
 });
 
 $( "#btn_left" ).click(function() {
@@ -133,7 +137,8 @@ $( "#btn_left" ).click(function() {
       $("#status_id").html("motor control error!" );
     })
     .always(function() {
-  });
+    });
+    return false;
 });
 
 $( "#btn_right" ).click(function() {
@@ -147,7 +152,8 @@ $( "#btn_right" ).click(function() {
       $("#status_id").html("motor control error!" );
     })
     .always(function() {
-  });
+    });
+    return false;
 });
 
 $('input[type=radio][name=cmode]').change(function() {
@@ -171,8 +177,33 @@ $('input[type=checkbox][name=refined]').click( function(){
 });
 
 $('input[type=checkbox][name=norefresh]').click( function(){
-    if( $(this).is(':checked') ) 
+    if( $(this).is(':checked') ) {
 	$.cookie("norefresh", "true");
-    else
+
+        var urls = "/api/startvideo/" + $("#ss").val() + '/' + $("#iso").val() + '/' + $("#br").val() + '/'
+	                      + $("#sh").val() + '/' + $("#co").val() + '/' + $("#sa").val();
+
+	$.getJSON( urls, function( data ) {
+            $("#status_id").html("video started!" );
+
+            // Show loading notice
+            //var canvas = $('#canvas')[0];
+            var canvas = document.getElementById('canvas');
+
+            var context = canvas.getContext('2d');
+    
+            // Setup the WebSocket connection and start the player
+            var client = new WebSocket( 'ws://jupiter8.dyndns.org:8084/' );
+            var player = new jsmpeg(client, {canvas:canvas});
+
+	});
+
+    } else {
 	$.cookie("norefresh", "false");
+
+	$.getJSON( "/api/stopvideo", function( data ) {
+            $("#status_id").html("video stopped!" );
+  	});
+    }
+
 });

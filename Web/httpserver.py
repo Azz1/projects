@@ -24,7 +24,7 @@ sys.path.append(motorlib_path)
 from Adafruit_Motor_Driver import StepMotor
  
 camera_lock = threading.Semaphore()
-
+videostarted = False
 
 class ControlPackage :
 
@@ -114,6 +114,9 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
       self.send_header('Set-Cookie', c.output(header='').lstrip())
 
   def do_POST(self):
+    global camera_lock
+    global videostarted 
+
     self.__getCookie()
 
     if None != re.search('/api/refresh$', self.path):
@@ -233,6 +236,9 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
     return
  
   def do_GET(self):
+    global camera_lock
+    global videostarted 
+
     self.__getCookie()
 
     if None != re.search('/api/gettime$', self.path):	# get server time
@@ -246,6 +252,49 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
       self.__sendCookie()
       self.end_headers()
       self.wfile.write('{"time": "' + nowstring + '"}')
+
+    elif None != re.search('/api/startvideo', self.path):	# start video
+      print 'GET /api/startvideo'
+
+      ControlPackage.ss = int(float(self.path.split('/')[-6]) * 1000)
+      ControlPackage.iso = int(self.path.split('/')[-5])
+      ControlPackage.brightness = int(self.path.split('/')[-4])
+      ControlPackage.sharpness = int(self.path.split('/')[-3])
+      ControlPackage.contrast = int(self.path.split('/')[-2])
+      ControlPackage.saturation = int(self.path.split('/')[-1])
+ 
+      if not videostarted:
+        time.sleep(3)
+        cmdstr = 'sh runvideo.sh ' + str(ControlPackage.width) \
+                     + ' ' + str(ControlPackage.height) \
+                     + ' ' + str(ControlPackage.ss) + ' ' + str(ControlPackage.iso) \
+                     + ' ' + str(ControlPackage.brightness) \
+                     + ' ' + str(ControlPackage.sharpness) + ' ' + str(ControlPackage.contrast) \
+                     + ' ' + str(ControlPackage.saturation) 
+        print cmdstr
+        os.system( cmdstr )
+        videostarted = True
+        time.sleep(8)
+
+      self.send_response(200)
+      self.send_header('Content-Type', 'application/json')
+      self.__sendCookie()
+      self.end_headers()
+      self.wfile.write('{"status": "' + 'true' + '"}')
+
+    elif None != re.search('/api/stopvideo$', self.path):	# stop video
+      print 'GET /api/stopvideo'
+ 
+      cmdstr = 'sh stopvideo.sh' 
+      print cmdstr
+      os.system( cmdstr )
+      videostarted = False
+
+      self.send_response(200)
+      self.send_header('Content-Type', 'application/json')
+      self.__sendCookie()
+      self.end_headers()
+      self.wfile.write('{"status": "' + 'true' + '"}')
 
     elif None != re.search('/api/init$', self.path):	# load initial params
       self.send_response(200)
