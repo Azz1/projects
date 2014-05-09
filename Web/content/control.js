@@ -75,6 +75,7 @@ $( "#btn_refresh" ).click(function() {
 
 	var canvas = $('#canvas')[0];
         var context = canvas.getContext('2d');
+        //context.restore();
 
         var img = new Image();
 	img.src = "data:image/jpeg;base64," + msg['image'];
@@ -189,8 +190,9 @@ $('input[type=checkbox][name=norefresh]').click( function(){
             // Show loading notice
             //var canvas = $('#canvas')[0];
             var canvas = document.getElementById('canvas');
-
             var context = canvas.getContext('2d');
+            //context.restore();
+	    //context.scale(2.1875, 2.1875);
     
             // Setup the WebSocket connection and start the player
             var client = new WebSocket( 'ws://jupiter8.dyndns.org:8084/' );
@@ -203,7 +205,13 @@ $('input[type=checkbox][name=norefresh]').click( function(){
 
 	$.getJSON( "/api/stopvideo", function( data ) {
             $("#status_id").html("video stopped!" );
+
+            var canvas = document.getElementById('canvas');
+            var context = canvas.getContext('2d');
+	    context.canvas.width = 700;
+	    context.canvas.height = 525;
   	});
+
     }
 
 });

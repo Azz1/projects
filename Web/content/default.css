@@ -2,10 +2,12 @@ body
 {
   font-family: Arial;
   font-weight: normal;
-  font-size: 0.8em;
+  font-size: 0.7em;
   color: #999999;
   background-color: #052030; 
 }
+
+input { font-size: 0.8em; }
 
 .heading 
 {
