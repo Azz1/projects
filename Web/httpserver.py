@@ -177,7 +177,7 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
       self.send_header('Content-Type', 'application/json')
       self.__sendCookie()
       self.end_headers()
-      self.wfile.write('{"image": "' + imgstr + '"}')
+      self.wfile.write('{"seq": ' + str(ControlPackage.imageseq) + ', "timestamp": "'+  time.strftime("%Y%m%d%H%M%S", localtime) +'", "image": "' + imgstr + '"}')
 
     elif None != re.search('/api/motor/*', self.path): # motor control
       length = int(self.headers.getheader('content-length'))
