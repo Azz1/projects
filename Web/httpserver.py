@@ -54,6 +54,7 @@ class ControlPackage :
   ss = 4000		#microsecond
   iso = 400		#100-800 400 default
   videolen = 10		#video length
+  imageseq = 0		#sequence id of snapshot image
 
   # initialize vertical step motor
   motorV = StepMotor(0x60, debug=False)
@@ -132,14 +133,18 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
         ControlPackage.saturation = int(data['sa'][0])
 	ControlPackage.Validate()
 
+	ControlPackage.imageseq = ControlPackage.imageseq + 1
+	localtime   = time.localtime()
+	fname = 'temp/image-' + str(ControlPackage.imageseq) + '-' + time.strftime("%Y%m%d%H%M%S", localtime) + '.jpg'
+
         # TAKE A PHOTO
         camera_lock.acquire(); 
         #ControlPackage.camera.start_preview()
         #time.sleep(0.5)
-        #ControlPackage.camera.capture('temp/image.jpg', format='jpeg', resize=(ControlPackage.width,ControlPackage.height))
+        #ControlPackage.camera.capture(fname, format='jpeg', resize=(ControlPackage.width,ControlPackage.height))
 
 	# to enable -ss option, which is shutter speed, update the firmware sudo rpi-update
-        cmdstr = 'raspistill -o temp/image.jpg -w ' + str(ControlPackage.width) \
+        cmdstr = 'raspistill -o ' + fname + ' -w ' + str(ControlPackage.width) \
                      + ' -h ' + str(ControlPackage.height) \
                      + ' -br ' + str(ControlPackage.brightness) \
                      + ' -ss ' + str(ControlPackage.ss) + ' -ISO ' + str(ControlPackage.iso) \
@@ -153,7 +158,7 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
         #ControlPackage.camera.stop_preview()
 
       #READ IMAGE AND PUT ON SCREEN
-      img = Image.open('temp/image.jpg')
+      img = Image.open(fname)
       #basewidth = 800
       #wpercent = (basewidth/float(img.size[0]))
       #hsize = int((float(img.size[1])*float(wpercent)))
@@ -164,7 +169,9 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
       img.save(output, format='JPEG')
       imgstr = base64.b64encode(output.getvalue()) 
       del img
-      os.remove('temp/image.jpg')
+      
+      if ControlPackage.imageseq > 10:
+          os.system('rm -f temp/image-' + str(ControlPackage.imageseq-10) + '-*.jpg')
 
       self.send_response(200)
       self.send_header('Content-Type', 'application/json')
