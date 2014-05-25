@@ -54,7 +54,9 @@ class ControlPackage :
   ss = 4000		#microsecond
   iso = 400		#100-800 400 default
   videolen = 10		#video length
-  imageseq = 0		#sequence id of snapshot image
+  imageseq = 0		#sequence id of refresh image
+  simageseq = 0		#sequence id of snapshot image
+  videoseq = 0		#sequence id of video snapshots
 
   # initialize vertical step motor
   motorV = StepMotor(0x60, debug=False)
@@ -135,7 +137,7 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
 
 	ControlPackage.imageseq = ControlPackage.imageseq + 1
 	localtime   = time.localtime()
-	fname = 'temp/image-' + str(ControlPackage.imageseq) + '-' + time.strftime("%Y%m%d%H%M%S", localtime) + '.jpg'
+	fname = 'temp/image-' + str(ControlPackage.imageseq) + '-' + time.strftime("%Y%m%d-%H%M%S", localtime) + '.jpg'
 
         # TAKE A PHOTO
         camera_lock.acquire(); 
@@ -177,7 +179,7 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
       self.send_header('Content-Type', 'application/json')
       self.__sendCookie()
       self.end_headers()
-      self.wfile.write('{"seq": ' + str(ControlPackage.imageseq) + ', "timestamp": "'+  time.strftime("%Y%m%d%H%M%S", localtime) +'", "image": "' + imgstr + '"}')
+      self.wfile.write('{"seq": ' + str(ControlPackage.imageseq) + ', "timestamp": "'+  time.strftime("%Y%m%d-%H%M%S", localtime) +'", "image": "' + imgstr + '"}')
 
     elif None != re.search('/api/motor/*', self.path): # motor control
       length = int(self.headers.getheader('content-length'))
@@ -333,14 +335,19 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
 
 	ControlPackage.Validate()
 
+	ControlPackage.simageseq = ControlPackage.simageseq + 1
+	localtime   = time.localtime()
+	fname = 'temp/snapshot-' + str(ControlPackage.simageseq) + '-' + time.strftime("%Y%m%d-%H%M%S", localtime) + '.jpg'
+
+
         # TAKE A PHOTO OF HIGH RESOLUTION
         camera_lock.acquire(); 
 
         #ControlPackage.camera.start_preview()
         #time.sleep(0.5)
-        #ControlPackage.camera.capture('temp/image.jpg', format='jpeg', resize=(ControlPackage.width,ControlPackage.height))
+        #ControlPackage.camera.capture(fname, format='jpeg', resize=(ControlPackage.width,ControlPackage.height))
 
-	cmdstr = 'raspistill -o temp/simage.jpg -br ' \
+	cmdstr = 'raspistill -o ' + fname + ' -br ' \
                      + str(ControlPackage.brightness) \
                      + ' -ss ' + str(ControlPackage.ss) + ' -ISO ' + str(ControlPackage.iso) \
                      + ' -sh ' + str(ControlPackage.sharpness) + ' -co ' + str(ControlPackage.contrast) \
@@ -353,19 +360,22 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
         #ControlPackage.camera.stop_preview()
 
       #READ IMAGE AND PUT ON SCREEN
-      #img = Image.open('temp/simage.jpg')
+      #img = Image.open(fname)
       #img = img.transpose(Image.ROTATE_180)
 
-      #img.save('temp/snapimg.jpg', format='JPEG')
+      #img.save(fname, format='JPEG')
+
+      if ControlPackage.simageseq > 10:
+          os.system('rm -f temp/snapshot-' + str(ControlPackage.simageseq-10) + '-*.jpg')
+
 
       self.send_response(200)
       self.send_header('Content-Type', 'application/jpeg')
-      dts  = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
-      self.send_header('Content-Disposition', 'inline;filename="snapshot-' + dts + '.jpg"')
+      self.send_header('Content-Disposition', 'inline;filename="' + fname.replace('temp/', '') + '"')
 
       self.__sendCookie()
       self.end_headers()
-      with open('temp/simage.jpg', 'r') as content_file:
+      with open(fname, 'r') as content_file:
         content = content_file.read()
         self.wfile.write(content)
 
@@ -382,10 +392,14 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
 
 	ControlPackage.Validate()
 
+	ControlPackage.videoseq = ControlPackage.videoseq + 1
+	localtime   = time.localtime()
+	fname = 'temp/videoshot-' + str(ControlPackage.videoseq) + '-' + time.strftime("%Y%m%d-%H%M%S", localtime) + '.h264'
+
         # TAKE A PHOTO OF HIGH RESOLUTION
         camera_lock.acquire(); 
 
-	cmdstr = 'raspivid -o temp/svideo.h264 -br ' \
+	cmdstr = 'raspivid -o ' + fname + ' -br ' \
                      + str(ControlPackage.brightness) \
                      + ' -ss ' + str(ControlPackage.ss) + ' -ISO ' + str(ControlPackage.iso) \
                      + ' -sh ' + str(ControlPackage.sharpness) + ' -co ' + str(ControlPackage.contrast) \
@@ -396,14 +410,16 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
       finally:
         camera_lock.release(); 
 
+      if ControlPackage.videoseq > 5:
+          os.system('rm -f temp/videoshot-' + str(ControlPackage.videoseq-5) + '-*.h264')
+
       self.send_response(200)
       self.send_header('Content-Type', 'application/octet-stream')
-      dts  = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
-      self.send_header('Content-Disposition', 'attachment;filename="videoshot-' + dts + '.h264"')
+      self.send_header('Content-Disposition', 'attachment;filename="' + fname.replace('temp/', '') + '"')
 
       self.__sendCookie()
       self.end_headers()
-      with open('temp/svideo.h264', 'r') as content_file:
+      with open(fname, 'r') as content_file:
         content = content_file.read()
         self.wfile.write(content)
 
