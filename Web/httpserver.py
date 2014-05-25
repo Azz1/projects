@@ -57,6 +57,8 @@ class ControlPackage :
   imageseq = 0		#sequence id of refresh image
   simageseq = 0		#sequence id of snapshot image
   videoseq = 0		#sequence id of video snapshots
+  max_keep_snapshots = 10	#max number of snapsnots keep in cache
+  max_keep_videoshots = 5	#max number of videosnots keep in cache
 
   # initialize vertical step motor
   motorV = StepMotor(0x60, debug=False)
@@ -172,8 +174,8 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
       imgstr = base64.b64encode(output.getvalue()) 
       del img
       
-      if ControlPackage.imageseq > 10:
-          os.system('rm -f temp/image-' + str(ControlPackage.imageseq-10) + '-*.jpg')
+      if ControlPackage.imageseq > ControlPackage.max_keep_snapshots:
+          os.system('rm -f temp/image-' + str(ControlPackage.imageseq-ControlPackage.max_keep_snapshots) + '-*.jpg')
 
       self.send_response(200)
       self.send_header('Content-Type', 'application/json')
@@ -365,8 +367,8 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
 
       #img.save(fname, format='JPEG')
 
-      if ControlPackage.simageseq > 10:
-          os.system('rm -f temp/snapshot-' + str(ControlPackage.simageseq-10) + '-*.jpg')
+      if ControlPackage.simageseq > ControlPackage.max_keep_snapshots:
+          os.system('rm -f temp/snapshot-' + str(ControlPackage.simageseq-ControlPackage.max_keep_snapshots) + '-*.jpg')
 
 
       self.send_response(200)
@@ -410,8 +412,8 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
       finally:
         camera_lock.release(); 
 
-      if ControlPackage.videoseq > 5:
-          os.system('rm -f temp/videoshot-' + str(ControlPackage.videoseq-5) + '-*.h264')
+      if ControlPackage.videoseq > ControlPackage.max_keep_videoshots:
+          os.system('rm -f temp/videoshot-' + str(ControlPackage.videoseq-ControlPackage.max_keep_videoshots) + '-*.h264')
 
       self.send_response(200)
       self.send_header('Content-Type', 'application/octet-stream')
