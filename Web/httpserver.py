@@ -9,6 +9,7 @@ import Cookie
 import time, datetime
 import re
 import os
+import glob
 import cgi
 import sys
 import PIL
@@ -156,6 +157,13 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
                      + ' -sa ' + str(ControlPackage.saturation) 
         print cmdstr
         os.system( cmdstr )
+
+      except:	# use last available image if snapshot failed
+	fname = 'temp/image-' + str(ControlPackage.imageseq-1) + '-*.jpg'
+        for c in glob.glob(fname):
+	    if os.path.isfile(c):
+		fname = c
+		break
 
       finally:
         camera_lock.release(); 
