@@ -24,7 +24,7 @@ motorlib_path = os.path.abspath('../Adafruit')
 sys.path.append(motorlib_path)
 from Adafruit_Motor_Driver import StepMotor
  
-camera_lock = threading.Semaphore()
+camera_lock = threading.Lock()
 videostarted = False
 
 class ControlPackage :
