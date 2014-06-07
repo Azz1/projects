@@ -49,12 +49,12 @@ class ControlPackage :
   width = 700
   height = 525
   brightness = 50	#0-100 50 default
-  sharpness = 0		#-100-100 0 default
-  contrast = 0		#-100-100 0 default
-  saturation = 0	#-100-100 0 default
+  sharpness = 20	#-100-100 0 default
+  contrast = 20		#-100-100 0 default
+  saturation = 20	#-100-100 0 default
   ss = 4000		#microsecond
   iso = 400		#100-800 400 default
-  videolen = 10		#video length
+  videolen = 20		#video length
   imageseq = 0		#sequence id of refresh image
   simageseq = 0		#sequence id of snapshot image
   videoseq = 0		#sequence id of video snapshots
