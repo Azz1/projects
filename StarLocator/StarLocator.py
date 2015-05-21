@@ -39,12 +39,12 @@ class StarLocator:
 	if ha < 0.0:
 	    ha += 360
 	
-	sinalt = math.sin(dec) * math.sin(self.LAT) + math.cos(self.LAT) * math.cos(ha)
+	sinalt = math.sin(math.radians(dec)) * math.sin(math.radians(self.LAT)) + math.cos(math.radians(self.LAT)) * math.cos(math.radians(ha))
 	alt = math.asin(sinalt)
 
-	cosa = (math.sin(des) - math.sin(alt) * math.sin(self.LAT))/(math.cos(alt) * math.cos(self.LAT))
+	cosa = (math.sin(math.radians(des)) - math.sin(math.radians(alt)) * math.sin(math.radians(self.LAT)))/(math.cos(math.radians(alt)) * math.cos(math.radians(self.LAT)))
 	a = math.acos(cosa)
-	if math.sin(ha) > 0:
+	if math.sin(math.radians(ha)) > 0:
 	    a = 360 -a
 	return (a, alt)
 
