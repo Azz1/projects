@@ -126,7 +126,7 @@ class Adafruit_LSM303(Adafruit_I2C):
 
         #res.append((x, y, z, heading )) 
 
-        res = [( xAngle, yAngle, zAngle, heading )]
+        res = ( xAngle, yAngle, zAngle, heading )
 
         return res
 
