@@ -301,20 +301,20 @@ class StepMotor :
     if dir == 'FORWARD' and self.FWD_pin > 0:
       #print 'FORWARD pin %s check ...' % str(self.FWD_pin)
       if GPIO.input(self.FWD_pin) :
-        time.sleep(0.03)	
+        #time.sleep(0.03)	
         if GPIO.input(self.FWD_pin) :		#check again after 0.1s in case of false positive
-          #print 'FORWARD pin %s raised!' % str(self.FWD_pin)
-          return self.currentstep 
-	  #pass
+          print 'FORWARD pin %s raised!' % str(self.FWD_pin)
+          #return self.currentstep 
+	  pass
 
     elif dir == 'BACKWARD' and self.BKWD_pin > 0:
       #print 'BACKWARD pin %s check ...' % str(self.BKWD_pin)
       if GPIO.input(self.BKWD_pin) :
-        time.sleep(0.03)	
+        #time.sleep(0.03)	
         if GPIO.input(self.BKWD_pin) :		#check again after 0.1s in case of false positive
           #print 'BACKWARD pin %s raised!' % str(self.BKWD_pin)
-          return self.currentstep 
-	  #pass
+          #return self.currentstep 
+	  pass
 
     # next determine what sort of stepping procedure we're up to
     if style == 'SINGLE' :
