@@ -3,60 +3,68 @@ import time
  
 # Global definations
 
-enable_pin = 18
-coil_A_1_pin = 4
-coil_A_2_pin = 17
-coil_B_1_pin = 23
-coil_B_2_pin = 24
- 
+Motor_V_Pin = [12, 16, 20, 21]
+Motor_H_Pin = [6, 13, 19, 26]
+
 # Operations
 
-def forward(delay, steps):  
-  for i in range(0, steps):
-    setStep(1, 0, 1, 0)
-    time.sleep(delay)
-    setStep(0, 1, 1, 0)
-    time.sleep(delay)
-    setStep(0, 1, 0, 1)
-    time.sleep(delay)
-    setStep(1, 0, 0, 1)
-    time.sleep(delay)
+StepCount1 = 4
+Seq1 = []
+Seq1 = range(0, StepCount1)
+Seq1[0] = [1,0,1,0]
+Seq1[1] = [0,1,1,0]
+Seq1[2] = [0,1,0,1]
+Seq1[3] = [1,0,0,1]
+
+StepCount2 = 8
+Seq2 = []
+Seq2 = range(0, StepCount2)
+Seq2[0] = [1,0,0,0]
+Seq2[1] = [1,1,0,0]
+Seq2[2] = [0,1,0,0]
+Seq2[3] = [0,1,1,0]
+Seq2[4] = [0,0,1,0]
+Seq2[5] = [0,0,1,1]
+Seq2[6] = [0,0,0,1]
+Seq2[7] = [1,0,0,1]
  
-def backwards(delay, steps):  
+Motor_Pin = Motor_V_Pin
+StepCount = StepCount1
+Seq = Seq1
+
+def forward(delay, steps):  		#H-Right, V-Down
   for i in range(0, steps):
-    setStep(1, 0, 0, 1)
-    time.sleep(delay)
-    setStep(0, 1, 0, 1)
-    time.sleep(delay)
-    setStep(0, 1, 1, 0)
-    time.sleep(delay)
-    setStep(1, 0, 1, 0)
-    time.sleep(delay)
+    for j in range(0, StepCount):
+      setStep(Seq[j][0], Seq[j][1], Seq[j][2], Seq[j][3])
+      time.sleep(delay)
+ 
+def backwards(delay, steps):  		#H-Left, V-Up
+  for i in range(0, steps):
+    for j in range(0, StepCount):
+      setStep(Seq[StepCount-1-j][0], Seq[StepCount-1-j][1], Seq[StepCount-1-j][2], Seq[StepCount-1-j][3])
+      time.sleep(delay)
  
 def setStep(w1, w2, w3, w4):
-  GPIO.output(coil_A_1_pin, w1)
-  GPIO.output(coil_A_2_pin, w2)
-  GPIO.output(coil_B_1_pin, w3)
-  GPIO.output(coil_B_2_pin, w4)
+  GPIO.output(Motor_Pin[0], w1)
+  GPIO.output(Motor_Pin[1], w2)
+  GPIO.output(Motor_Pin[2], w3)
+  GPIO.output(Motor_Pin[3], w4)
  
 def release():
-  GPIO.output(coil_A_1_pin, 0)
-  GPIO.output(coil_A_2_pin, 0)
-  GPIO.output(coil_B_1_pin, 0)
-  GPIO.output(coil_B_2_pin, 0)
+  GPIO.output(Motor_Pin[0], 0)
+  GPIO.output(Motor_Pin[1], 0)
+  GPIO.output(Motor_Pin[2], 0)
+  GPIO.output(Motor_Pin[3], 0)
   GPIO.cleanup
 
 def init():
   GPIO.setmode(GPIO.BCM)
  
-  GPIO.setup(enable_pin, GPIO.OUT)
-  GPIO.setup(coil_A_1_pin, GPIO.OUT)
-  GPIO.setup(coil_A_2_pin, GPIO.OUT)
-  GPIO.setup(coil_B_1_pin, GPIO.OUT)
-  GPIO.setup(coil_B_2_pin, GPIO.OUT)
+  GPIO.setup(Motor_Pin[0], GPIO.OUT)
+  GPIO.setup(Motor_Pin[1], GPIO.OUT)
+  GPIO.setup(Motor_Pin[2], GPIO.OUT)
+  GPIO.setup(Motor_Pin[3], GPIO.OUT)
  
-  GPIO.output(enable_pin, 1)
-
 # Main body
 
 try:
