@@ -22,7 +22,12 @@ import RPi.GPIO as GPIO
 #import picamera
 motorlib_path = os.path.abspath('../Adafruit')
 sys.path.append(motorlib_path)
-from Adafruit_Motor_Driver import StepMotor
+
+#via motor shield
+#from Adafruit_Motor_Driver import StepMotor
+
+#via GPIO
+from StepMotor import StepMotor
  
 camera_lock = threading.Lock()
 videostarted = False
