@@ -76,32 +76,36 @@ class StepMotor :
     self.delay = 60.0 / (50 * rpm) / self.StepCount;
 
   def step(self, steps, dir, style):
-    #check sensor if reaching the limit
-    if dir == 'FORWARD' and self.FWD_pin > 0:
-      #print 'FORWARD pin %s check ...' % str(self.FWD_pin)
-      if GPIO.input(self.FWD_pin) :
-        #time.sleep(0.03)
-        if GPIO.input(self.FWD_pin) :      #check again after 0.1s in case of false positive
-          print 'FORWARD pin %s raised!' % str(self.FWD_pin)
-          #return 
-          pass
-
-    elif dir == 'BACKWARD' and self.BKWD_pin > 0:
-      #print 'BACKWARD pin %s check ...' % str(self.BKWD_pin)
-      if GPIO.input(self.BKWD_pin) :
-        #time.sleep(0.03)
-        if GPIO.input(self.BKWD_pin) :     #check again after 0.1s in case of false positive
-          #print 'BACKWARD pin %s raised!' % str(self.BKWD_pin)
-          #return 
-          pass
-
     if dir == 'FORWARD':
       self.forward(self.delay, steps)
     else:
       self.backwards(self.delay, steps)
 
+  def checklimit(self, dir):
+    #check sensor if reaching the limit
+    if dir == 'FORWARD' and self.FWD_pin > 0:
+      #print 'FORWARD pin %s check ...' % str(self.FWD_pin)
+      if GPIO.input(self.FWD_pin) :
+        time.sleep(0.03)
+        if GPIO.input(self.FWD_pin) :      #check again after 0.1s in case of false positive
+          print 'FORWARD pin %s raised!' % str(self.FWD_pin)
+          return True
+
+    elif dir == 'BACKWARD' and self.BKWD_pin > 0:
+      #print 'BACKWARD pin %s check ...' % str(self.BKWD_pin)
+      if GPIO.input(self.BKWD_pin) :
+        time.sleep(0.03)
+        if GPIO.input(self.BKWD_pin) :     #check again after 0.1s in case of false positive
+          print 'BACKWARD pin %s raised!' % str(self.BKWD_pin)
+          return True
+
+    return False
+
+
   def backwards(self, delay, steps):  		#H-Right, V-Down
     for i in range(0, steps):
+      if self.checklimit('BACKWARD'):
+        break
       for j in range(0, self.StepCount):
         self.setStep(self.Seq[j][0], self.Seq[j][1], self.Seq[j][2], self.Seq[j][3])
         time.sleep(self.delay)
@@ -109,6 +113,8 @@ class StepMotor :
  
   def forward(self, delay, steps):  		#H-Left, V-Up
     for i in range(0, steps):
+      if self.checklimit('FORWARD'):
+        break
       for j in range(0, self.StepCount):
         self.setStep(self.Seq[self.StepCount-1-j][0], self.Seq[self.StepCount-1-j][1], self.Seq[self.StepCount-1-j][2], self.Seq[self.StepCount-1-j][3])
         time.sleep(self.delay)
