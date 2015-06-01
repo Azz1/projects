@@ -35,7 +35,12 @@ socketServer.on('connection', function(socket) {
 
 socketServer.broadcast = function(data, opts) {
 	for( var i in this.clients ) {
-		this.clients[i].send(data, opts);
+		if (this.clients[i].readyState == 1) {
+			this.clients[i].send(data, opts);
+		}
+		else {
+			console.log( 'Error: Client ('+i+') not connected.' );
+		}
 	}
 };
 
@@ -43,10 +48,11 @@ socketServer.broadcast = function(data, opts) {
 // HTTP Server to accept incomming MPEG Stream
 var streamServer = require('http').createServer( function(request, response) {
 	var params = request.url.substr(1).split('/');
-	width = (params[1] || 320)|0;
-	height = (params[2] || 240)|0;
 
 	if( params[0] == STREAM_SECRET ) {
+		width = (params[1] || 320)|0;
+		height = (params[2] || 240)|0;
+		
 		console.log(
 			'Stream Connected: ' + request.socket.remoteAddress + 
 			':' + request.socket.remotePort + ' size: ' + width + 'x' + height
