@@ -54,7 +54,7 @@ class StarTracking:
 	target_az, target_alt = self.GetTarget()
         print "Target: (" + str(target_az) + ", " + str(target_alt) + ")"
 
-        pos_alt, pos_y, pos_z, pos_az = tr.position.read()
+        pos_x, pos_y, pos_alt, pos_az = tr.position.read()
         print "Current position: (" + str(pos_az) + ", " + str(pos_alt) + ")"
 
 

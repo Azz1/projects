@@ -118,7 +118,7 @@ class Adafruit_LSM303(Adafruit_I2C):
 	y = self.mag16(list, 2)
 	z = self.mag16(list, 4)
 
-	heading = 360 - (math.atan2(y,x) * 180) / pi
+	heading = 360 + 180 - (math.atan2(y,x) * 180) / pi  #+180 because sensor is pointed backward
   
   	# Normalize to 0-360
   	if heading > 360:
