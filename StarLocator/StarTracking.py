@@ -31,18 +31,23 @@ class StarTracking:
     #     az   - AZ in degree
     #     alt  - ALT in degree
 
-    def __init__(self, lat, long, mode, ra_h, ra_m, ra_s, dec_dg, dec_m, dec_s, az, alt):
+    def __init__(self, lat, long, mode, ra_h, ra_m, ra_s, dec_dg, dec_m, dec_s, az, alt, v_speed, v_steps, h_speed, h_steps):
 	self.locator = StarLocator(lat, long)
 	self.position = Adafruit_LSM303()
 	self.mode = mode
-	self.ra_h = ra_h
+	self.ra_h = ra_h	# target RA & DEC if mode <> ALTAZ
 	self.ra_m = ra_m
 	self.ra_s = ra_s
 	self.dec_dg = dec_dg
 	self.dec_m = dec_m
 	self.dec_s = dec_s
-	self.az = az
+	self.az = az		# target AZ & ALT if mode = ALTAZ
 	self.alt = alt
+
+	self.v_steps = v_steps	# initial motor params
+	self.v_speed = v_speed
+	self.h_steps = h_steps
+	self.h_speed = h_speed
 
     def GetTarget(self):
 	if self.mode == "ALTAZ":
@@ -62,7 +67,10 @@ if __name__ == '__main__':
 
     from time import sleep
 
-    tr = StarTracking(42.27069402, -83.04411196, "ALTAZ", 16.0, 41.0, 42.0, 36.0, 28.0, 0.0, 180.0, 45.0)
+    tr = StarTracking(42.27069402, -83.04411196, "ALTAZ", 
+			16.0, 41.0, 42.0, 36.0, 28.0, 0.0, 
+			220.0, 45.0, 
+			30, 100, 5, 50)
 
     print 'Start star tracking ...'
     tr.Track()
