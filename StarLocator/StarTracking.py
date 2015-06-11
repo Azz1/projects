@@ -47,18 +47,51 @@ class MotorControlThread (threading.Thread):
 
 
     def run(self):
-        print "Starting " + self.name
+        print "Starting " + self.threadName
+        dir = ""
+        speed = 0
+        steps = 0
 
 	while True:
 	   threadLock.acquire()
 	   if exitFlag: break
 	   if not self.q.empty():
-    	      print q.get()
+    	      (dir, speed, steps) = q.get()
            threadLock.release()
+	   
+	   if self.threadName == "H-Motor":
+	   # LEFT-FWD, RIGHT-BKWD
+	      self.motor.setSpeed(speed)
+	      if dir == "LEFT":
+                 self.motor.step(steps, "FORWARD", "MICROSTEP")
+              else:
+                 self.motor.step(steps, "BACKWARD", "MICROSTEP")
+              self.motor.release()
+
+              if dir.upper() == 'LEFT' and GPIO.input(ControlPackage.HL_pin):
+                 print 'Horizontal leftmost limit reached!'
+
+              if dir.upper() == 'RIGHT' and GPIO.input(ControlPackage.HR_pin):
+                 print 'Horizontal rightmost limit reached!'	
+	   	
+	   else:
+	   # UP-FWD, DOWN-BKWD
+	      self.motor.setSpeed(speed)
+	      if dir == "UP":
+                 self.motor.step(steps, "FORWARD", "MICROSTEP")
+              else:
+                 self.motor.step(steps, "BACKWARD", "MICROSTEP")
+              self.motor.release()
+
+              if dir.upper() == 'UP' and GPIO.input(ControlPackage.VH_pin):
+                 print 'Vertical highest limit reached!'
+
+              if dir.upper() == 'DOWN' and GPIO.input(ControlPackage.VL_pin):
+                 print 'Vertical lowest limit reached!'	
 
            time.sleep(0.1)
 
-        print "Exiting " + self.name
+        print "Exiting " + self.threadName
 
 class StarTracking:
 
