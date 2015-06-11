@@ -126,6 +126,12 @@ class StarTracking:
 	self.h_speed = h_speed
 	
 	self.istracking = False
+    	self.motor_h = MotorControlThread("H-Motor")
+    	self.motor_v = MotorControlThread("V-Motor")
+    	self.motor_h.start()
+    	self.motor_v.start()
+    	self.motor_h.join()
+    	self.motor_v.join()
 
     def GetTarget(self):
 	if self.mode == "ALTAZ":
@@ -134,11 +140,15 @@ class StarTracking:
 	    return self.locator.RaDec2AltAz1(self.ra_h, self.ra_m, self.ra_s, self.dec_dg, self.dec_m, self.dec_s, datetime.datetime.utcnow())
 
     def Track(self):
-	target_az, target_alt = self.GetTarget()
-        print "Target: (" + str(target_az) + ", " + str(target_alt) + ")"
+    	while True:
+	   target_az, target_alt = self.GetTarget()
+           print "Target: (" + str(target_az) + ", " + str(target_alt) + ")"
 
-        pos_x, pos_y, pos_alt, pos_az = tr.position.read()
-        print "Current position: (" + str(pos_az) + ", " + str(pos_alt) + ")"
+           pos_x, pos_y, pos_alt, pos_az = tr.position.read()
+           print "Current position: (" + str(pos_az) + ", " + str(pos_alt) + ")"
+
+      	   threadLock.acquire()
+           threadLock.release()
 
 
 if __name__ == '__main__':
