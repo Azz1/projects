@@ -7,6 +7,8 @@ import datetime
 import os
 import sys
 import math
+import threading
+import Queue
 from StarLocator import StarLocator
 
 motorlib_path = os.path.abspath('../Adafruit')
@@ -16,6 +18,47 @@ from Adafruit_Motor_Driver import StepMotor
 lsm303lib_path = os.path.abspath('../Adafruit/Adafruit_LSM303')
 sys.path.append(lsm303lib_path)
 from Adafruit_LSM303 import Adafruit_LSM303
+
+web_path = os.path.abspath('../Web')
+sys.path.append(web_path)
+from httpserver import ControlPackage
+
+exitFlag = False
+threadLock = threading.Lock()
+v_cmdqueue = Queue.Queue()	#queue of objects (dir=UP/DOWN, speed, steps) UP-FWD, DOWN-BKWD
+h_cmdqueue = Queue.Queue()	#queue of objects (dir=LEFT/RIGHT, speed, steps) LEFT-FWD, RIGHT-BKWD
+
+class MotorControlThread (threading.Thread):
+    def __init__(self, threadName):
+        threading.Thread.__init__(self)
+        self.threadName = threadName
+
+	# initialize vertical step motor
+  	self.motor = StepMotor(0x60, debug=False)
+  	self.motor.setFreq(1600)
+	if self.threadName == "H-Motor":
+	   self.q = h_cmdqueue
+  	   self.motor.setPort("M1M2")
+  	   self.motor.setSensor(ControlPackage.HL_pin, ControlPackage.HR_pin)
+	else:
+	   self.q = v_cmdqueue
+  	   self.motor.setPort("M3M4")
+  	   self.motor.setSensor(ControlPackage.VH_pin, ControlPackage.VL_pin)
+
+
+    def run(self):
+        print "Starting " + self.name
+
+	while True:
+	   threadLock.acquire()
+	   if exitFlag: break
+	   if not self.q.empty():
+    	      print q.get()
+           threadLock.release()
+
+           time.sleep(0.1)
+
+        print "Exiting " + self.name
 
 class StarTracking:
 
@@ -48,6 +91,8 @@ class StarTracking:
 	self.v_speed = v_speed
 	self.h_steps = h_steps
 	self.h_speed = h_speed
+	
+	self.istracking = False
 
     def GetTarget(self):
 	if self.mode == "ALTAZ":

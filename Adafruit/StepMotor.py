@@ -49,6 +49,7 @@ class StepMotor :
     else:
       self.Motor_Pin = StepMotor.Motor_H_Pin
 
+    GPIO.setwarnings(False)
     GPIO.setmode(GPIO.BCM)
  
     GPIO.setup(self.Motor_Pin[0], GPIO.OUT)

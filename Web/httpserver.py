@@ -42,6 +42,7 @@ class ControlPackage :
   #HL_pin = 17
   #HR_pin = 4
 
+  GPIO.setwarnings(False)
   GPIO.setmode(GPIO.BCM)
 
   GPIO.setup(VL_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
