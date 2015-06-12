@@ -3,8 +3,10 @@
 # Python library for Star Locator and tracking
 
 from dateutil import tz
+import RPi.GPIO as GPIO
 import datetime
 import os
+import time
 import sys
 import math
 import threading
@@ -13,7 +15,7 @@ from StarLocator import StarLocator
 
 motorlib_path = os.path.abspath('../Adafruit')
 sys.path.append(motorlib_path)
-from Adafruit_Motor_Driver import StepMotor
+from StepMotor import StepMotor
 
 lsm303lib_path = os.path.abspath('../Adafruit/Adafruit_LSM303')
 sys.path.append(lsm303lib_path)
@@ -48,46 +50,48 @@ class MotorControlThread (threading.Thread):
 
     def run(self):
         print "Starting " + self.threadName
-        dir = ""
-        speed = 0
-        steps = 0
-
 	while True:
+           dir = ""
+           speed = 0
+           steps = 0
+	  
 	   threadLock.acquire()
 	   if exitFlag: break
 	   if not self.q.empty():
-    	      (dir, speed, steps) = q.get()
+    	      (dir, speed, steps) = self.q.get()
            threadLock.release()
 	   
-	   if self.threadName == "H-Motor":
-	   # LEFT-FWD, RIGHT-BKWD
-	      self.motor.setSpeed(speed)
-	      if dir == "LEFT":
-                 self.motor.step(steps, "FORWARD", "MICROSTEP")
-              else:
-                 self.motor.step(steps, "BACKWARD", "MICROSTEP")
-              self.motor.release()
+	   if dir != "" : 
 
-              if dir.upper() == 'LEFT' and GPIO.input(ControlPackage.HL_pin):
-                 print 'Horizontal leftmost limit reached!'
+	      if self.threadName == "H-Motor":
+	      # LEFT-FWD, RIGHT-BKWD
+	         self.motor.setSpeed(speed)
+	         if dir == "LEFT":
+                    self.motor.step(steps, "FORWARD", "MICROSTEP")
+                 else:
+                    self.motor.step(steps, "BACKWARD", "MICROSTEP")
+                 self.motor.release()
 
-              if dir.upper() == 'RIGHT' and GPIO.input(ControlPackage.HR_pin):
-                 print 'Horizontal rightmost limit reached!'	
-	   	
-	   else:
-	   # UP-FWD, DOWN-BKWD
-	      self.motor.setSpeed(speed)
-	      if dir == "UP":
-                 self.motor.step(steps, "FORWARD", "MICROSTEP")
-              else:
-                 self.motor.step(steps, "BACKWARD", "MICROSTEP")
-              self.motor.release()
+                 if dir.upper() == 'LEFT' and GPIO.input(ControlPackage.HL_pin):
+                    print 'Horizontal leftmost limit reached!'
 
-              if dir.upper() == 'UP' and GPIO.input(ControlPackage.VH_pin):
-                 print 'Vertical highest limit reached!'
+                 if dir.upper() == 'RIGHT' and GPIO.input(ControlPackage.HR_pin):
+                    print 'Horizontal rightmost limit reached!'	
+	      	
+	      else:
+	      # UP-FWD, DOWN-BKWD
+	         self.motor.setSpeed(speed)
+	         if dir == "UP":
+                    self.motor.step(steps, "FORWARD", "MICROSTEP")
+                 else:
+                    self.motor.step(steps, "BACKWARD", "MICROSTEP")
+                 self.motor.release()
 
-              if dir.upper() == 'DOWN' and GPIO.input(ControlPackage.VL_pin):
-                 print 'Vertical lowest limit reached!'	
+                 if dir.upper() == 'UP' and GPIO.input(ControlPackage.VH_pin):
+                    print 'Vertical highest limit reached!'
+
+                 if dir.upper() == 'DOWN' and GPIO.input(ControlPackage.VL_pin):
+                    print 'Vertical lowest limit reached!'	
 
            time.sleep(0.1)
 
@@ -130,8 +134,6 @@ class StarTracking:
     	self.motor_v = MotorControlThread("V-Motor")
     	self.motor_h.start()
     	self.motor_v.start()
-    	self.motor_h.join()
-    	self.motor_v.join()
 
     def GetTarget(self):
 	if self.mode == "ALTAZ":
@@ -140,6 +142,24 @@ class StarTracking:
 	    return self.locator.RaDec2AltAz1(self.ra_h, self.ra_m, self.ra_s, self.dec_dg, self.dec_m, self.dec_s, datetime.datetime.utcnow())
 
     def Track(self):
+	last_v_offset = 0.0
+	last_h_offset = 0.0
+	v_offset = 0.0
+	h_offset = 0.0
+	v_dir = ""
+	h_dir = ""
+
+	v_speed = 30
+	h_speed = 5
+
+	min_v_steps = 10
+	min_h_steps = 1
+	last_v_steps = 100
+	last_h_steps = 5
+	v_steps = last_v_steps
+	h_steps = last_h_steps
+
+
     	while True:
 	   target_az, target_alt = self.GetTarget()
            print "Target: (" + str(target_az) + ", " + str(target_alt) + ")"
@@ -147,9 +167,42 @@ class StarTracking:
            pos_x, pos_y, pos_alt, pos_az = tr.position.read()
            print "Current position: (" + str(pos_az) + ", " + str(pos_alt) + ")"
 
-      	   threadLock.acquire()
-           threadLock.release()
+	   v_offset = pos_alt - target_alt
+	   h_offset = pos_az - target_az
+	   if h_offset > 180 : h_offset = 360 - h_offset
+	   elif h_offset < -180 : h_offset = 360 + h_offset
 
+	   if math.fabs(v_offset) < 1 and math.fabs(h_offset) < 1: pass
+	   else:
+	      if math.fabs(v_offset) < 5 : v_steps = min_v_steps
+	      else : v_steps = 100
+
+	      if math.fabs(h_offset) < 5 : h_steps = min_h_steps
+	      else : h_steps = 5
+	         
+	      if v_offset > 0 : v_dir = "DOWN"
+	      else : v_dir = "UP"
+
+	      if h_offset > 0 : h_dir = "LEFT"
+	      else : h_dir = "RIGHT"
+
+	      if math.fabs(v_offset) >= 1 :
+      	         threadLock.acquire()
+		 v_cmdqueue.put((v_dir, v_speed, v_steps))
+                 threadLock.release()
+	      if math.fabs(h_offset) >= 1 : 
+      	         threadLock.acquire()
+		 h_cmdqueue.put((h_dir, h_speed, h_steps))
+                 threadLock.release()
+
+	   last_v_offset = v_offset
+	   last_h_offset = h_offset
+	   last_v_steps = v_steps
+	   last_h_steps = h_steps
+           time.sleep(0.5)
+
+    	self.motor_h.join()
+    	self.motor_v.join()
 
 if __name__ == '__main__':
 
@@ -157,7 +210,7 @@ if __name__ == '__main__':
 
     tr = StarTracking(42.27069402, -83.04411196, "ALTAZ", 
 			16.0, 41.0, 42.0, 36.0, 28.0, 0.0, 
-			220.0, 45.0, 
+			250.0, 30.0, 
 			30, 100, 5, 50)
 
     print 'Start star tracking ...'
