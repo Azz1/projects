@@ -25,7 +25,7 @@ web_path = os.path.abspath('../Web')
 sys.path.append(web_path)
 from httpserver import ControlPackage
 
-exitFlag = False
+exitFlag = threading.Event()
 threadLock = threading.Lock()
 v_cmdqueue = Queue.Queue()	#queue of objects (dir=UP/DOWN, speed, steps) UP-FWD, DOWN-BKWD
 h_cmdqueue = Queue.Queue()	#queue of objects (dir=LEFT/RIGHT, speed, steps) LEFT-FWD, RIGHT-BKWD
@@ -50,13 +50,12 @@ class MotorControlThread (threading.Thread):
 
     def run(self):
         print "Starting " + self.threadName
-	while True:
+	while exitFlag.is_set():
            dir = ""
            speed = 0
            steps = 0
 	  
 	   threadLock.acquire()
-	   if exitFlag: break
 	   if not self.q.empty():
     	      (dir, speed, steps) = self.q.get()
            threadLock.release()
@@ -129,9 +128,12 @@ class StarTracking:
 	self.h_steps = h_steps
 	self.h_speed = h_speed
 	
+	exitFlag.set()
 	self.istracking = False
     	self.motor_h = MotorControlThread("H-Motor")
     	self.motor_v = MotorControlThread("V-Motor")
+    	self.motor_h.daemon = True
+    	self.motor_v.daemon = True
     	self.motor_h.start()
     	self.motor_v.start()
 
@@ -142,6 +144,8 @@ class StarTracking:
 	    return self.locator.RaDec2AltAz1(self.ra_h, self.ra_m, self.ra_s, self.dec_dg, self.dec_m, self.dec_s, datetime.datetime.utcnow())
 
     def Track(self):
+	min_v_offset = 0.5
+	min_h_offset = 0.5
 	last_v_offset = 0.0
 	last_h_offset = 0.0
 	v_offset = 0.0
@@ -152,6 +156,8 @@ class StarTracking:
 	v_speed = 30
 	h_speed = 5
 
+	init_v_steps = 100
+	init_h_steps = 5
 	min_v_steps = 10
 	min_h_steps = 1
 	last_v_steps = 100
@@ -159,50 +165,55 @@ class StarTracking:
 	v_steps = last_v_steps
 	h_steps = last_h_steps
 
+        try:
+    	   while True:
+	      target_az, target_alt = self.GetTarget()
+              print "Target: (" + str(target_az) + ", " + str(target_alt) + ")"
+   
+              pos_x, pos_y, pos_alt, pos_az = tr.position.read()
+              print "Current position: (" + str(pos_az) + ", " + str(pos_alt) + ")"
+   
+	      v_offset = pos_alt - target_alt
+	      h_offset = pos_az - target_az
+	      if h_offset > 180 : h_offset = 360 - h_offset
+	      elif h_offset < -180 : h_offset = 360 + h_offset
 
-    	while True:
-	   target_az, target_alt = self.GetTarget()
-           print "Target: (" + str(target_az) + ", " + str(target_alt) + ")"
+	      if math.fabs(v_offset) < min_v_offset and math.fabs(h_offset) < min_h_offset: pass
+	      else:
+	         if math.fabs(v_offset) < 5 : v_steps = min_v_steps
+	         else : v_steps = init_v_steps
 
-           pos_x, pos_y, pos_alt, pos_az = tr.position.read()
-           print "Current position: (" + str(pos_az) + ", " + str(pos_alt) + ")"
-
-	   v_offset = pos_alt - target_alt
-	   h_offset = pos_az - target_az
-	   if h_offset > 180 : h_offset = 360 - h_offset
-	   elif h_offset < -180 : h_offset = 360 + h_offset
-
-	   if math.fabs(v_offset) < 1 and math.fabs(h_offset) < 1: pass
-	   else:
-	      if math.fabs(v_offset) < 5 : v_steps = min_v_steps
-	      else : v_steps = 100
-
-	      if math.fabs(h_offset) < 5 : h_steps = min_h_steps
-	      else : h_steps = 5
+	         if math.fabs(h_offset) < 5 : h_steps = min_h_steps
+	         else : h_steps = init_h_steps
 	         
-	      if v_offset > 0 : v_dir = "DOWN"
-	      else : v_dir = "UP"
+	         if v_offset > 0 : v_dir = "DOWN"
+	         else : v_dir = "UP"
 
-	      if h_offset > 0 : h_dir = "LEFT"
-	      else : h_dir = "RIGHT"
+	         if h_offset > 0 : h_dir = "LEFT"
+	         else : h_dir = "RIGHT"
 
-	      if math.fabs(v_offset) >= 1 :
-      	         threadLock.acquire()
-		 v_cmdqueue.put((v_dir, v_speed, v_steps))
-                 threadLock.release()
-	      if math.fabs(h_offset) >= 1 : 
-      	         threadLock.acquire()
-		 h_cmdqueue.put((h_dir, h_speed, h_steps))
-                 threadLock.release()
+	         if math.fabs(v_offset) >= min_v_offset :
+      	            threadLock.acquire()
+		    v_cmdqueue.put((v_dir, v_speed, v_steps))
+                    threadLock.release()
+	         if math.fabs(h_offset) >= min_h_offset : 
+      	            threadLock.acquire()
+		    h_cmdqueue.put((h_dir, h_speed, h_steps))
+                    threadLock.release()
 
-	   last_v_offset = v_offset
-	   last_h_offset = h_offset
-	   last_v_steps = v_steps
-	   last_h_steps = h_steps
-           time.sleep(0.5)
+	      last_v_offset = v_offset
+	      last_h_offset = h_offset
+	      last_v_steps = v_steps
+	      last_h_steps = h_steps
+              time.sleep(1.0)
 
-    	self.motor_h.join()
-    	self.motor_v.join()
+        except KeyboardInterrupt:
+	   print "Interruption accepted, exiting ..."
+           exitFlag.clear()
+    	   self.motor_h.join()
+    	   self.motor_v.join()
+
+	   raise
 
 if __name__ == '__main__':
 
@@ -210,8 +221,9 @@ if __name__ == '__main__':
 
     tr = StarTracking(42.27069402, -83.04411196, "ALTAZ", 
 			16.0, 41.0, 42.0, 36.0, 28.0, 0.0, 
-			250.0, 30.0, 
+			250.0, 20.0, 
 			30, 100, 5, 50)
 
     print 'Start star tracking ...'
     tr.Track()
+
