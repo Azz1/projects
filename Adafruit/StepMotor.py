@@ -106,7 +106,7 @@ class StepMotor :
 
 
   def backwards(self, delay, steps):  		#H-Right, V-Down
-    #self.current_step = 0
+    self.current_step = 0
 
     for i in range(0, steps):
       if self.checklimit('BACKWARD'):
@@ -117,13 +117,13 @@ class StepMotor :
       if self.current_step >= self.StepCount :
 	 self.current_step = 0
 
-    #self.release()
+    self.release()
  
   def forward(self, delay, steps):  		#H-Left, V-Up
-    self.current_step -= 1
-    if self.current_step < 0 :
-      self.current_step = self.StepCount-1
-    #self.current_step = self.StepCount-1
+    #self.current_step -= 1
+    #if self.current_step < 0 :
+    #  self.current_step = self.StepCount-1
+    self.current_step = self.StepCount-1
 
     for i in range(0, steps):
       if self.checklimit('FORWARD'):
@@ -134,7 +134,7 @@ class StepMotor :
       if self.current_step < 0 :
 	 self.current_step = self.StepCount-1
 
-    #self.release()
+    self.release()
 
   def setStep(self, w1, w2, w3, w4):
     GPIO.output(self.Motor_Pin[0], w1)

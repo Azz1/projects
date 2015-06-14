@@ -157,11 +157,11 @@ class StarTracking:
 	h_speed = 5
 
 	init_v_steps = 100
-	init_h_steps = 5
+	init_h_steps = 8
 	min_v_steps = 10
-	min_h_steps = 1
+	min_h_steps = 2
 	last_v_steps = 100
-	last_h_steps = 5
+	last_h_steps = 8
 	v_steps = last_v_steps
 	h_steps = last_h_steps
 
