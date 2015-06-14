@@ -56,6 +56,7 @@ class StepMotor :
     GPIO.setup(self.Motor_Pin[1], GPIO.OUT)
     GPIO.setup(self.Motor_Pin[2], GPIO.OUT)
     GPIO.setup(self.Motor_Pin[3], GPIO.OUT)
+    self.current_step = 0
  
 
   def setSensor(self, fpin, bpin) :
@@ -68,6 +69,7 @@ class StepMotor :
 
 
   def release(self):
+    self.current_step = 0
     GPIO.output(self.Motor_Pin[0], 0)
     GPIO.output(self.Motor_Pin[1], 0)
     GPIO.output(self.Motor_Pin[2], 0)
@@ -104,22 +106,35 @@ class StepMotor :
 
 
   def backwards(self, delay, steps):  		#H-Right, V-Down
+    #self.current_step = 0
+
     for i in range(0, steps):
       if self.checklimit('BACKWARD'):
         break
-      for j in range(0, self.StepCount):
-        self.setStep(self.Seq[j][0], self.Seq[j][1], self.Seq[j][2], self.Seq[j][3])
-        time.sleep(self.delay)
-    self.release()
+      self.setStep(self.Seq[self.current_step][0], self.Seq[self.current_step][1], self.Seq[self.current_step][2], self.Seq[self.current_step][3])
+      time.sleep(self.delay)
+      self.current_step += 1
+      if self.current_step >= self.StepCount :
+	 self.current_step = 0
+
+    #self.release()
  
   def forward(self, delay, steps):  		#H-Left, V-Up
+    self.current_step -= 1
+    if self.current_step < 0 :
+      self.current_step = self.StepCount-1
+    #self.current_step = self.StepCount-1
+
     for i in range(0, steps):
       if self.checklimit('FORWARD'):
         break
-      for j in range(0, self.StepCount):
-        self.setStep(self.Seq[self.StepCount-1-j][0], self.Seq[self.StepCount-1-j][1], self.Seq[self.StepCount-1-j][2], self.Seq[self.StepCount-1-j][3])
-        time.sleep(self.delay)
-    self.release()
+      self.setStep(self.Seq[self.current_step][0], self.Seq[self.current_step][1], self.Seq[self.current_step][2], self.Seq[self.current_step][3])
+      time.sleep(self.delay)
+      self.current_step -= 1
+      if self.current_step < 0 :
+	 self.current_step = self.StepCount-1
+
+    #self.release()
 
   def setStep(self, w1, w2, w3, w4):
     GPIO.output(self.Motor_Pin[0], w1)
