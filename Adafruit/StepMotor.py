@@ -262,9 +262,8 @@ class MotorControlThread (threading.Thread):
       ControlPackage.threadLock.release()
 	   
       if dir != "" : 
-	# if steps is less than motor seq step count, force to 2
-	# otherwise adjust to the next closest n step counts
-        if steps < self.motor.StepCount : steps = 2
+	# adjust to the next closest n step counts
+        if steps < self.motor.StepCount : steps = self.motor.StepCount
         else : 
           while steps % self.motor.StepCount <> 0 :
             steps += 1
