@@ -3,6 +3,7 @@
 from BaseHTTPServer import BaseHTTPRequestHandler,HTTPServer
 from SocketServer import ThreadingMixIn
 import threading
+import Queue
 import argparse
 import json
 import Cookie
@@ -22,93 +23,19 @@ import RPi.GPIO as GPIO
 #import picamera
 motorlib_path = os.path.abspath('../Adafruit')
 sys.path.append(motorlib_path)
+trackinglib_path = os.path.abspath('../StarLocator')
+sys.path.append(trackinglib_path)
 
 #via motor shield
 #from Adafruit_Motor_Driver import StepMotor
 
 #via GPIO
 from StepMotor import StepMotor
+from StepMotor import ControlPackage
+from StarTracking import StarTracking
  
 camera_lock = threading.Lock()
 videostarted = False
-
-class ControlPackage :
-
-  # Touch sensor GPIO pins
-  VL_pin = 24
-  VH_pin = 23
-  HL_pin = 25
-  HR_pin = 8
-  #HL_pin = 17
-  #HR_pin = 4
-
-  GPIO.setwarnings(False)
-  GPIO.setmode(GPIO.BCM)
-
-  GPIO.setup(VL_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-  GPIO.setup(VH_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-  GPIO.setup(HL_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-  GPIO.setup(HR_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-
-  # initialize the camera 
-  #camera = picamera.PiCamera()
-  width = 700
-  height = 525
-  brightness = 50	#0-100 50 default
-  sharpness = 20	#-100-100 0 default
-  contrast = 20		#-100-100 0 default
-  saturation = 20	#-100-100 0 default
-  ss = 4000		#microsecond
-  iso = 400		#100-800 400 default
-  videolen = 20		#video length
-  imageseq = 0		#sequence id of refresh image
-  simageseq = 0		#sequence id of snapshot image
-  videoseq = 0		#sequence id of video snapshots
-  max_keep_snapshots = 10	#max number of snapsnots keep in cache
-  max_keep_videoshots = 5	#max number of videosnots keep in cache
-
-  # initialize vertical step motor
-  motorV = StepMotor(0x60, debug=False)
-  motorV.setFreq(1600)
-  motorV.setPort("M3M4")
-  motorV.setSensor(VH_pin, VL_pin)
-  vspeed = 30
-  vsteps = 100
-
-  # initialize horizontal step motor
-  motorH = StepMotor(0x60, debug=False)
-  motorH.setFreq(1600)
-  motorH.setPort("M1M2")
-  motorH.setSensor(HL_pin, HR_pin)
-  hspeed = 5
-  hsteps = 5
-
-  @staticmethod
-  def release():
-    ControlPackage.motorV.release()
-    ControlPackage.motorH.release()
-    #ControlPackage.camera.close()
-    #del ControlPackage.camera
-
-  @staticmethod
-  def Validate():
-    if ControlPackage.brightness < 0: ControlPackage.brightness = 0
-    elif ControlPackage.brightness > 100: ControlPackage.brightness = 100
-    if ControlPackage.sharpness < -100: ControlPackage.sharpness = -100
-    elif ControlPackage.sharpness > 100: ControlPackage.sharpness = 100
-    if ControlPackage.contrast < -100: ControlPackage.contrast = -100
-    elif ControlPackage.contrast > 100: ControlPackage.contrast = 100
-    if ControlPackage.saturation < -100: ControlPackage.saturation = -100
-    elif ControlPackage.saturation > 100: ControlPackage.saturation = 100
-    if ControlPackage.iso < 100: ControlPackage.iso = 100
-    elif ControlPackage.iso > 800: ControlPackage.iso = 800
-    if ControlPackage.ss < 100 : ControlPackage.ss = 100
-
-    if ControlPackage.vspeed <= 0 : ControlPackage.vspeed = 1
-    if ControlPackage.vsteps <= 0 : ControlPackage.vsteps = 1
-    if ControlPackage.hspeed <= 0 : ControlPackage.hspeed = 1
-    if ControlPackage.hsteps <= 0 : ControlPackage.vsteps = 1
-
 
 class HTTPRequestHandler(BaseHTTPRequestHandler):
  
@@ -204,7 +131,7 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
       steps = int(data['steps'][0])
       motorid = self.path.split('/')[-2]
       dir = self.path.split('/')[-1]
-      print "motor %s move: [%s %s]" % (motorid, dir, speed)
+      #print "motor %s move: [%s %s]" % (motorid, dir, speed)
 
       status = True	# move success
       statstr = 'Motor move complete.'
@@ -219,9 +146,16 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
 
 	ControlPackage.vspeed = speed
 	ControlPackage.vsteps = steps
-        ControlPackage.motorV.setSpeed(speed)
-        ControlPackage.motorV.step(steps, dir.upper(), move_method)
-        ControlPackage.motorV.release()
+
+	ControlPackage.threadLock.acquire()
+	if dir.upper() == 'FORWARD' : v_dir = 'UP'
+	else : v_dir = 'DOWN'
+        ControlPackage.v_cmdqueue.put((v_dir, speed, steps))
+        ControlPackage.threadLock.release()
+
+        #ControlPackage.motorV.setSpeed(speed)
+        #ControlPackage.motorV.step(steps, dir.upper(), move_method)
+        #ControlPackage.motorV.release()
 
         if dir.upper() == 'FORWARD' and GPIO.input(ControlPackage.VH_pin):
           status = False
@@ -234,9 +168,16 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
       else:
 	ControlPackage.hspeed = speed
 	ControlPackage.hsteps = steps
-        ControlPackage.motorH.setSpeed(speed)
-        ControlPackage.motorH.step(steps, dir.upper(), 'MICROSTEP')
-        ControlPackage.motorH.release()
+
+	ControlPackage.threadLock.acquire()
+	if dir.upper() == 'FORWARD' : h_dir = 'LEFT'
+	else : h_dir = 'RIGHT'
+        ControlPackage.h_cmdqueue.put((h_dir, speed, steps))
+        ControlPackage.threadLock.release()
+
+        #ControlPackage.motorH.setSpeed(speed)
+        #ControlPackage.motorH.step(steps, dir.upper(), 'MICROSTEP')
+        #ControlPackage.motorH.release()
  
         if dir.upper() == 'FORWARD' and GPIO.input(ControlPackage.HL_pin):
           status = False
@@ -545,6 +486,7 @@ if __name__=='__main__':
     while True:
       time.sleep(1)
   except KeyboardInterrupt:
+    ControlPackage.exitFlag.clear()
     server.stop()
     ControlPackage.release()
 

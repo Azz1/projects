@@ -16,85 +16,11 @@ from StarLocator import StarLocator
 motorlib_path = os.path.abspath('../Adafruit')
 sys.path.append(motorlib_path)
 from StepMotor import StepMotor
+from StepMotor import ControlPackage
 
 lsm303lib_path = os.path.abspath('../Adafruit/Adafruit_LSM303')
 sys.path.append(lsm303lib_path)
 from Adafruit_LSM303 import Adafruit_LSM303
-
-web_path = os.path.abspath('../Web')
-sys.path.append(web_path)
-from httpserver import ControlPackage
-
-exitFlag = threading.Event()
-threadLock = threading.Lock()
-v_cmdqueue = Queue.Queue()	#queue of objects (dir=UP/DOWN, speed, steps) UP-FWD, DOWN-BKWD
-h_cmdqueue = Queue.Queue()	#queue of objects (dir=LEFT/RIGHT, speed, steps) LEFT-FWD, RIGHT-BKWD
-
-class MotorControlThread (threading.Thread):
-    def __init__(self, threadName):
-        threading.Thread.__init__(self)
-        self.threadName = threadName
-
-	# initialize vertical step motor
-  	self.motor = StepMotor(0x60, debug=False)
-  	self.motor.setFreq(1600)
-	if self.threadName == "H-Motor":
-	   self.q = h_cmdqueue
-  	   self.motor.setPort("M1M2")
-  	   self.motor.setSensor(ControlPackage.HL_pin, ControlPackage.HR_pin)
-	else:
-	   self.q = v_cmdqueue
-  	   self.motor.setPort("M3M4")
-  	   self.motor.setSensor(ControlPackage.VH_pin, ControlPackage.VL_pin)
-
-
-    def run(self):
-        print "Starting " + self.threadName
-	while exitFlag.is_set():
-           dir = ""
-           speed = 0
-           steps = 0
-	  
-	   threadLock.acquire()
-	   if not self.q.empty():
-    	      (dir, speed, steps) = self.q.get()
-           threadLock.release()
-	   
-	   if dir != "" : 
-
-	      if self.threadName == "H-Motor":
-	      # LEFT-FWD, RIGHT-BKWD
-	         self.motor.setSpeed(speed)
-	         if dir == "LEFT":
-                    self.motor.step(steps, "FORWARD", "MICROSTEP")
-                 else:
-                    self.motor.step(steps, "BACKWARD", "MICROSTEP")
-                 self.motor.release()
-
-                 if dir.upper() == 'LEFT' and GPIO.input(ControlPackage.HL_pin):
-                    print 'Horizontal leftmost limit reached!'
-
-                 if dir.upper() == 'RIGHT' and GPIO.input(ControlPackage.HR_pin):
-                    print 'Horizontal rightmost limit reached!'	
-	      	
-	      else:
-	      # UP-FWD, DOWN-BKWD
-	         self.motor.setSpeed(speed)
-	         if dir == "UP":
-                    self.motor.step(steps, "FORWARD", "MICROSTEP")
-                 else:
-                    self.motor.step(steps, "BACKWARD", "MICROSTEP")
-                 self.motor.release()
-
-                 if dir.upper() == 'UP' and GPIO.input(ControlPackage.VH_pin):
-                    print 'Vertical highest limit reached!'
-
-                 if dir.upper() == 'DOWN' and GPIO.input(ControlPackage.VL_pin):
-                    print 'Vertical lowest limit reached!'	
-
-           time.sleep(0.1)
-
-        print "Exiting " + self.threadName
 
 class StarTracking:
 
@@ -128,14 +54,10 @@ class StarTracking:
 	self.h_steps = h_steps
 	self.h_speed = h_speed
 	
-	exitFlag.set()
+	ControlPackage.exitFlag.set()
 	self.istracking = False
-    	self.motor_h = MotorControlThread("H-Motor")
-    	self.motor_v = MotorControlThread("V-Motor")
-    	self.motor_h.daemon = True
-    	self.motor_v.daemon = True
-    	self.motor_h.start()
-    	self.motor_v.start()
+    	self.motor_h = ControlPackage.motorH
+    	self.motor_v = ControlPackage.motorV
 
     def GetTarget(self):
 	if self.mode == "ALTAZ":
@@ -193,13 +115,13 @@ class StarTracking:
 	         else : h_dir = "RIGHT"
 
 	         if math.fabs(v_offset) >= min_v_offset :
-      	            threadLock.acquire()
-		    v_cmdqueue.put((v_dir, v_speed, v_steps))
-                    threadLock.release()
+      	            ControlPackage.threadLock.acquire()
+		    ControlPackage.v_cmdqueue.put((v_dir, v_speed, v_steps))
+                    ControlPackage.threadLock.release()
 	         if math.fabs(h_offset) >= min_h_offset : 
-      	            threadLock.acquire()
-		    h_cmdqueue.put((h_dir, h_speed, h_steps))
-                    threadLock.release()
+      	            ControlPackage.threadLock.acquire()
+		    ControlPackage.h_cmdqueue.put((h_dir, h_speed, h_steps))
+                    ControlPackage.threadLock.release()
 
 	      last_v_offset = v_offset
 	      last_h_offset = h_offset
@@ -209,7 +131,7 @@ class StarTracking:
 
         except KeyboardInterrupt:
 	   print "Interruption accepted, exiting ..."
-           exitFlag.clear()
+           ControlPackage.exitFlag.clear()
     	   self.motor_h.join()
     	   self.motor_v.join()
 

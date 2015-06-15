@@ -1,6 +1,8 @@
 import RPi.GPIO as GPIO
 import time
 import math
+import threading
+import Queue
  
 class StepMotor :
   # Global definations
@@ -142,6 +144,174 @@ class StepMotor :
     GPIO.output(self.Motor_Pin[2], w3)
     GPIO.output(self.Motor_Pin[3], w4)
  
+class ControlPackage :
+
+  # Touch sensor GPIO pins
+  VL_pin = 24
+  VH_pin = 23
+  HL_pin = 25
+  HR_pin = 8
+  #HL_pin = 17
+  #HR_pin = 4
+
+  GPIO.setwarnings(False)
+  GPIO.setmode(GPIO.BCM)
+
+  GPIO.setup(VL_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+  GPIO.setup(VH_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+  GPIO.setup(HL_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+  GPIO.setup(HR_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+
+  # initialize the camera 
+  #camera = picamera.PiCamera()
+  width = 700
+  height = 525
+  brightness = 50	#0-100 50 default
+  sharpness = 20	#-100-100 0 default
+  contrast = 20		#-100-100 0 default
+  saturation = 20	#-100-100 0 default
+  ss = 4000		#microsecond
+  iso = 400		#100-800 400 default
+  videolen = 20		#video length
+  imageseq = 0		#sequence id of refresh image
+  simageseq = 0		#sequence id of snapshot image
+  videoseq = 0		#sequence id of video snapshots
+  max_keep_snapshots = 10	#max number of snapsnots keep in cache
+  max_keep_videoshots = 5	#max number of videosnots keep in cache
+
+  # initialize step motors
+  exitFlag = threading.Event()
+  threadLock = threading.Lock()
+  #queue of objects (dir=UP/DOWN, speed, steps) UP-FWD, DOWN-BKWD
+  v_cmdqueue = Queue.Queue()      
+  #queue of objects (dir=LEFT/RIGHT, speed, steps) LEFT-FWD, RIGHT-BKWD
+  h_cmdqueue = Queue.Queue()      
+
+  # initialize vertical step motor
+  #motorV = StepMotor(0x60, debug=False)
+  #motorV.setFreq(1600)
+  #motorV.setPort("M3M4")
+  #motorV.setSensor(VH_pin, VL_pin)
+  vspeed = 30
+  vsteps = 100
+
+  # initialize horizontal step motor
+  #motorH = StepMotor(0x60, debug=False)
+  #motorH.setFreq(1600)
+  #motorH.setPort("M1M2")
+  #motorH.setSensor(HL_pin, HR_pin)
+  hspeed = 5
+  hsteps = 8
+
+  @staticmethod
+  def release():
+    ControlPackage.motorV.release()
+    ControlPackage.motorH.release()
+    #ControlPackage.camera.close()
+    #del ControlPackage.camera
+
+  @staticmethod
+  def Validate():
+    if ControlPackage.brightness < 0: ControlPackage.brightness = 0
+    elif ControlPackage.brightness > 100: ControlPackage.brightness = 100
+    if ControlPackage.sharpness < -100: ControlPackage.sharpness = -100
+    elif ControlPackage.sharpness > 100: ControlPackage.sharpness = 100
+    if ControlPackage.contrast < -100: ControlPackage.contrast = -100
+    elif ControlPackage.contrast > 100: ControlPackage.contrast = 100
+    if ControlPackage.saturation < -100: ControlPackage.saturation = -100
+    elif ControlPackage.saturation > 100: ControlPackage.saturation = 100
+    if ControlPackage.iso < 100: ControlPackage.iso = 100
+    elif ControlPackage.iso > 800: ControlPackage.iso = 800
+    if ControlPackage.ss < 100 : ControlPackage.ss = 100
+
+    if ControlPackage.vspeed <= 0 : ControlPackage.vspeed = 1
+    if ControlPackage.vsteps <= 0 : ControlPackage.vsteps = 1
+    if ControlPackage.hspeed <= 0 : ControlPackage.hspeed = 1
+    if ControlPackage.hsteps <= 0 : ControlPackage.vsteps = 1
+
+class MotorControlThread (threading.Thread):
+  def __init__(self, threadName):
+    threading.Thread.__init__(self)
+    self.threadName = threadName
+
+    # initialize vertical step motor
+    self.motor = StepMotor(0x60, debug=False)
+    self.motor.setFreq(1600)
+    if self.threadName == "H-Motor":
+      self.q = ControlPackage.h_cmdqueue
+      self.motor.setPort("M1M2")
+      self.motor.setSensor(ControlPackage.HL_pin, ControlPackage.HR_pin)
+    else:
+      self.q = ControlPackage.v_cmdqueue
+      self.motor.setPort("M3M4")
+      self.motor.setSensor(ControlPackage.VH_pin, ControlPackage.VL_pin)
+
+  def release(self) :
+    self.motor.release()
+
+  def run(self):
+    print "Starting " + self.threadName
+    while ControlPackage.exitFlag.is_set():
+      dir = ""
+      speed = 0
+      steps = 0
+	  
+      ControlPackage.threadLock.acquire()
+      if not self.q.empty():
+    	(dir, speed, steps) = self.q.get()
+      ControlPackage.threadLock.release()
+	   
+      if dir != "" : 
+	# if steps is less than motor seq step count, force to 2
+	# otherwise adjust to the next closest n step counts
+        if steps < self.motor.StepCount : steps = 2
+        else : 
+          while steps % self.motor.StepCount <> 0 :
+            steps += 1
+        print self.threadName + ' ' + dir + ' Speed: ' + str(speed) + ' Steps: ' + str(steps)
+
+        if self.threadName == "H-Motor":
+	  # LEFT-FWD, RIGHT-BKWD
+	  self.motor.setSpeed(speed)
+	  if dir == "LEFT":
+            self.motor.step(steps, "FORWARD", "MICROSTEP")
+          else:
+            self.motor.step(steps, "BACKWARD", "MICROSTEP")
+          self.motor.release()
+
+          if dir.upper() == 'LEFT' and GPIO.input(ControlPackage.HL_pin):
+            print 'Horizontal leftmost limit reached!'
+
+          if dir.upper() == 'RIGHT' and GPIO.input(ControlPackage.HR_pin):
+            print 'Horizontal rightmost limit reached!'	
+	      	
+	else:
+	  # UP-FWD, DOWN-BKWD
+	  self.motor.setSpeed(speed)
+	  if dir == "UP":
+            self.motor.step(steps, "FORWARD", "MICROSTEP")
+          else:
+            self.motor.step(steps, "BACKWARD", "MICROSTEP")
+          self.motor.release()
+
+          if dir.upper() == 'UP' and GPIO.input(ControlPackage.VH_pin):
+            print 'Vertical highest limit reached!'
+
+          if dir.upper() == 'DOWN' and GPIO.input(ControlPackage.VL_pin):
+            print 'Vertical lowest limit reached!'	
+
+      time.sleep(0.1)
+
+    print "Exiting " + self.threadName
+
+ControlPackage.motorH = MotorControlThread("H-Motor")
+ControlPackage.motorV = MotorControlThread("V-Motor")
+ControlPackage.motorH.daemon = True
+ControlPackage.motorV.daemon = True
+ControlPackage.exitFlag.set()
+ControlPackage.motorH.start()
+ControlPackage.motorV.start()
+
 # Main body
 
 if __name__ == '__main__':
