@@ -102,10 +102,10 @@ class StarTracking:
 
 	      if math.fabs(v_offset) < min_v_offset and math.fabs(h_offset) < min_h_offset: pass
 	      else:
-	         if math.fabs(v_offset) < 5 : v_steps = min_v_steps
+	         if math.fabs(v_offset) < 1 : v_steps = min_v_steps
 	         else : v_steps = init_v_steps
 
-	         if math.fabs(h_offset) < 5 : h_steps = min_h_steps
+	         if math.fabs(h_offset) < 1 : h_steps = min_h_steps
 	         else : h_steps = init_h_steps
 	         
 	         if v_offset > 0 : v_dir = "DOWN"
