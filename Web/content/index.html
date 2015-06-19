@@ -21,7 +21,7 @@
         	    Canvas not supported
       	    </canvas>
 	  </td>
-	  <td class="params">
+	  <td class="params" rowspan="2">
 	      <table>
 	  	 <tr>
 	    	   <td><span class="param_name">Language: </span></td>
@@ -96,29 +96,49 @@
 	  	 <tr>
 	    	   <td><span class="param_name">My Location: </span></td>
 	    	   <td>
-			<span class="param_value">LAT: <input type="text" name="myloclat" id="myloclat" tabindex="12" value="42.27" /> dg</span>
+			<span class="param_value">LAT: <br/><input type="text" name="myloclat" id="myloclat" tabindex="12" value="42.27" /> dg</span>
 		   </td><td colspan="2">
-			<span class="param_value">LONG: <input type="text" name="myloclong" id="myloclong" tabindex="13" value="-83.04" /> dg</span>
+			<span class="param_value">LONG: <br/><input type="text" name="myloclong" id="myloclong" tabindex="13" value="-83.04" /> dg</span>
 		   </td>
 	  	 </tr>
 	  	 <tr>
 	    	   <td><span class="param_name">Target: </span></td>
 	    	   <td>
-			<span class="param_value">AZ: <input type="text" name="tgaz" id="tgaz" tabindex="14" value="" /> dg</span>
-			<br/>
-			<span class="param_value">RA:<br/> 
-				<input type="text" name="tgrah" id="tgrah" tabindex="16" value="" /> h<br/> 
-				<input type="text" name="tgram" id="tgram" tabindex="17" value="" /> m<br/> 
-				<input type="text" name="tgras" id="tgras" tabindex="18" value="" /> s
-			</span>
+			<span class="param_value">AZ: <br/><input type="text" name="tgaz" id="tgaz" tabindex="14" value="" /> dg</span>
 		   </td><td colspan="2">
-			<span class="param_value">ALT: <input type="text" name="tgalt" id="tgalt" tabindex="15" value="" /> dg</span>
-			<br/>
-			<span class="param_value">DEC:<br/> 
-				<input type="text" name="tgdecdg" id="tgdecdg" tabindex="19" value="" /> dg<br/> 
-				<input type="text" name="tgdecm" id="tgdecm" tabindex="20" value="" /> m<br/> 
-				<input type="text" name="tgdecs" id="tgdecs" tabindex="21" value="" /> s
-			</span>
+			<span class="param_value">ALT: <br/><input type="text" name="tgalt" id="tgalt" tabindex="15" value="" /> dg</span>
+		   </td>
+		 </tr>
+	  	 <tr>
+	    	   <td><span class="param_name"></span></td>
+	    	   <td>
+			<span class="param_value">RA: </span>
+		   </td><td colspan="2">
+			<span class="param_value">DEC:</span> 
+		   </td>
+		 </tr>
+	  	 <tr>
+	    	   <td><span class="param_name"></span></td>
+	    	   <td>
+			<span class="param_value"><input type="text" name="tgrah" id="tgrah" tabindex="16" value="" /> h</span>
+		   </td><td colspan="2">
+			<span class="param_value"><input type="text" name="tgdecdg" id="tgdecdg" tabindex="19" value="" /> dg</span>
+		   </td>
+	  	 </tr>
+	  	 <tr>
+	    	   <td><span class="param_name"></span></td>
+	    	   <td>
+			<span class="param_value"><input type="text" name="tgram" id="tgram" tabindex="17" value="" /> m</span>
+		   </td><td colspan="2">
+			<span class="param_value"><input type="text" name="tgdecm" id="tgdecm" tabindex="20" value="" /> m</span>
+		   </td>
+	  	 </tr>
+	  	 <tr>
+	    	   <td><span class="param_name"></span></td>
+	    	   <td>
+			<span class="param_value"><input type="text" name="tgras" id="tgras" tabindex="18" value="" /> s</span>
+		   </td><td colspan="2">
+			<span class="param_value"><input type="text" name="tgdecs" id="tgdecs" tabindex="21" value="" /> s</span>
 		   </td>
 	  	 </tr>
 	  	 <tr>
@@ -132,7 +152,7 @@
 	  </td>
 	</tr>
 	<tr>
-	  <td colspan="2" class="buttons">
+	  <td class="buttons">
 	      <table>
 	  	 <tr>
 	    	   <td><span id="btn_up" class="button">Up</span></td>

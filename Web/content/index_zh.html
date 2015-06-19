@@ -21,7 +21,7 @@
         	    Canvas not supported
       	    </canvas>
 	  </td>
-	  <td class="params">
+	  <td class="params" rowspan="2">
 	      <table>
 	  	 <tr>
 	    	   <td><span class="param_name">语言: </span></td>
@@ -39,15 +39,15 @@
 	    	   <td colspan="4"><span class="param_name"><b>马达参数</b></span></td>
 	  	 </tr>
 	  	 <tr>
-	    	   <td><span class="param_name">垂直步进速度: </span></td>
+	    	   <td><span class="param_name">垂直速度: </span></td>
 	    	   <td><span class="param_value"><input type="text" name="vspeed" id="vspeed" tabindex="1" value="30" /> rpm</span></td>
-	    	   <td><span class="param_name">水平步进速度: </span></td>
+	    	   <td><span class="param_name">水平速度: </span></td>
 	    	   <td><span class="param_value"><input type="text" name="hspeed" id="hspeed" tabindex="3" value="5" /> rpm</span></td>
 	  	 </tr>
 	  	 <tr>
-	    	   <td><span class="param_name">垂直步进步数: </span></td>
+	    	   <td><span class="param_name">垂直步数: </span></td>
 	    	   <td><span class="param_value"><input type="text" name="vsteps" id="vsteps" tabindex="2" value="200" /> 步</span></td>
-	    	   <td><span class="param_name">水平步进步数: </span></td>
+	    	   <td><span class="param_name">水平步数: </span></td>
 	    	   <td><span class="param_value"><input type="text" name="hsteps" id="hsteps" tabindex="4" value="2" /> 步</span></td>
 	  	 </tr>
 	  	 <tr>
@@ -96,29 +96,49 @@
                  <tr>
                    <td><span class="param_name">我的位置: </span></td>
                    <td>
-                        <span class="param_value">纬度: <input type="text" name="myloclat" id="myloclat" tabindex="12" value="42.27" /> 度</span>
+                        <span class="param_value">纬度: <br/><input type="text" name="myloclat" id="myloclat" tabindex="12" value="42.27" /> 度</span>
                    </td><td colspan="2">
-                        <span class="param_value">经度: <input type="text" name="myloclong" id="myloclong" tabindex="13" value="-83.04" /> 度</span>
+                        <span class="param_value">经度: <br/><input type="text" name="myloclong" id="myloclong" tabindex="13" value="-83.04" /> 度</span>
                    </td>
                  </tr>
                  <tr>
                    <td><span class="param_name">目标位置: </span></td>
                    <td>
-                        <span class="param_value">AZ: <input type="text" name="tgaz" id="tgaz" tabindex="14" value="" /> 度</span>
-                        <br/>
-                        <span class="param_value">RA:<br/>
-                                <input type="text" name="tgrah" id="tgrah" tabindex="16" value="" /> 时<br/>
-                                <input type="text" name="tgram" id="tgram" tabindex="17" value="" /> 分<br/>
-                                <input type="text" name="tgras" id="tgras" tabindex="18" value="" /> 秒
-                        </span>
+                        <span class="param_value">AZ: <br/><input type="text" name="tgaz" id="tgaz" tabindex="14" value="" /> 度</span>
                    </td><td colspan="2">
-                        <span class="param_value">ALT: <input type="text" name="tgalt" id="tgalt" tabindex="15" value="" /> 度</span>
-                        <br/>
-                        <span class="param_value">DEC:<br/>
-                                <input type="text" name="tgdecdg" id="tgdecdg" tabindex="19" value="" /> 度<br/>
-                                <input type="text" name="tgdecm" id="tgdecm" tabindex="20" value="" /> 分<br/>
-                                <input type="text" name="tgdecs" id="tgdecs" tabindex="21" value="" /> 秒
-                        </span>
+                        <span class="param_value">ALT: <br/><input type="text" name="tgalt" id="tgalt" tabindex="15" value="" /> 度</span>
+                   </td>
+                 </tr>
+                 <tr>
+                   <td><span class="param_name"></span></td>
+                   <td>
+                        <span class="param_value">RA: </span>
+                   </td><td colspan="2">
+                        <span class="param_value">DEC: </span>
+                   </td>
+                 </tr>
+                 <tr>
+                   <td><span class="param_name"></span></td>
+                   <td>
+                        <span class="param_value"><input type="text" name="tgrah" id="tgrah" tabindex="16" value="" /> 时</span>
+                   </td><td colspan="2">
+                        <span class="param_value"><input type="text" name="tgdecdg" id="tgdecdg" tabindex="19" value="" /> 度</span>
+                   </td>
+                 </tr>
+                 <tr>
+                   <td><span class="param_name"></span></td>
+                   <td>
+                        <span class="param_value"><input type="text" name="tgram" id="tgram" tabindex="17" value="" /> 分</span>
+                   </td><td colspan="2">
+                        <span class="param_value"><input type="text" name="tgdecm" id="tgdecm" tabindex="20" value="" /> 分</span>
+                   </td>
+                 </tr>
+                 <tr>
+                   <td><span class="param_name"></span></td>
+                   <td>
+                        <span class="param_value"><input type="text" name="tgras" id="tgras" tabindex="18" value="" /> 秒</span>
+                   </td><td colspan="2">
+                        <span class="param_value"><input type="text" name="tgdecs" id="tgdecs" tabindex="21" value="" /> 秒</span>
                    </td>
                  </tr>
                  <tr>
@@ -129,11 +149,10 @@
 	    	   <td><span class="param_name" colspan="2"><a href="https://in-the-sky.org/ephemeris.php" target=_blank>查找星体位置</a></span></td>
 	  	 </tr>
 	      </table>
-	      </table>
 	  </td>
 	</tr>
 	<tr>
-	  <td colspan="2" class="buttons">
+	  <td class="buttons">
 	      <table>
 	  	 <tr>
 	    	   <td><span id="btn_up" class="button">上移</span></td>
