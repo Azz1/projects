@@ -25,81 +25,106 @@
 	      <table>
 	  	 <tr>
 	    	   <td><span class="param_name">语言: </span></td>
-	    	   <td><span class="param_value"><a href="index.html">English</a></span></td>
+	    	   <td colspan="3"><span class="param_value"><a href="index.html">English</a></span></td>
 	  	 </tr>
 	  	 <tr>
 	    	   <td><span class="param_name">时间: </span></td>
-	    	   <td><span id="time_id" class="param_time"></span></td>
+	    	   <td colspan="3"><span id="time_id" class="param_time"></span></td>
 	  	 </tr>
 	  	 <tr>
-	    	   <td><span class="param_name">&nbsp;</span></td>
-	    	   <td><span class="param_value">&nbsp;</span></td>
+	    	   <td colspan="2"><span class="param_name">&nbsp;</span></td>
+	    	   <td colspan="2"><span class="param_value">&nbsp;</span></td>
 	  	 </tr>
 	  	 <tr>
-	    	   <td colspan="2"><span class="param_name"><b>马达参数</b></span></td>
+	    	   <td colspan="4"><span class="param_name"><b>马达参数</b></span></td>
 	  	 </tr>
 	  	 <tr>
-	    	   <td><span class="param_name">垂直步进速度(rpm): </span></td>
-	    	   <td><span class="param_value"><input type="text" name="vspeed" id="vspeed" tabindex="1" value="30" /></span></td>
+	    	   <td><span class="param_name">垂直步进速度: </span></td>
+	    	   <td><span class="param_value"><input type="text" name="vspeed" id="vspeed" tabindex="1" value="30" /> rpm</span></td>
+	    	   <td><span class="param_name">水平步进速度: </span></td>
+	    	   <td><span class="param_value"><input type="text" name="hspeed" id="hspeed" tabindex="3" value="5" /> rpm</span></td>
 	  	 </tr>
 	  	 <tr>
-	    	   <td><span class="param_name">垂直步进步数(步): </span></td>
-	    	   <td><span class="param_value"><input type="text" name="vsteps" id="vsteps" tabindex="2" value="200" /></span></td>
+	    	   <td><span class="param_name">垂直步进步数: </span></td>
+	    	   <td><span class="param_value"><input type="text" name="vsteps" id="vsteps" tabindex="2" value="200" /> 步</span></td>
+	    	   <td><span class="param_name">水平步进步数: </span></td>
+	    	   <td><span class="param_value"><input type="text" name="hsteps" id="hsteps" tabindex="4" value="2" /> 步</span></td>
 	  	 </tr>
 	  	 <tr>
-	    	   <td><span class="param_name">水平步进速度(rpm): </span></td>
-	    	   <td><span class="param_value"><input type="text" name="hspeed" id="hspeed" tabindex="3" value="5" /></span></td>
-	  	 </tr>
-	  	 <tr>
-	    	   <td><span class="param_name">水平步进步数(步): </span></td>
-	    	   <td><span class="param_value"><input type="text" name="hsteps" id="hsteps" tabindex="4" value="2" /></span></td>
-	  	 </tr>
-	  	 <tr>
-	    	   <td colspan="2"><span class="param_name"><input type="checkbox" name="refined">精细控制</span>&nbsp;&nbsp;
+	    	   <td colspan="4"><span class="param_name"><input type="checkbox" name="refined">精细控制</span>&nbsp;&nbsp;
 	    	   <span class="param_name"><input type="checkbox" name="norefresh">视频模式</span></td>
 	  	 </tr>
 	  	 <tr>
-	    	   <td><span class="param_name">&nbsp;</span></td>
-	    	   <td><span class="param_value">&nbsp;</span></td>
+	    	   <td colspan="2"><span class="param_name">&nbsp;</span></td>
+	    	   <td colspan="2"><span class="param_value">&nbsp;</span></td>
 	  	 </tr>
 	  	 <tr>
-	    	   <td colspan="2"><span class="param_name"><b>光学参数</b></span></td>
+	    	   <td colspan="4"><span class="param_name"><b>光学参数</b></span></td>
 	  	 </tr>
 	  	 <tr>
-	    	   <td><span class="param_name">曝光时长(毫秒): </span></td>
-	    	   <td><span class="param_value"><input type="text" name="ss" id="ss" tabindex="5" value="4" /></span></td>
-	  	 </tr>
-	  	 <tr>
+	    	   <td><span class="param_name">曝光时长: </span></td>
+	    	   <td><span class="param_value"><input type="text" name="ss" id="ss" tabindex="5" value="4" /> 毫秒</span></td>
 	    	   <td><span class="param_name">ISO: </span></td>
 	    	   <td><span class="param_value"><input type="text" name="iso" id="iso" tabindex="6" value="400" /></span></td>
 	  	 </tr>
 	  	 <tr>
-	    	   <td><span class="param_name">亮度(0-100): </span></td>
-	    	   <td><span class="param_value"><input type="text" name="br" id="br" tabindex="7" value="60" /></span></td>
+	    	   <td><span class="param_name">亮度: </span></td>
+	    	   <td><span class="param_value"><input type="text" name="br" id="br" tabindex="7" value="60" />(0-100)</span></td>
+	    	   <td><span class="param_name">锐度: </span></td>
+	    	   <td><span class="param_value"><input type="text" name="sh" id="sh" tabindex="8" value="20" />(-100-100)</span></td>
 	  	 </tr>
 	  	 <tr>
-	    	   <td><span class="param_name">锐度(-100-100): </span></td>
-	    	   <td><span class="param_value"><input type="text" name="sh" id="sh" tabindex="8" value="20" /></span></td>
+	    	   <td><span class="param_name">对比度: </span></td>
+	    	   <td><span class="param_value"><input type="text" name="co" id="co" tabindex="9" value="20" />(-100-100)</span></td>
+	    	   <td><span class="param_name">饱和度: </span></td>
+	    	   <td><span class="param_value"><input type="text" name="sa" id="sa" tabindex="10" value="20" />(-100-100)</span></td>
 	  	 </tr>
 	  	 <tr>
-	    	   <td><span class="param_name">对比度(-100-100): </span></td>
-	    	   <td><span class="param_value"><input type="text" name="co" id="co" tabindex="9" value="20" /></span></td>
-	  	 </tr>
-	  	 <tr>
-	    	   <td><span class="param_name">饱和度(-100-100): </span></td>
-	    	   <td><span class="param_value"><input type="text" name="sa" id="sa" tabindex="10" value="20" /></span></td>
-	  	 </tr>
-	  	 <tr>
-	    	   <td colspan='2'><span class="param_name" >
+	    	   <td colspan='4'><span class="param_name" >
 			<input type="radio" name="cmode" value="day" checked>白昼/明亮物体&nbsp;
 			<input type="radio" name="cmode" value="night">夜间
                        </span>
 		   </td>
 	  	 </tr>
 	  	 <tr>
-	    	   <td><span class="param_name"><br />视频时长(秒): </span></td>
-	    	   <td><span class="param_value"><br /><input type="text" name="videolen" id="videolen" tabindex="11" value="10" /></span></td>
+	    	   <td><span class="param_name"><br />视频时长: </span></td>
+	    	   <td colspan="3"><span class="param_value"><br /><input type="text" name="videolen" id="videolen" tabindex="11" value="10" /> 秒</span></td>
 	  	 </tr>
+ 		 <tr>
+                   <td colspan="4"><span class="param_name" ><br/><b>星体定位</b></span></td>
+                 </tr>
+                 <tr>
+                   <td><span class="param_name">我的位置: </span></td>
+                   <td>
+                        <span class="param_value">纬度: <input type="text" name="myloclat" id="myloclat" tabindex="12" value="42.27" /> 度</span>
+                   </td><td colspan="2">
+                        <span class="param_value">经度: <input type="text" name="myloclong" id="myloclong" tabindex="13" value="-83.04" /> 度</span>
+                   </td>
+                 </tr>
+                 <tr>
+                   <td><span class="param_name">目标位置: </span></td>
+                   <td>
+                        <span class="param_value">AZ: <input type="text" name="tgaz" id="tgaz" tabindex="14" value="" /> 度</span>
+                        <br/>
+                        <span class="param_value">RA:<br/>
+                                <input type="text" name="tgrah" id="tgrah" tabindex="16" value="" /> 时<br/>
+                                <input type="text" name="tgram" id="tgram" tabindex="17" value="" /> 分<br/>
+                                <input type="text" name="tgras" id="tgras" tabindex="18" value="" /> 秒
+                        </span>
+                   </td><td colspan="2">
+                        <span class="param_value">ALT: <input type="text" name="tgalt" id="tgalt" tabindex="15" value="" /> 度</span>
+                        <br/>
+                        <span class="param_value">DEC:<br/>
+                                <input type="text" name="tgdecdg" id="tgdecdg" tabindex="19" value="" /> 度<br/>
+                                <input type="text" name="tgdecm" id="tgdecm" tabindex="20" value="" /> 分<br/>
+                                <input type="text" name="tgdecs" id="tgdecs" tabindex="21" value="" /> 秒
+                        </span>
+                   </td>
+                 </tr>
+                 <tr>
+                   <td colspan="4"><span class="param_name"><input type="checkbox" name="tracking">自动定位</span>
+                   </td>
+                 </tr>
 	  	 <tr>
 	    	   <td><span class="param_name" colspan="2"><a href="https://in-the-sky.org/ephemeris.php" target=_blank>查找星体位置</a></span></td>
 	  	 </tr>

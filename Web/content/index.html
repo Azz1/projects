@@ -25,115 +25,108 @@
 	      <table>
 	  	 <tr>
 	    	   <td><span class="param_name">Language: </span></td>
-	    	   <td><span class="param_value"><a href="index_zh.html">中文</a></span></td>
+	    	   <td colspan="3"><span class="param_value"><a href="index_zh.html">中文</a></span></td>
 	  	 </tr>
 	  	 <tr>
 	    	   <td><span class="param_name">Time: </span></td>
-	    	   <td><span id="time_id" class="param_time"></span></td>
+	    	   <td colspan="3"><span id="time_id" class="param_time"></span></td>
 	  	 </tr>
 	  	 <tr>
-	    	   <td><span class="param_name">&nbsp;</span></td>
-	    	   <td><span class="param_value">&nbsp;</span></td>
+	    	   <td colspan="2"><span class="param_name">&nbsp;</span></td>
+	    	   <td colspan="2"><span class="param_value">&nbsp;</span></td>
 	  	 </tr>
 	  	 <tr>
-	    	   <td colspan="2"><span class="param_name" ><b>Motor Control Parameters</b></span></td>
+	    	   <td colspan="4"><span class="param_name" ><b>Motor Control Parameters</b></span></td>
 	  	 </tr>
 	  	 <tr>
-	    	   <td><span class="param_name">V-Speed(rpm): </span></td>
-	    	   <td><span class="param_value"><input type="text" name="vspeed" id="vspeed" tabindex="1" value="30" /></span></td>
+	    	   <td><span class="param_name">V-Speed: </span></td>
+	    	   <td><span class="param_value"><input type="text" name="vspeed" id="vspeed" tabindex="1" value="30" /> rpm</span></td>
+	    	   <td><span class="param_name">H-Speed: </span></td>
+	    	   <td><span class="param_value"><input type="text" name="hspeed" id="hspeed" tabindex="3" value="5" /> rpm</span></td>
 	  	 </tr>
 	  	 <tr>
-	    	   <td><span class="param_name">V-Steps(steps): </span></td>
-	    	   <td><span class="param_value"><input type="text" name="vsteps" id="vsteps" tabindex="2" value="200" /></span></td>
+	    	   <td><span class="param_name">V-Steps: </span></td>
+	    	   <td><span class="param_value"><input type="text" name="vsteps" id="vsteps" tabindex="2" value="200" /> steps</span></td>
+	    	   <td><span class="param_name">H-Steps: </span></td>
+	    	   <td><span class="param_value"><input type="text" name="hsteps" id="hsteps" tabindex="4" value="2" /> steps</span></td>
 	  	 </tr>
 	  	 <tr>
-	    	   <td><span class="param_name">H-Speed(rpm): </span></td>
-	    	   <td><span class="param_value"><input type="text" name="hspeed" id="hspeed" tabindex="3" value="5" /></span></td>
-	  	 </tr>
-	  	 <tr>
-	    	   <td><span class="param_name">H-Steps(steps): </span></td>
-	    	   <td><span class="param_value"><input type="text" name="hsteps" id="hsteps" tabindex="4" value="2" /></span></td>
-	  	 </tr>
-	  	 <tr>
-	    	   <td colspan="2"><span class="param_name"><input type="checkbox" name="refined">Refined move</span>&nbsp;&nbsp;
+	    	   <td colspan="4"><span class="param_name"><input type="checkbox" name="refined">Refined move</span>&nbsp;&nbsp;
 	    	   <span class="param_name"><input type="checkbox" name="norefresh">Video mode</span></td>
 	  	 </tr>
 	  	 <tr>
-	    	   <td><span class="param_name">&nbsp;</span></td>
-	    	   <td><span class="param_value">&nbsp;</span></td>
+	    	   <td colspan="2"><span class="param_name">&nbsp;</span></td>
+	    	   <td colspan="2"><span class="param_value">&nbsp;</span></td>
 	  	 </tr>
 	  	 <tr>
-	    	   <td colspan="2"><span class="param_name" ><b>Camera Control Parameters</b></span></td>
+	    	   <td colspan="4"><span class="param_name" ><b>Camera Control Parameters</b></span></td>
 	  	 </tr>
 	  	 <tr>
-	    	   <td><span class="param_name">Shutter Speed(ms): </span></td>
-	    	   <td><span class="param_value"><input type="text" name="ss" id="ss" tabindex="5" value="4" /></span></td>
-	  	 </tr>
-	  	 <tr>
+	    	   <td><span class="param_name">Shutter Speed: </span></td>
+	    	   <td><span class="param_value"><input type="text" name="ss" id="ss" tabindex="5" value="4" /> ms</span></td>
 	    	   <td><span class="param_name">ISO: </span></td>
 	    	   <td><span class="param_value"><input type="text" name="iso" id="iso" tabindex="6" value="400" /></span></td>
 	  	 </tr>
 	  	 <tr>
-	    	   <td><span class="param_name">Brightness(0-100): </span></td>
-	    	   <td><span class="param_value"><input type="text" name="br" id="br" tabindex="7" value="60" /></span></td>
+	    	   <td><span class="param_name">Brightness: </span></td>
+	    	   <td><span class="param_value"><input type="text" name="br" id="br" tabindex="7" value="60" />(0-100)</span></td>
+	    	   <td><span class="param_name">Sharpness: </span></td>
+	    	   <td><span class="param_value"><input type="text" name="sh" id="sh" tabindex="8" value="20" />(-100-100)</span></td>
 	  	 </tr>
 	  	 <tr>
-	    	   <td><span class="param_name">Sharpness(-100-100): </span></td>
-	    	   <td><span class="param_value"><input type="text" name="sh" id="sh" tabindex="8" value="20" /></span></td>
+	    	   <td><span class="param_name">Contrast: </span></td>
+	    	   <td><span class="param_value"><input type="text" name="co" id="co" tabindex="9" value="20" />(-100-100)</span></td>
+	    	   <td><span class="param_name">Saturation: </span></td>
+	    	   <td><span class="param_value"><input type="text" name="sa" id="sa" tabindex="10" value="20" />(-100-100)</span></td>
 	  	 </tr>
 	  	 <tr>
-	    	   <td><span class="param_name">Contrast(-100-100): </span></td>
-	    	   <td><span class="param_value"><input type="text" name="co" id="co" tabindex="9" value="20" /></span></td>
-	  	 </tr>
-	  	 <tr>
-	    	   <td><span class="param_name">Saturation(-100-100): </span></td>
-	    	   <td><span class="param_value"><input type="text" name="sa" id="sa" tabindex="10" value="20" /></span></td>
-	  	 </tr>
-	  	 <tr>
-	    	   <td colspan='2'><span class="param_name" >
+	    	   <td colspan='4'><span class="param_name" >
 			<input type="radio" name="cmode" value="day" checked >Day or bright object mode&nbsp;
 			<input type="radio" name="cmode" value="night">Night mode
                        </span>
 		   </td>
 	  	 </tr>
 	  	 <tr>
-	    	   <td><span class="param_name"><br />Video Length(s): </span></td>
-	    	   <td><span class="param_value"><br /><input type="text" name="videolen" id="videolen" tabindex="11" value="10" /></span></td>
+	    	   <td><span class="param_name"><br />Video Length: </span></td>
+	    	   <td colspan="3"><span class="param_value"><br /><input type="text" name="videolen" id="videolen" tabindex="11" value="10" /> s</span></td>
 	  	 </tr>
 	  	 <tr>
-	    	   <td colspan="2"><span class="param_name" ><br/><b>Star Locator</b></span></td>
+	    	   <td colspan="4"><span class="param_name" ><br/><b>Star Locator</b></span></td>
 	  	 </tr>
 	  	 <tr>
 	    	   <td><span class="param_name">My Location: </span></td>
 	    	   <td>
-			<span class="param_value">LAT(dg): <input type="text" name="myloclat" id="myloclat" tabindex="12" value="42.27" /></span>
-			<span class="param_value">LONG(dg): <input type="text" name="myloclong" id="myloclong" tabindex="13" value="-83.04" /></span>
+			<span class="param_value">LAT: <input type="text" name="myloclat" id="myloclat" tabindex="12" value="42.27" /> dg</span>
+		   </td><td colspan="2">
+			<span class="param_value">LONG: <input type="text" name="myloclong" id="myloclong" tabindex="13" value="-83.04" /> dg</span>
 		   </td>
 	  	 </tr>
 	  	 <tr>
 	    	   <td><span class="param_name">Target: </span></td>
 	    	   <td>
-			<span class="param_value">AZ(dg): <input type="text" name="tgaz" id="tgaz" tabindex="14" value="" /></span>
-			<span class="param_value">ALT(dg): <input type="text" name="tgalt" id="tgalt" tabindex="15" value="" /></span>
+			<span class="param_value">AZ: <input type="text" name="tgaz" id="tgaz" tabindex="14" value="" /> dg</span>
 			<br/>
-			<span class="param_value">RA(h/m/s): 
-				<input type="text" name="tgrah" id="tgrah" tabindex="16" value="" />
-				<input type="text" name="tgram" id="tgram" tabindex="17" value="" />
-				<input type="text" name="tgras" id="tgras" tabindex="18" value="" />
+			<span class="param_value">RA:<br/> 
+				<input type="text" name="tgrah" id="tgrah" tabindex="16" value="" /> h<br/> 
+				<input type="text" name="tgram" id="tgram" tabindex="17" value="" /> m<br/> 
+				<input type="text" name="tgras" id="tgras" tabindex="18" value="" /> s
 			</span>
-			<span class="param_value">DEC(dg/m/s): 
-				<input type="text" name="tgdecdg" id="tgdecdg" tabindex="19" value="" />
-				<input type="text" name="tgdecm" id="tgdecm" tabindex="20" value="" />
-				<input type="text" name="tgdecs" id="tgdecs" tabindex="21" value="" />
+		   </td><td colspan="2">
+			<span class="param_value">ALT: <input type="text" name="tgalt" id="tgalt" tabindex="15" value="" /> dg</span>
+			<br/>
+			<span class="param_value">DEC:<br/> 
+				<input type="text" name="tgdecdg" id="tgdecdg" tabindex="19" value="" /> dg<br/> 
+				<input type="text" name="tgdecm" id="tgdecm" tabindex="20" value="" /> m<br/> 
+				<input type="text" name="tgdecs" id="tgdecs" tabindex="21" value="" /> s
 			</span>
 		   </td>
 	  	 </tr>
 	  	 <tr>
-	    	   <td colspan="2"><span class="param_name"><input type="checkbox" name="tracking">Tracking</span>
+	    	   <td colspan="4"><span class="param_name"><input type="checkbox" name="tracking">Tracking</span>
 	    	   </td>
 	  	 </tr>
 	  	 <tr>
-	    	   <td  colspan="2"><span class="param_name"><br/><a href="https://in-the-sky.org/ephemeris.php" target=_blank>Find Star Locations</a></span></td>
+	    	   <td  colspan="4"><span class="param_name"><br/><a href="https://in-the-sky.org/ephemeris.php" target=_blank>Find Star Locations</a></span></td>
 	  	 </tr>
 	      </table>
 	  </td>

@@ -99,3 +99,15 @@ input { font-size: 0.8em; }
 .param_time
 {
 }
+
+input[type="text"]
+{
+   width: 30px;
+}
+
+td
+{
+   text-align: left;
+   vertical-align: top;
+}
+

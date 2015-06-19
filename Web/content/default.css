@@ -100,3 +100,13 @@ input { font-size: 0.8em; }
 {
 }
 
+input[type="text"] 
+{
+   width: 30px;
+}
+
+td
+{
+   text-align: left;
+   vertical-align: top;
+}
