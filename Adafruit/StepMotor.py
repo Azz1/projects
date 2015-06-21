@@ -181,6 +181,7 @@ class ControlPackage :
 
   # initialize step motors
   exitFlag = threading.Event()
+  isTracking = threading.Event()
   threadLock = threading.Lock()
   #queue of objects (dir=UP/DOWN, speed, steps) UP-FWD, DOWN-BKWD
   v_cmdqueue = Queue.Queue()      
@@ -202,6 +203,21 @@ class ControlPackage :
   #motorH.setSensor(HL_pin, HR_pin)
   hspeed = 5
   hsteps = 8
+
+  # Tracking parameters
+  tgaz = 0.0
+  tgalt = 0.0
+  tgrah = 0.0
+  tgram = 0.0
+  tgras = 0.0
+  tgdecdg = 0.0
+  tgdecm = 0.0
+  tgdecs = 0.0
+  myloclat = 42.27
+  myloclong = -83.04
+  tgazadj = 0.0
+  tgaltadj = 0.0
+  altazradec = 'ALTAZ'
 
   @staticmethod
   def release():

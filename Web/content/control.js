@@ -215,3 +215,49 @@ $('input[type=checkbox][name=norefresh]').click( function(){
     }
 
 });
+
+$('input[type=checkbox][name=tracking]').click( function(){
+    if( $(this).is(':checked') ) {
+	$.cookie("tracking", "true");
+
+        $.post("/api/starttracking", {
+		"myloclat": $( "#myloclat" ).val(), 
+		"myloclong": $("#myloclong").val(), 
+		"altazradec": $('input[type=radio][name=altazradec]')[0].checked? 'ALTAZ' : 'RADEC', 
+		"tgaz": $("#tgaz").val(), 
+		"tgalt": $("#tgalt").val(), 
+		"tgazadj": $("#tgazadj").val(), 
+		"tgaltadj": $("#tgaltadj").val(), 
+		"tgrah": $("#tgrah").val(), 
+		"tgram": $("#tgram").val(), 
+		"tgras": $("#tgras").val(), 
+		"tgdecdg": $("#tgdecdg").val(), 
+		"tgdecm": $("#tgdecm").val(), 
+		"tgdecs": $("#tgdecs").val(),
+		"vspeed": $( "#vspeed" ).val(), 
+		"vsteps": $("#vsteps").val(),
+		"hspeed": $( "#hspeed" ).val(), 
+		"hsteps": $("#hsteps").val()
+		}, function(data) {
+        })
+        .done(function(data) {
+	    if( data["detai"] != "")
+            	$("#status_id").html(data["detail"]);
+	    else
+                $("#status_id").html("tracking started!" );
+        })
+        .fail(function() {
+          $("#status_id").html("start tracking failed!" );
+        })
+        .always(function() {
+        });
+    } else {
+	$.cookie("tracking", "false");
+
+	$.getJSON( "/api/stoptracking", function( data ) {
+            $("#status_id").html("tracking stopped!" );
+  	});
+
+    }
+
+});
