@@ -76,15 +76,12 @@ class StarTracking:
 	v_dir = ""
 	h_dir = ""
 
-	v_speed = 30
-	h_speed = 5
-
-	init_v_steps = 100
-	init_h_steps = 8
+	init_v_steps = self.v_steps
+	init_h_steps = self.h_steps
 	min_v_steps = 10
 	min_h_steps = 2
-	last_v_steps = 100
-	last_h_steps = 8
+	last_v_steps = self.v_steps
+	last_h_steps = self.h_steps
 	v_steps = last_v_steps
 	h_steps = last_h_steps
 
@@ -117,11 +114,11 @@ class StarTracking:
 
 	         if math.fabs(v_offset) >= min_v_offset :
       	            ControlPackage.threadLock.acquire()
-		    ControlPackage.v_cmdqueue.put((v_dir, v_speed, v_steps))
+		    ControlPackage.v_cmdqueue.put((v_dir, self.v_speed, v_steps))
                     ControlPackage.threadLock.release()
 	         if math.fabs(h_offset) >= min_h_offset : 
       	            ControlPackage.threadLock.acquire()
-		    ControlPackage.h_cmdqueue.put((h_dir, h_speed, h_steps))
+		    ControlPackage.h_cmdqueue.put((h_dir, self.h_speed, h_steps))
                     ControlPackage.threadLock.release()
 
 	      last_v_offset = v_offset
