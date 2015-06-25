@@ -119,15 +119,40 @@ class Adafruit_LSM303(Adafruit_I2C):
 	z = self.mag16(list, 4)
 
 	heading = 360 + 180 - (math.atan2(y,x) * 180) / pi  #+180 because sensor is pointed backward
-	if heading > 360: heading -= 360
   
   	# Normalize to 0-360
   	if heading > 360:
     	  heading -= 360
+  	if heading < 0:
+    	  heading += 360
 
         #res.append((x, y, z, heading )) 
 
         res = ( xAngle, yAngle, zAngle, heading )
+
+        return res
+
+    def readmag(self):
+	pi = 3.141592
+
+        # Read the magnetometer
+        list = self.mag.readList(self.LSM303_REGISTER_MAG_OUT_X_H_M, 6)
+
+	x = self.mag16(list, 0)
+	y = self.mag16(list, 2)
+	z = self.mag16(list, 4)
+
+	heading = 360 - (math.atan2(y,x) * 180) / pi
+  
+  	# Normalize to 0-360
+  	if heading > 360:
+    	  heading -= 360
+  	if heading < 0:
+    	  heading += 360
+
+        #res.append((x, y, z, heading )) 
+
+        res = ( x, y, z, heading )
 
         return res
 
@@ -145,5 +170,6 @@ if __name__ == '__main__':
 
     print '[(Accelerometer X, Y, Z), (Magnetometer X, Y, Z, orientation)]'
     while True:
-        print lsm.read()
+        #print lsm.read()
+        print lsm.readmag()
         sleep(1) # Output is fun to watch if this is commented out
