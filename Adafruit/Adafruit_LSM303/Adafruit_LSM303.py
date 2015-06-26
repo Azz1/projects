@@ -26,6 +26,7 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 
+import ConfigParser, os
 import math
 from Adafruit_I2C import Adafruit_I2C
 
@@ -52,6 +53,12 @@ class Adafruit_LSM303(Adafruit_I2C):
     LSM303_MAGGAIN_5_6 = 0xC0 # +/- 5.6
     LSM303_MAGGAIN_8_1 = 0xE0 # +/- 8.1
 
+    MX_MIN = 0.0
+    MX_MAX = 0.0
+    MY_MIN = 0.0
+    MY_MAX = 0.0
+    MZ_MIN = 0.0
+    MZ_MAX = 0.0
 
     def __init__(self, busnum=-1, debug=False, hires=False):
 
@@ -73,6 +80,22 @@ class Adafruit_LSM303(Adafruit_I2C):
   
         # Enable the magnetometer
         self.mag.write8(self.LSM303_REGISTER_MAG_MR_REG_M, 0x00)
+
+        config = ConfigParser.ConfigParser()
+        config.readfp(open('../../magcalibrate.conf'))
+	self.MX_MIN = config.getfloat('mag', 'XMIN')
+	self.MX_MAX = config.getfloat('mag', 'XMAX')
+	self.MY_MIN = config.getfloat('mag', 'YMIN')
+	self.MY_MAX = config.getfloat('mag', 'YMAX')
+	self.MZ_MIN = config.getfloat('mag', 'ZMIN')
+	self.MZ_MAX = config.getfloat('mag', 'ZMAX')
+	print "Read from config file:"
+	print "\tXMIN: {0}".format(self.MX_MIN)
+	print "\tXMAX: {0}".format(self.MX_MAX)
+	print "\tYMIN: {0}".format(self.MY_MIN)
+	print "\tYMAX: {0}".format(self.MY_MAX)
+	print "\tZMIN: {0}".format(self.MZ_MIN)
+	print "\tZMAX: {0}".format(self.MZ_MAX)
 
 
     # Interpret signed 12-bit acceleration component from list
@@ -118,7 +141,11 @@ class Adafruit_LSM303(Adafruit_I2C):
 	y = self.mag16(list, 2)
 	z = self.mag16(list, 4)
 
-	heading = 360 + 180 - (math.atan2(y,x) * 180) / pi  #+180 because sensor is pointed backward
+	x1 = self.normalize(x, self.MX_MIN, self.MX_MAX)
+	y1 = self.normalize(y, self.MY_MIN, self.MY_MAX)
+	z1 = self.normalize(z, self.MZ_MIN, self.MZ_MAX)
+
+	heading = 360 + 180 - (math.atan2(y1,x1) * 180) / pi  #+180 because sensor is pointed backward
   
   	# Normalize to 0-360
   	if heading > 360:
@@ -132,6 +159,11 @@ class Adafruit_LSM303(Adafruit_I2C):
 
         return res
 
+    def normalize(self, m, vmin, vmax):
+        r = (vmax - vmin)/2.0
+        z = vmax - r
+        return (m - z) / r
+
     def readmag(self):
 	pi = 3.141592
 
@@ -142,7 +174,11 @@ class Adafruit_LSM303(Adafruit_I2C):
 	y = self.mag16(list, 2)
 	z = self.mag16(list, 4)
 
-	heading = 360 - (math.atan2(y,x) * 180) / pi
+	x1 = self.normalize(x, self.MX_MIN, self.MX_MAX)
+	y1 = self.normalize(y, self.MY_MIN, self.MY_MAX)
+	z1 = self.normalize(z, self.MZ_MIN, self.MZ_MAX)
+
+	heading = 360 - (math.atan2(y1,x1) * 180) / pi
   
   	# Normalize to 0-360
   	if heading > 360:
@@ -169,7 +205,37 @@ if __name__ == '__main__':
     lsm = Adafruit_LSM303()
 
     print '[(Accelerometer X, Y, Z), (Magnetometer X, Y, Z, orientation)]'
-    while True:
+
+    x_max = 0.0
+    x_min = 0.0
+    y_max = 0.0
+    y_min = 0.0
+    z_max = 0.0
+    z_min = 0.0
+
+    try:
+      while True:
         #print lsm.read()
-        print lsm.readmag()
+        x, y, z, heading = lsm.readmag()
+
+	if x < x_min: x_min = x
+	if x > x_max: x_max = x
+
+	if y < y_min: y_min = y
+	if y > y_max: y_max = y
+
+	if z < z_min: z_min = z
+	if z > z_max: z_max = z
+
+        print '({0}, {1}, {2}) - heading: {3}'.format(x,y,z,heading)
         sleep(1) # Output is fun to watch if this is commented out
+
+    except KeyboardInterrupt:
+        print "Interruption accepted, exiting ...\n"
+        print "XMIN={0}".format(x_min)
+        print "XMAX={0}".format(x_max)
+        print "YMIN={0}".format(y_min)
+        print "YMAX={0}".format(y_max)
+        print "ZMIN={0}".format(z_min)
+        print "ZMAX={0}".format(z_max)
+
