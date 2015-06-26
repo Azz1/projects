@@ -179,6 +179,7 @@ class Adafruit_LSM303(Adafruit_I2C):
 	z1 = self.normalize(z, self.MZ_MIN, self.MZ_MAX)
 
 	heading = 360 - (math.atan2(y1,x1) * 180) / pi
+	#heading = (math.acos(x1/(math.sqrt(x1*x1 + y1*y1 + z1*z1))) * 180) / pi
   
   	# Normalize to 0-360
   	if heading > 360:
