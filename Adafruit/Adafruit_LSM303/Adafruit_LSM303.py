@@ -133,22 +133,25 @@ class Adafruit_LSM303(Adafruit_I2C):
         # Read the magnetometer
         list = self.mag.readList(self.LSM303_REGISTER_MAG_OUT_X_H_M, 6)
 
+	#x = self.mag16(list, 0)
+	#y = self.mag16(list, 2)
+	#z = self.mag16(list, 4)
 	x = self.mag16(list, 0)
-	y = self.mag16(list, 2)
-	z = self.mag16(list, 4)
+	z = self.mag16(list, 2)
+	y = self.mag16(list, 4)
 
-	x1 = x
-	y1 = y
-	z1 = z
-	#x1 = self.normalize(x, self.MX_MIN, self.MX_MAX)
-	#y1 = self.normalize(y, self.MY_MIN, self.MY_MAX)
-	#z1 = self.normalize(z, self.MZ_MIN, self.MZ_MAX)
+	#x1 = x
+	#y1 = y
+	#z1 = z
+	x1 = self.normalize(x, self.MX_MIN, self.MX_MAX)
+	y1 = self.normalize(y, self.MY_MIN, self.MY_MAX)
+	z1 = self.normalize(z, self.MZ_MIN, self.MZ_MAX)
 
 	#title compensate
 	xh = x1*math.cos(alpha) + y1*math.sin(alpha)*math.sin(gamma) - z1*math.cos(gamma)*math.sin(alpha);
   	yh = y1*math.cos(gamma) + z1*math.sin(gamma);
 
-	heading = - (math.atan2(yh,xh) * 180) / math.pi + 180 	#sensor is pointed backward
+	heading = (math.atan2(yh,xh) * 180) / math.pi + 180 	#sensor is pointed backward
 
 	if heading > 0 : heading = heading - 360
 	heading += 360	
@@ -172,15 +175,21 @@ class Adafruit_LSM303(Adafruit_I2C):
         # Read the magnetometer
         list = self.mag.readList(self.LSM303_REGISTER_MAG_OUT_X_H_M, 6)
 
+	#x = self.mag16(list, 0)
+	#y = self.mag16(list, 2)
+	#z = self.mag16(list, 4)
 	x = self.mag16(list, 0)
-	y = self.mag16(list, 2)
-	z = self.mag16(list, 4)
+	z = self.mag16(list, 2)
+	y = self.mag16(list, 4)
 
+	#x1 = x
+	#y1 = y
+	#z1 = z
 	x1 = self.normalize(x, self.MX_MIN, self.MX_MAX)
 	y1 = self.normalize(y, self.MY_MIN, self.MY_MAX)
 	z1 = self.normalize(z, self.MZ_MIN, self.MZ_MAX)
 
-	heading = -(math.atan2(y1,x1) * 180) / math.pi  
+	heading = (math.atan2(y1,x1) * 180) / math.pi  
 
 	if heading > 0 : heading = heading - 360
 	heading += 360	
@@ -212,7 +221,7 @@ if __name__ == '__main__':
 
     try:
       while True:
-        print lsm.read()
+        #print lsm.read()
         x, y, z, heading = lsm.readmag()
 
 	if x < x_min: x_min = x
