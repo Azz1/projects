@@ -88,10 +88,10 @@ class StarTracking:
         try:
     	   while ControlPackage.isTracking.is_set():
 	      target_az, target_alt = self.GetTarget()
-              print "Target: (" + str(target_az) + ", " + str(target_alt) + ")"
+              print "\nTarget location: \t(" + str(target_az) + ", \t" + str(target_alt) + ")"
    
               pos_x, pos_y, pos_alt, pos_az = self.position.read()
-              print "Current position: (" + str(pos_az) + ", " + str(pos_alt) + ")"
+              print "Current position: \t(" + str(pos_az + self.azadj) + ", \t" + str(pos_alt + self.altadj) + ")\n"
    
 	      v_offset = pos_alt + self.altadj - target_alt
 	      h_offset = pos_az + self.azadj  - target_az

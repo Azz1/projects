@@ -81,8 +81,10 @@ class Adafruit_LSM303(Adafruit_I2C):
         # Enable the magnetometer
         self.mag.write8(self.LSM303_REGISTER_MAG_MR_REG_M, 0x00)
 
+        fullpath = os.path.realpath(__file__)
+        filepath = os.path.dirname(fullpath) + '/../../magcalibrate.conf' 
         config = ConfigParser.ConfigParser()
-        config.readfp(open('../../magcalibrate.conf'))
+        config.readfp(open(filepath))
 	self.MX_MIN = config.getfloat('mag', 'XMIN')
 	self.MX_MAX = config.getfloat('mag', 'XMAX')
 	self.MY_MIN = config.getfloat('mag', 'YMIN')
@@ -151,8 +153,8 @@ class Adafruit_LSM303(Adafruit_I2C):
 	xh = x1*math.cos(alpha) + y1*math.sin(alpha)*math.sin(gamma) - z1*math.cos(gamma)*math.sin(alpha);
   	yh = y1*math.cos(gamma) + z1*math.sin(gamma);
 
-	#heading = (math.atan2(y1,x1) * 180) / math.pi + 180 	#sensor is pointed backward
-	heading = (math.atan2(yh,xh) * 180) / math.pi + 180 	#sensor is pointed backward
+	heading = (math.atan2(y1,x1) * 180) / math.pi + 180 	#sensor is pointed backward
+	#heading = (math.atan2(yh,xh) * 180) / math.pi + 180 	#sensor is pointed backward
 
 	if heading > 0 : heading = heading - 360
 	heading += 360	
@@ -183,12 +185,12 @@ class Adafruit_LSM303(Adafruit_I2C):
 	z = self.mag16(list, 2)
 	y = self.mag16(list, 4)
 
-	x1 = x
-	y1 = y
-	z1 = z
-	#x1 = self.normalize(x, self.MX_MIN, self.MX_MAX)
-	#y1 = self.normalize(y, self.MY_MIN, self.MY_MAX)
-	#z1 = self.normalize(z, self.MZ_MIN, self.MZ_MAX)
+	#x1 = x
+	#y1 = y
+	#z1 = z
+	x1 = self.normalize(x, self.MX_MIN, self.MX_MAX)
+	y1 = self.normalize(y, self.MY_MIN, self.MY_MAX)
+	z1 = self.normalize(z, self.MZ_MIN, self.MZ_MAX)
 
 	heading = (math.atan2(y1,x1) * 180) / math.pi  
 
