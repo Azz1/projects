@@ -129,8 +129,8 @@ class Adafruit_LSM303(Adafruit_I2C):
    	yAngle = math.atan2( y, (math.sqrt(x*x + z*z)))
    	zAngle = math.atan2( math.sqrt(x*x + y*y), z)	
 
-	alpha = -zAngle
-	gamma = 0
+	alpha = xAngle
+	gamma = yAngle
 
         # Read the magnetometer
         list = self.mag.readList(self.LSM303_REGISTER_MAG_OUT_X_H_M, 6)
@@ -153,8 +153,8 @@ class Adafruit_LSM303(Adafruit_I2C):
 	xh = x1*math.cos(alpha) + y1*math.sin(alpha)*math.sin(gamma) - z1*math.cos(gamma)*math.sin(alpha);
   	yh = y1*math.cos(gamma) + z1*math.sin(gamma);
 
-	heading = (math.atan2(y1,x1) * 180) / math.pi + 180 	#sensor is pointed backward
-	#heading = (math.atan2(yh,xh) * 180) / math.pi + 180 	#sensor is pointed backward
+	#heading = (math.atan2(y1,x1) * 180) / math.pi + 180 	#sensor is pointed backward
+	heading = (math.atan2(yh,xh) * 180) / math.pi + 180 	#sensor is pointed backward
 
 	if heading > 0 : heading = heading - 360
 	heading += 360	
