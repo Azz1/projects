@@ -91,7 +91,6 @@ class StarTracking:
               print "\nTarget location: \t(" + str(target_az) + ", \t" + str(target_alt) + ")"
    
               pos_alt, pos_y, pos_z, pos_az = self.position.read()
-	      pos_alt = -pos_alt
               print "Current position: \t(" + str(pos_az + self.azadj) + ", \t" + str(pos_alt + self.altadj) + ")\n"
    
 	      v_offset = pos_alt + self.altadj - target_alt
