@@ -215,7 +215,7 @@ class ControlPackage :
   tgdecs = 0.0
   myloclat = 42.27
   myloclong = -83.04
-  tgazadj = 8.0
+  tgazadj = 0.0
   tgaltadj = 0.0
   altazradec = 'ALTAZ'
 

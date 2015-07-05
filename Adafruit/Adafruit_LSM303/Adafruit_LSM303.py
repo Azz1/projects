@@ -142,12 +142,12 @@ class Adafruit_LSM303(Adafruit_I2C):
 	z = self.mag16(list, 2)
 	y = self.mag16(list, 4)
 
-	x1 = x
-	y1 = y
-	z1 = z
-	#x1 = self.normalize(x, self.MX_MIN, self.MX_MAX)
-	#y1 = self.normalize(y, self.MY_MIN, self.MY_MAX)
-	#z1 = self.normalize(z, self.MZ_MIN, self.MZ_MAX)
+	#x1 = x
+	#y1 = y
+	#z1 = z
+	x1 = self.normalize(x, self.MX_MIN, self.MX_MAX)
+	y1 = self.normalize(y, self.MY_MIN, self.MY_MAX)
+	z1 = self.normalize(z, self.MZ_MIN, self.MZ_MAX)
 
 	#title compensate
 	xh = x1*math.cos(alpha) + y1*math.sin(alpha)*math.sin(gamma) - z1*math.cos(gamma)*math.sin(alpha);
