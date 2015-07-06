@@ -11,6 +11,7 @@ import sys
 import math
 import threading
 import Queue
+from array import *
 from StarLocator import StarLocator
 
 motorlib_path = os.path.abspath('../Adafruit')
@@ -66,6 +67,44 @@ class StarTracking:
 	else:
 	    return self.locator.RaDec2AltAz1(self.ra_h, self.ra_m, self.ra_s, self.dec_dg, self.dec_m, self.dec_s, datetime.datetime.utcnow())
 
+    def read(self):
+	alt_arr = array('d', [0.0, 0.0, 0.0, 0.0, 0.0])
+	az_arr = array('d', [0.0, 0.0, 0.0, 0.0, 0.0])
+
+	for i in range(len(alt_arr)):
+          alt_arr[i], pos_y, pos_z, az_arr[i] = self.position.read()
+          time.sleep(0.1)
+	   
+	min_val = 9999.0
+	max_val = -9999.0
+	min_idx = 0
+	max_idx = 0
+	for i in range(len(alt_arr)):
+	  if alt_arr[i] < min_val:
+	    min_val = alt_arr[i]
+	    min_idx = i
+	  if alt_arr[i] > max_val:
+	    max_val = alt_arr[i]
+	    max_idx = i
+	alt_arr[min_idx] = 0.0  
+	alt_arr[max_idx] = 0.0  
+	
+	min_val = 9999.0
+	max_val = -9999.0
+	min_idx = 0
+	max_idx = 0
+	for i in range(len(az_arr)):
+	  if az_arr[i] < min_val:
+	    min_val = az_arr[i]
+	    min_idx = i
+	  if az_arr[i] > max_val:
+	    max_val = az_arr[i]
+	    max_idx = i
+	az_arr[min_idx] = 0.0  
+	az_arr[max_idx] = 0.0  
+
+	return sum(alt_arr) / (len(alt_arr)-2), sum(az_arr) / (len(az_arr)-2)
+
     def Track(self):
 	min_v_offset = 0.5
 	min_h_offset = 0.5
@@ -90,7 +129,7 @@ class StarTracking:
 	      target_az, target_alt = self.GetTarget()
               print "\nTarget location: \t(" + str(target_az) + ", \t" + str(target_alt) + ")"
    
-              pos_alt, pos_y, pos_z, pos_az = self.position.read()
+              pos_alt, pos_az = self.read()
               print "Current position: \t(" + str(pos_az + self.azadj) + ", \t" + str(pos_alt + self.altadj) + ")\n"
    
 	      v_offset = pos_alt + self.altadj - target_alt
