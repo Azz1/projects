@@ -88,6 +88,8 @@ class StarTracking:
 	    max_idx = i
 	alt_arr[min_idx] = 0.0  
 	alt_arr[max_idx] = 0.0  
+	alt_i = 2.0
+	if min_idx == max_idx: alt_i = 1.0
 	
 	min_val = 9999.0
 	max_val = -9999.0
@@ -102,8 +104,10 @@ class StarTracking:
 	    max_idx = i
 	az_arr[min_idx] = 0.0  
 	az_arr[max_idx] = 0.0  
+	az_i = 2.0
+	if min_idx == max_idx: az_i = 1.0
 
-	return sum(alt_arr) / (len(alt_arr)-2), sum(az_arr) / (len(az_arr)-2)
+	return sum(alt_arr) / (len(alt_arr)-alt_i), sum(az_arr) / (len(az_arr)-az_i)
 
     def Track(self):
 	min_v_offset = 0.5
