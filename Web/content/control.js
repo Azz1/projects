@@ -15,9 +15,9 @@ jQuery(document).ready(function() {
 	      if( key == "time" )
               	foo.html(val); 
 	      if( key == "tgaz" )
-		$("#tgaz").val(val); 
+		$("#tgaz_l").html(val); 
 	      if( key == "tgalt" )
-		$("#tgalt").val(val); 
+		$("#tgalt_l").html(val); 
 	      if( key == "curaz" )
 		$("#curaz").html(val); 
 	      if( key == "curalt" )
