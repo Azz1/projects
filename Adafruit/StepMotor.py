@@ -205,6 +205,12 @@ class ControlPackage :
   hsteps = 8
 
   # Tracking parameters
+
+  # current direction
+  curaz = 0.0
+  curalt = 0.0
+
+  # target direction
   tgaz = 0.0
   tgalt = 0.0
   tgrah = 0.0
@@ -213,10 +219,15 @@ class ControlPackage :
   tgdecdg = 0.0
   tgdecm = 0.0
   tgdecs = 0.0
+
+  #current location
   myloclat = 42.27
   myloclong = -83.04
+
+  #error adjustment
   tgazadj = 0.0
   tgaltadj = 0.0
+
   altazradec = 'ALTAZ'
 
   @staticmethod

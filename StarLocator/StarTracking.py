@@ -127,11 +127,19 @@ class StarTracking:
         try:
     	   while ControlPackage.isTracking.is_set():
 	      target_az, target_alt = self.GetTarget()
+
               print "\nTarget location: \t(" + str(target_az) + ", \t" + str(target_alt) + ")"
    
               pos_alt, pos_az = self.read()
               print "Current position: \t(" + str(pos_az + self.azadj) + ", \t" + str(pos_alt + self.altadj) + ")\n"
    
+      	      ControlPackage.threadLock.acquire()
+	      ControlPackage.tgaz = target_az
+	      ControlPackage.tgalt = target_alt
+	      ControlPackage.curaz = pos_az + self.azadj
+	      ControlPackage.curalt = pos_alt + self.altadj
+              ControlPackage.threadLock.release()
+
 	      v_offset = pos_alt + self.altadj - target_alt
 	      h_offset = pos_az + self.azadj  - target_az
 	      if h_offset > 180 : h_offset = 360 - h_offset

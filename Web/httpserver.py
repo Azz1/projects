@@ -276,17 +276,38 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
 
     self.__getCookie()
 
-    if None != re.search('/api/gettime$', self.path):	# get server time
+    if None != re.search('/api/gettime', self.path):	# get server time
       mytz="%+4.4d" % (time.timezone / -(60*60) * 100) # time.timezone counts westwards!
       dt  = datetime.datetime.now()
       dts = dt.strftime('%Y-%m-%d %H:%M:%S')  # %Z (timezone) would be empty
       nowstring="%s%s" % (dts,mytz)
+
+      s = self.path.split('/')[-2]
+      if s != "": ControlPackage.tgazadj = float(s)
+      s = self.path.split('/')[-1]
+      if s != "": ControlPackage.tgaltadj = float(s)
  
+      if not ControlPackage.isTracking.is_set():
+        tr = StarTracking(ControlPackage.myloclat, ControlPackage.myloclong, ControlPackage.altazradec,
+                        ControlPackage.tgrah, ControlPackage.tgram, ControlPackage.tgras, 
+                        ControlPackage.tgdecdg, ControlPackage.tgdecm, ControlPackage.tgdecs,
+                        ControlPackage.tgaz, ControlPackage.tgalt, ControlPackage.tgazadj, ControlPackage.tgaltadj,
+                        0, 0, 0, 0)
+        ControlPackage.curalt, ControlPackage.curaz = tr.read()
+        ControlPackage.curalt += ControlPackage.tgaltadj
+        ControlPackage.curaz += ControlPackage.tgazadj
+
       self.send_response(200)
       self.send_header('Content-Type', 'application/json')
       self.__sendCookie()
       self.end_headers()
-      self.wfile.write('{"time": "' + nowstring + '"}')
+      self.wfile.write('{' \
+		        + '"time": "' + nowstring + '",' \
+		        + '"curaz": "' + '%.4f' % ControlPackage.curaz + '",' \
+		        + '"curalt": "' + '%.4f' % ControlPackage.curalt + '",' \
+			+ '"tgaz": "' + '%.4f' % ControlPackage.tgaz + '",' \
+			+ '"tgalt": "' + '%.4f' % ControlPackage.tgalt + '"' \
+			+ '}')
 
     elif None != re.search('/api/startvideo', self.path):	# start video
       print 'GET /api/startvideo'

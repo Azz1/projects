@@ -10,9 +10,18 @@ jQuery(document).ready(function() {
     function updateTime() {
         //var now = new Date();
 
-	$.getJSON( "/api/gettime", function( data ) {
+	$.getJSON( "/api/gettime/" + $("#tgazadj").val() + '/' + $("#tgaltadj").val(), function( data ) {
   	    $.each( data, function( key, val ) {
-              foo.html(val); 
+	      if( key == "time" )
+              	foo.html(val); 
+	      if( key == "tgaz" )
+		$("#tgaz").val(val); 
+	      if( key == "tgalt" )
+		$("#tgalt").val(val); 
+	      if( key == "curaz" )
+		$("#curaz").html(val); 
+	      if( key == "curalt" )
+		$("#curalt").html(val); 
   	    });
 	});
         //$( "#btn_refresh" ).click();

@@ -91,13 +91,13 @@ class Adafruit_LSM303(Adafruit_I2C):
 	self.MY_MAX = config.getfloat('mag', 'YMAX')
 	self.MZ_MIN = config.getfloat('mag', 'ZMIN')
 	self.MZ_MAX = config.getfloat('mag', 'ZMAX')
-	print "Read from config file:"
-	print "\tXMIN: {0}".format(self.MX_MIN)
-	print "\tXMAX: {0}".format(self.MX_MAX)
-	print "\tYMIN: {0}".format(self.MY_MIN)
-	print "\tYMAX: {0}".format(self.MY_MAX)
-	print "\tZMIN: {0}".format(self.MZ_MIN)
-	print "\tZMAX: {0}".format(self.MZ_MAX)
+	#print "Read from config file:"
+	#print "\tXMIN: {0}".format(self.MX_MIN)
+	#print "\tXMAX: {0}".format(self.MX_MAX)
+	#print "\tYMIN: {0}".format(self.MY_MIN)
+	#print "\tYMAX: {0}".format(self.MY_MAX)
+	#print "\tZMIN: {0}".format(self.MZ_MIN)
+	#print "\tZMAX: {0}".format(self.MZ_MAX)
 
 
     # Interpret signed 12-bit acceleration component from list
