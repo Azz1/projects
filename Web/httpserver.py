@@ -244,7 +244,7 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
 
         tr = StarTracking(ControlPackage.myloclat, ControlPackage.myloclong, ControlPackage.altazradec,
                         ControlPackage.tgrah, ControlPackage.tgram, ControlPackage.tgras, ControlPackage.tgdecdg, ControlPackage.tgdecm, ControlPackage.tgdecs,
-                        ControlPackage.tgaz, ControlPackage.tgalt, ControlPackage.tgazadj, ControlPackage.tgaltadj,
+                        ControlPackage.tgaz, ControlPackage.tgalt, 
                         vspeed, vsteps, hspeed, hsteps)
 
         print 'Start star tracking ...'
@@ -291,7 +291,7 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
         tr = StarTracking(ControlPackage.myloclat, ControlPackage.myloclong, ControlPackage.altazradec,
                         ControlPackage.tgrah, ControlPackage.tgram, ControlPackage.tgras, 
                         ControlPackage.tgdecdg, ControlPackage.tgdecm, ControlPackage.tgdecs,
-                        ControlPackage.tgaz, ControlPackage.tgalt, ControlPackage.tgazadj, ControlPackage.tgaltadj,
+                        ControlPackage.tgaz, ControlPackage.tgalt, 
                         0, 0, 0, 0)
         ControlPackage.curalt, ControlPackage.curaz = tr.read()
         ControlPackage.curalt += ControlPackage.tgaltadj

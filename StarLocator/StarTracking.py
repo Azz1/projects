@@ -37,7 +37,7 @@ class StarTracking:
     #     az   - AZ in degree	azadj - AZ adjustment
     #     alt  - ALT in degree	altadj - ALT adjustment
 
-    def __init__(self, lat, long, mode, ra_h, ra_m, ra_s, dec_dg, dec_m, dec_s, az, alt, azadj, altadj, v_speed, v_steps, h_speed, h_steps):
+    def __init__(self, lat, long, mode, ra_h, ra_m, ra_s, dec_dg, dec_m, dec_s, az, alt, v_speed, v_steps, h_speed, h_steps):
 	self.locator = StarLocator(lat, long)
 	self.position = Adafruit_LSM303()
 	self.mode = mode
@@ -49,8 +49,6 @@ class StarTracking:
 	self.dec_s = dec_s
 	self.az = az		# target AZ & ALT if mode = ALTAZ
 	self.alt = alt
-	self.azadj = azadj
-	self.altadj = altadj
 
 	self.v_steps = v_steps	# initial motor params
 	self.v_speed = v_speed
@@ -135,17 +133,17 @@ class StarTracking:
               print "\nTarget location: \t(" + str(target_az) + ", \t" + str(target_alt) + ")"
    
               pos_alt, pos_az = self.read()
-              print "Current position: \t(" + str(pos_az + self.azadj) + ", \t" + str(pos_alt + self.altadj) + ")\n"
+              print "Current position: \t(" + str(pos_az + ControlPackage.tgazadj) + ", \t" + str(pos_alt + ControlPackage.tgaltadj) + ")\n"
    
       	      ControlPackage.threadLock.acquire()
 	      ControlPackage.tgaz = target_az
 	      ControlPackage.tgalt = target_alt
-	      ControlPackage.curaz = pos_az + self.azadj
-	      ControlPackage.curalt = pos_alt + self.altadj
+	      ControlPackage.curaz = pos_az + ControlPackage.tgazadj
+	      ControlPackage.curalt = pos_alt + ControlPackage.tgaltadj
               ControlPackage.threadLock.release()
 
-	      v_offset = pos_alt + self.altadj - target_alt
-	      h_offset = pos_az + self.azadj  - target_az
+	      v_offset = pos_alt + ControlPackage.tgaltadj - target_alt
+	      h_offset = pos_az + ControlPackage.tgazadj - target_az
 	      if h_offset > 180 : h_offset = 360 - h_offset
 	      elif h_offset < -180 : h_offset = 360 + h_offset
 
@@ -193,7 +191,7 @@ if __name__ == '__main__':
 
     tr = StarTracking(42.27069402, -83.04411196, "ALTAZ", 
 			16.0, 41.0, 42.0, 36.0, 28.0, 0.0, 
-			250.0, 20.0, 0, 0, 
+			250.0, 20.0, 
 			30, 100, 5, 50)
 
     print 'Start star tracking ...'
