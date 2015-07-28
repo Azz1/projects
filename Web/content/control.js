@@ -270,3 +270,20 @@ $('input[type=checkbox][name=tracking]').click( function(){
     }
 
 });
+
+$( "#adjoffset" ).click(function() {
+  $.post("/api/adjoffset", {}, function(data) {
+    })
+    .done(function(data) {
+        if( data["detai"] != "")
+            $("#tgazadj").val(data["azadj"]);
+            $("#tgaltadj").val(data["altadj"]);
+    })
+    .fail(function() {
+      $("#status_id").html("offset adjustment error!" );
+    })
+    .always(function() {
+    });
+
+  return false;
+});

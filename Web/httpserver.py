@@ -262,6 +262,19 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
       self.__sendCookie()
       self.end_headers()
       self.wfile.write('{"status": "' + str(status) + '", "detail": "' + statstr + '"}')
+
+    elif None != re.search('/api/adjoffset', self.path): # Direction offset adjustmnet 
+      print 'POST /api/adjoffset'
+
+      azadj = ControlPackage.tgaz - ControlPackage.curaz + ControlPackage.tgazadj
+      altadj = ControlPackage.tgalt - ControlPackage.curalt + ControlPackage.tgaltadj
+
+      self.send_response(200)
+      self.send_header('Content-Type', 'application/json')
+      self.__sendCookie()
+      self.end_headers()
+      self.wfile.write('{"azadj": "' + ("%.2f" % azadj) + '", "altadj": "' + ("%.2f" % altadj) + '"}')
+
     else:
       self.send_response(403)
       self.send_header('Content-Type', 'application/json')

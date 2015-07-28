@@ -31,6 +31,13 @@ input { font-size: 0.8em; }
   border-width: 1px;
 }
 
+.smallbutton
+{
+  background-color: #505050;
+  color: #000000;
+  text-decoration: none;
+}
+
 .buttons 
 {
 }
