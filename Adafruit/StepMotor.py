@@ -256,6 +256,12 @@ class ControlPackage :
     if ControlPackage.hspeed <= 0 : ControlPackage.hspeed = 1
     if ControlPackage.hsteps <= 0 : ControlPackage.vsteps = 1
 
+  @staticmethod
+  def newadj():
+    ControlPackage.tgazadj = ControlPackage.tgaz - ControlPackage.curaz + ControlPackage.tgazadj
+    ControlPackage.tgaltadj = ControlPackage.tgalt - ControlPackage.curalt + ControlPackage.tgaltadj
+    return (ControlPackage.tgazadj, ControlPackage.tgaltadj)
+
 class MotorControlThread (threading.Thread):
   def __init__(self, threadName):
     threading.Thread.__init__(self)

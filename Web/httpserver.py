@@ -266,8 +266,7 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
     elif None != re.search('/api/adjoffset', self.path): # Direction offset adjustmnet 
       print 'POST /api/adjoffset'
 
-      azadj = ControlPackage.tgaz - ControlPackage.curaz + ControlPackage.tgazadj
-      altadj = ControlPackage.tgalt - ControlPackage.curalt + ControlPackage.tgaltadj
+      azadj, altadj = ControlPackage.newadj()
 
       self.send_response(200)
       self.send_header('Content-Type', 'application/json')
