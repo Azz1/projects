@@ -144,7 +144,7 @@ class StarTracking:
 
 	      v_offset = pos_alt + ControlPackage.tgaltadj - target_alt
 	      h_offset = pos_az + ControlPackage.tgazadj - target_az
-	      if h_offset > 180 : h_offset = 360 - h_offset
+	      if h_offset > 180 : h_offset = h_offset - 360
 	      elif h_offset < -180 : h_offset = 360 + h_offset
 
 	      if math.fabs(v_offset) < min_v_offset and math.fabs(h_offset) < min_h_offset: pass
@@ -165,7 +165,7 @@ class StarTracking:
       	            ControlPackage.threadLock.acquire()
 		    ControlPackage.v_cmdqueue.put((v_dir, self.v_speed, v_steps))
                     ControlPackage.threadLock.release()
-	         if math.fabs(h_offset) >= min_h_offset : 
+	         if h_offset >= 2 * min_h_offset or h_offset <= - min_h_offset: 
       	            ControlPackage.threadLock.acquire()
 		    ControlPackage.h_cmdqueue.put((h_dir, self.h_speed, h_steps))
                     ControlPackage.threadLock.release()
