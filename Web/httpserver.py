@@ -333,8 +333,8 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
  
       if not videostarted:
         time.sleep(5)
-        cmdstr = 'sh runvideo.sh ' + str(int(ControlPackage.width/2.1875)) \
-                     + ' ' + str(int(ControlPackage.height/2.1875)) \
+        cmdstr = 'sh runvideo.sh ' + str(int(ControlPackage.width/2.1875*2)) \
+                     + ' ' + str(int(ControlPackage.height/2.1875*2)) \
                      + ' ' + str(ControlPackage.ss) + ' ' + str(ControlPackage.iso) \
                      + ' ' + str(ControlPackage.brightness) \
                      + ' ' + str(ControlPackage.sharpness) + ' ' + str(ControlPackage.contrast) \
