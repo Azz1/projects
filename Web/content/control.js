@@ -287,3 +287,34 @@ $( "#adjoffset" ).click(function() {
 
   return false;
 });
+
+$( "#focus_in" ).click(function() {
+    $.post("/api/motor/f/forward", {"steps": $("#focus_step").val()}, function(data) {
+    })
+    .done(function(data) {
+        if( data["detai"] != "")
+            $("#status_id").html(data["detail"]);
+    })
+    .fail(function() {
+      $("#status_id").html("motor control error!" );
+    })
+    .always(function() {
+    });
+    return false;
+});
+
+$( "#focus_out" ).click(function() {
+    $.post("/api/motor/f/backward", {"steps": $("#focus_step").val()}, function(data) {
+    })
+    .done(function(data) {
+        if( data["detai"] != "")
+            $("#status_id").html(data["detail"]);
+    })
+    .fail(function() {
+      $("#status_id").html("motor control error!" );
+    })
+    .always(function() {
+    });
+    return false;
+});
+
