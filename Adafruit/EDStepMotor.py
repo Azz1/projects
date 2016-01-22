@@ -1,8 +1,15 @@
 import RPi.GPIO as GPIO
 import time
 import math
+import os
+import sys
 import threading
 from StepMotor import StepMotor
+
+trackinglib_path = os.path.abspath('../EasyDriver')
+sys.path.append(trackinglib_path)
+
+import easydriver as ed
 
 # EasyDriver controlled stepper motor
 class EDStepMotor(StepMotor) :
@@ -14,7 +21,8 @@ class EDStepMotor(StepMotor) :
     pass
  
   def setPort(self, port):
-    "Select Motor Shield port"
+    # Select Motor Shield port
+
     if port == 'M3M4' or port == "V": 
       self.Motor_Pin = StepMotor.Motor_V_Pin
     elif port == 'M1M2' or port == "H": 
@@ -25,20 +33,36 @@ class EDStepMotor(StepMotor) :
     GPIO.setwarnings(False)
     GPIO.setmode(GPIO.BCM)
  
-    GPIO.setup(self.Motor_Pin[0], GPIO.OUT)
-    GPIO.setup(self.Motor_Pin[1], GPIO.OUT)
-    GPIO.setup(self.Motor_Pin[2], GPIO.OUT)
-    GPIO.setup(self.Motor_Pin[3], GPIO.OUT)
+    GPIO.setup(self.Motor_Pin[0], GPIO.OUT)	# Step GPIO pin
+    GPIO.setup(self.Motor_Pin[1], GPIO.OUT)	# Direction GPIO pin
+    GPIO.setup(self.Motor_Pin[2], GPIO.OUT) 	# Microstep 1 GPIO pin number.
+    GPIO.setup(self.Motor_Pin[3], GPIO.OUT) 	# Microstep 2 GPIO pin number.
+    GPIO.setup(self.Motor_Pin[4], GPIO.OUT) 	# Microstep 3 GPIO pin number.
     self.current_step = 0
  
+    """
+    Arguments to pass or set up after creating the instance.
+    Step GPIO pin number.
+    Delay between step pulses in seconds.
+    Direction GPIO pin number.
+    Microstep 1 GPIO pin number.
+    Microstep 2 GPIO pin number.
+    Microstep 3 GPIO pin number.
+    Sleep GPIO pin number.
+    Enable GPIO pin number.
+    Reset GPIO pin number.
+    Name as a string.
+    """
+    self.stepper = ed.easydriver(self.Motor_Pin[0], 0.004, self.Motor_Pin[1], self.Motor_Pin[2], self.Motor_Pin[3], self.Motor_Pin[4])
 
   def setSensor(self, fpin, bpin) :
     self.FWD_pin = fpin
     self.BKWD_pin = bpin
 
-    GPIO.setmode(GPIO.BCM)
-    GPIO.setup(self.FWD_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-    GPIO.setup(self.BKWD_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+    if fpin > 0 and bpin > 0 :
+      GPIO.setmode(GPIO.BCM)
+      GPIO.setup(self.FWD_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+      GPIO.setup(self.BKWD_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
 
   def release(self):
@@ -49,13 +73,13 @@ class EDStepMotor(StepMotor) :
     GPIO.output(self.Motor_Pin[3], 0)
 
   def setSpeed(self, rpm):
-    pass
+    self.delay = 60.0 / (50 * rpm) / 8;
 
   def step(self, steps, dir, style):
     if dir == 'FORWARD':
-      self.forward(self.delay, steps)
+      self.forward(self.delay, steps, style)
     else:
-      self.backwards(self.delay, steps)
+      self.backwards(self.delay, steps, style)
 
   def checklimit(self, dir):
     #check sensor if reaching the limit
@@ -77,13 +101,30 @@ class EDStepMotor(StepMotor) :
 
     return False
 
-  def backwards(self, delay, steps):  		#H-Right, V-Down
-    self.current_step = 0
-    self.release()
+  def backwards(self, delay, steps, style):  		#H-Right, V-Down, F-Out
+    self.stepper.set_direction(False)
+    self.stepper.set_delay(delay)
+    if style == "MICROSTEP" :
+      self.stepper.set_sixteenth_step()
+    else :
+      self.stepper.set_full_step()
+
+    for i in range(0,steps):
+      if not self.checklimit("BACKWARD") :
+        self.stepper.step()
  
-  def forward(self, delay, steps):  		#H-Left, V-Up
-    self.current_step = self.StepCount-1
-    self.release()
+  def forward(self, delay, steps, style):  		#H-Left, V-Up, F-In
+    self.stepper.set_direction(True)
+    self.stepper.set_delay(delay)
+    if style == "MICROSTEP" :
+      self.stepper.set_sixteenth_step()
+    else :
+      self.stepper.set_full_step()
+
+    for i in range(0,steps):
+      if not self.checklimit("FORWARD") :
+        self.stepper.step()
+
 
 # Main body
 

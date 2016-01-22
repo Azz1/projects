@@ -149,10 +149,6 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
         ControlPackage.v_cmdqueue.put((v_dir, speed, steps))
         ControlPackage.threadLock.release()
 
-        #ControlPackage.motorV.setSpeed(speed)
-        #ControlPackage.motorV.step(steps, dir.upper(), move_method)
-        #ControlPackage.motorV.release()
-
         if dir.upper() == 'FORWARD' and GPIO.input(ControlPackage.VH_pin):
           status = False
           statstr = 'Vertical highest limit reached!'
@@ -161,7 +157,7 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
           status = False
           statstr = 'Vertical lowest limit reached!'
 
-      else:
+      elif motorid.lower() == 'h':
 	ControlPackage.hspeed = speed
 	ControlPackage.hsteps = steps
 
@@ -171,10 +167,6 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
         ControlPackage.h_cmdqueue.put((h_dir, speed, steps))
         ControlPackage.threadLock.release()
 
-        #ControlPackage.motorH.setSpeed(speed)
-        #ControlPackage.motorH.step(steps, dir.upper(), 'MICROSTEP')
-        #ControlPackage.motorH.release()
- 
         if dir.upper() == 'FORWARD' and GPIO.input(ControlPackage.HL_pin):
           status = False
           statstr = 'Horizontal leftmost limit reached!'
@@ -182,6 +174,16 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
         if dir.upper() == 'BACKWARD' and GPIO.input(ControlPackage.HR_pin):
           status = False
           statstr = 'Horizontal rightmost limit reached!'
+
+      else:
+	ControlPackage.fspeed = speed
+	ControlPackage.fsteps = steps
+
+	ControlPackage.threadLock.acquire()
+	if dir.upper() == 'FORWARD' : f_dir = 'IN'
+	else : f_dir = 'OUT'
+        ControlPackage.f_cmdqueue.put((f_dir, speed, steps))
+        ControlPackage.threadLock.release()
 
       self.send_response(200)
       self.send_header('Content-Type', 'application/json')

@@ -12,8 +12,8 @@ class StepMotor :
          
   #GPIO Pins for vertical motor, horizontal motor and focus motor
   Motor_V_Pin = [12, 16, 20, 21]
-  Motor_H_Pin = [6, 13, 19, 26]
-  Motor_F_Pin = [4, 17, 27, 22]
+  Motor_H_Pin = [6, 13, 19, 26, 5]
+  Motor_F_Pin = [4, 17, 27, 22, 18]
 
   @abstractmethod
   def step(self, steps, dir, style): pass
@@ -183,6 +183,7 @@ class MotorControlThread (threading.Thread):
       from EDStepMotor import EDStepMotor
       self.motor = EDStepMotor(0x60, debug=False)
       self.motor.setPort("M5M6")
+      self.motor.setSensor(0, 0)	# no sensor
 
 
   def release(self) :
@@ -201,11 +202,6 @@ class MotorControlThread (threading.Thread):
       ControlPackage.threadLock.release()
 	   
       if dir != "" : 
-	# adjust to the next closest n step counts
-        if steps < self.motor.StepCount : steps = self.motor.StepCount
-        else : 
-          while steps % self.motor.StepCount <> 0 :
-            steps += 1
         print self.threadName + ' ' + dir + ' Speed: ' + str(speed) + ' Steps: ' + str(steps)
 
         if self.threadName == "H-Motor":
@@ -227,9 +223,9 @@ class MotorControlThread (threading.Thread):
 	  # UP-FWD, DOWN-BKWD
 	  self.motor.setSpeed(speed)
 	  if dir == "UP":
-            self.motor.step(steps, "FORWARD", "MICROSTEP")
+            self.motor.step(steps, "FORWARD", "SINGLE")
           else:
-            self.motor.step(steps, "BACKWARD", "MICROSTEP")
+            self.motor.step(steps, "BACKWARD", "SINGLE")
           self.motor.release()
 
           if dir.upper() == 'UP' and GPIO.input(ControlPackage.VH_pin):

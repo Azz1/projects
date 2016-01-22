@@ -65,9 +65,10 @@ class GPIOStepMotor(StepMotor) :
     self.FWD_pin = fpin
     self.BKWD_pin = bpin
 
-    GPIO.setmode(GPIO.BCM)
-    GPIO.setup(self.FWD_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-    GPIO.setup(self.BKWD_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+    if fpin > 0 and bin > 0 :
+      GPIO.setmode(GPIO.BCM)
+      GPIO.setup(self.FWD_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+      GPIO.setup(self.BKWD_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
 
   def release(self):
@@ -81,6 +82,12 @@ class GPIOStepMotor(StepMotor) :
     self.delay = 60.0 / (50 * rpm) / self.StepCount;
 
   def step(self, steps, dir, style):
+    # adjust to the next closest n step counts
+    if steps < self.StepCount : steps = self.StepCount
+    else :
+      while steps % self.StepCount <> 0 :
+        steps += 1
+
     if dir == 'FORWARD':
       self.forward(self.delay, steps)
     else:

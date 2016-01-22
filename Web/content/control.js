@@ -289,7 +289,7 @@ $( "#adjoffset" ).click(function() {
 });
 
 $( "#focus_in" ).click(function() {
-    $.post("/api/motor/f/forward", {"steps": $("#focus_step").val()}, function(data) {
+    $.post("/api/motor/f/forward", {"speed": 5, "steps": $("#focus_step").val()}, function(data) {
     })
     .done(function(data) {
         if( data["detai"] != "")
@@ -304,7 +304,7 @@ $( "#focus_in" ).click(function() {
 });
 
 $( "#focus_out" ).click(function() {
-    $.post("/api/motor/f/backward", {"steps": $("#focus_step").val()}, function(data) {
+    $.post("/api/motor/f/backward", {"speed": 5, "steps": $("#focus_step").val()}, function(data) {
     })
     .done(function(data) {
         if( data["detai"] != "")
