@@ -26,11 +26,6 @@ sys.path.append(motorlib_path)
 trackinglib_path = os.path.abspath('../StarLocator')
 sys.path.append(trackinglib_path)
 
-#via motor shield
-#from Adafruit_Motor_Driver import StepMotor
-
-#via GPIO
-from StepMotor import StepMotor
 from StepMotor import ControlPackage
 from StarTracking import StarTracking
  
