@@ -132,8 +132,8 @@ if __name__ == '__main__':
 
   try:
     motor = EDStepMotor(0x60, debug=False)
-    motor.setPort("M3M4")
-    motor.setSensor(23, 24)
+    motor.setPort("M1M2")
+    motor.setSensor(8, 25)
 
     while True:
       speed = raw_input("Speed RPM?")
