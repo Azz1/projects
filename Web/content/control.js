@@ -10,9 +10,18 @@ jQuery(document).ready(function() {
     function updateTime() {
         //var now = new Date();
 
-	$.getJSON( "/api/gettime", function( data ) {
+	$.getJSON( "/api/gettime/" + $("#tgazadj").val() + '/' + $("#tgaltadj").val(), function( data ) {
   	    $.each( data, function( key, val ) {
-              foo.html(val); 
+	      if( key == "time" )
+              	foo.html(val); 
+	      if( key == "tgaz" )
+		$("#tgaz_l").html(val); 
+	      if( key == "tgalt" )
+		$("#tgalt_l").html(val); 
+	      if( key == "curaz" )
+		$("#curaz").html(val); 
+	      if( key == "curalt" )
+		$("#curalt").html(val); 
   	    });
 	});
         //$( "#btn_refresh" ).click();
@@ -261,3 +270,51 @@ $('input[type=checkbox][name=tracking]').click( function(){
     }
 
 });
+
+$( "#adjoffset" ).click(function() {
+  $.post("/api/adjoffset", {}, function(data) {
+    })
+    .done(function(data) {
+        if( data["detai"] != "")
+            $("#tgazadj").val(data["azadj"]);
+            $("#tgaltadj").val(data["altadj"]);
+    })
+    .fail(function() {
+      $("#status_id").html("offset adjustment error!" );
+    })
+    .always(function() {
+    });
+
+  return false;
+});
+
+$( "#focus_in" ).click(function() {
+    $.post("/api/motor/f/forward", {"speed": 5, "steps": $("#focus_step").val()}, function(data) {
+    })
+    .done(function(data) {
+        if( data["detai"] != "")
+            $("#status_id").html(data["detail"]);
+    })
+    .fail(function() {
+      $("#status_id").html("motor control error!" );
+    })
+    .always(function() {
+    });
+    return false;
+});
+
+$( "#focus_out" ).click(function() {
+    $.post("/api/motor/f/backward", {"speed": 5, "steps": $("#focus_step").val()}, function(data) {
+    })
+    .done(function(data) {
+        if( data["detai"] != "")
+            $("#status_id").html(data["detail"]);
+    })
+    .fail(function() {
+      $("#status_id").html("motor control error!" );
+    })
+    .always(function() {
+    });
+    return false;
+});
+

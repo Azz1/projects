@@ -91,13 +91,13 @@ class Adafruit_LSM303(Adafruit_I2C):
 	self.MY_MAX = config.getfloat('mag', 'YMAX')
 	self.MZ_MIN = config.getfloat('mag', 'ZMIN')
 	self.MZ_MAX = config.getfloat('mag', 'ZMAX')
-	print "Read from config file:"
-	print "\tXMIN: {0}".format(self.MX_MIN)
-	print "\tXMAX: {0}".format(self.MX_MAX)
-	print "\tYMIN: {0}".format(self.MY_MIN)
-	print "\tYMAX: {0}".format(self.MY_MAX)
-	print "\tZMIN: {0}".format(self.MZ_MIN)
-	print "\tZMAX: {0}".format(self.MZ_MAX)
+	#print "Read from config file:"
+	#print "\tXMIN: {0}".format(self.MX_MIN)
+	#print "\tXMAX: {0}".format(self.MX_MAX)
+	#print "\tYMIN: {0}".format(self.MY_MIN)
+	#print "\tYMAX: {0}".format(self.MY_MAX)
+	#print "\tZMIN: {0}".format(self.MZ_MIN)
+	#print "\tZMAX: {0}".format(self.MZ_MAX)
 
 
     # Interpret signed 12-bit acceleration component from list
@@ -142,19 +142,19 @@ class Adafruit_LSM303(Adafruit_I2C):
 	z = self.mag16(list, 2)
 	y = self.mag16(list, 4)
 
-	x1 = x
-	y1 = y
-	z1 = z
-	#x1 = self.normalize(x, self.MX_MIN, self.MX_MAX)
-	#y1 = self.normalize(y, self.MY_MIN, self.MY_MAX)
-	#z1 = self.normalize(z, self.MZ_MIN, self.MZ_MAX)
+	#x1 = x
+	#y1 = y
+	#z1 = z
+	x1 = self.normalize(x, self.MX_MIN, self.MX_MAX)
+	y1 = self.normalize(y, self.MY_MIN, self.MY_MAX)
+	z1 = self.normalize(z, self.MZ_MIN, self.MZ_MAX)
 
 	#title compensate
 	xh = x1*math.cos(alpha) + y1*math.sin(alpha)*math.sin(gamma) - z1*math.cos(gamma)*math.sin(alpha);
   	yh = y1*math.cos(gamma) + z1*math.sin(gamma);
 
-	#heading = (math.atan2(y1,x1) * 180) / math.pi + 180 	#sensor is pointed backward
-	heading = (math.atan2(yh,xh) * 180) / math.pi + 180 	#sensor is pointed backward
+	#heading = (math.atan2(y1,x1) * 180) / math.pi 	#sensor is pointed backward
+	heading = (math.atan2(yh,xh) * 180) / math.pi  	#sensor is pointed backward
 
 	if heading > 0 : heading = heading - 360
 	heading += 360	

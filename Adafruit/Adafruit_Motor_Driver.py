@@ -4,6 +4,7 @@ import time
 import math
 import RPi.GPIO as GPIO
 from Adafruit_I2C import Adafruit_I2C
+from StepMotor import StepMotor
 
 # ============================================================================
 # Adafruit DC Driver
@@ -134,7 +135,7 @@ class DCM :
 # By Jack Zhu 2014-03-12
 # ============================================================================
 
-class StepMotor :
+class AFStepMotor(StepMotor) :
   i2c = None
   revsteps = 200
   currentstep = 0

@@ -26,11 +26,6 @@ sys.path.append(motorlib_path)
 trackinglib_path = os.path.abspath('../StarLocator')
 sys.path.append(trackinglib_path)
 
-#via motor shield
-#from Adafruit_Motor_Driver import StepMotor
-
-#via GPIO
-from StepMotor import StepMotor
 from StepMotor import ControlPackage
 from StarTracking import StarTracking
  
@@ -154,10 +149,6 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
         ControlPackage.v_cmdqueue.put((v_dir, speed, steps))
         ControlPackage.threadLock.release()
 
-        #ControlPackage.motorV.setSpeed(speed)
-        #ControlPackage.motorV.step(steps, dir.upper(), move_method)
-        #ControlPackage.motorV.release()
-
         if dir.upper() == 'FORWARD' and GPIO.input(ControlPackage.VH_pin):
           status = False
           statstr = 'Vertical highest limit reached!'
@@ -166,7 +157,7 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
           status = False
           statstr = 'Vertical lowest limit reached!'
 
-      else:
+      elif motorid.lower() == 'h':
 	ControlPackage.hspeed = speed
 	ControlPackage.hsteps = steps
 
@@ -176,10 +167,6 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
         ControlPackage.h_cmdqueue.put((h_dir, speed, steps))
         ControlPackage.threadLock.release()
 
-        #ControlPackage.motorH.setSpeed(speed)
-        #ControlPackage.motorH.step(steps, dir.upper(), 'MICROSTEP')
-        #ControlPackage.motorH.release()
- 
         if dir.upper() == 'FORWARD' and GPIO.input(ControlPackage.HL_pin):
           status = False
           statstr = 'Horizontal leftmost limit reached!'
@@ -187,6 +174,16 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
         if dir.upper() == 'BACKWARD' and GPIO.input(ControlPackage.HR_pin):
           status = False
           statstr = 'Horizontal rightmost limit reached!'
+
+      else:
+	ControlPackage.fspeed = speed
+	ControlPackage.fsteps = steps
+
+	ControlPackage.threadLock.acquire()
+	if dir.upper() == 'FORWARD' : f_dir = 'IN'
+	else : f_dir = 'OUT'
+        ControlPackage.f_cmdqueue.put((f_dir, speed, steps))
+        ControlPackage.threadLock.release()
 
       self.send_response(200)
       self.send_header('Content-Type', 'application/json')
@@ -244,7 +241,7 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
 
         tr = StarTracking(ControlPackage.myloclat, ControlPackage.myloclong, ControlPackage.altazradec,
                         ControlPackage.tgrah, ControlPackage.tgram, ControlPackage.tgras, ControlPackage.tgdecdg, ControlPackage.tgdecm, ControlPackage.tgdecs,
-                        ControlPackage.tgaz, ControlPackage.tgalt, ControlPackage.tgazadj, ControlPackage.tgaltadj,
+                        ControlPackage.tgaz, ControlPackage.tgalt, 
                         vspeed, vsteps, hspeed, hsteps)
 
         print 'Start star tracking ...'
@@ -262,6 +259,18 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
       self.__sendCookie()
       self.end_headers()
       self.wfile.write('{"status": "' + str(status) + '", "detail": "' + statstr + '"}')
+
+    elif None != re.search('/api/adjoffset', self.path): # Direction offset adjustmnet 
+      print 'POST /api/adjoffset'
+
+      azadj, altadj = ControlPackage.newadj()
+
+      self.send_response(200)
+      self.send_header('Content-Type', 'application/json')
+      self.__sendCookie()
+      self.end_headers()
+      self.wfile.write('{"azadj": "' + ("%.2f" % azadj) + '", "altadj": "' + ("%.2f" % altadj) + '"}')
+
     else:
       self.send_response(403)
       self.send_header('Content-Type', 'application/json')
@@ -276,17 +285,38 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
 
     self.__getCookie()
 
-    if None != re.search('/api/gettime$', self.path):	# get server time
+    if None != re.search('/api/gettime', self.path):	# get server time
       mytz="%+4.4d" % (time.timezone / -(60*60) * 100) # time.timezone counts westwards!
       dt  = datetime.datetime.now()
       dts = dt.strftime('%Y-%m-%d %H:%M:%S')  # %Z (timezone) would be empty
       nowstring="%s%s" % (dts,mytz)
+
+      s = self.path.split('/')[-2]
+      if s != "": ControlPackage.tgazadj = float(s)
+      s = self.path.split('/')[-1]
+      if s != "": ControlPackage.tgaltadj = float(s)
  
+      if not ControlPackage.isTracking.is_set():
+        tr = StarTracking(ControlPackage.myloclat, ControlPackage.myloclong, ControlPackage.altazradec,
+                        ControlPackage.tgrah, ControlPackage.tgram, ControlPackage.tgras, 
+                        ControlPackage.tgdecdg, ControlPackage.tgdecm, ControlPackage.tgdecs,
+                        ControlPackage.tgaz, ControlPackage.tgalt, 
+                        0, 0, 0, 0)
+        ControlPackage.curalt, ControlPackage.curaz = tr.read()
+        ControlPackage.curalt += ControlPackage.tgaltadj
+        ControlPackage.curaz += ControlPackage.tgazadj
+
       self.send_response(200)
       self.send_header('Content-Type', 'application/json')
       self.__sendCookie()
       self.end_headers()
-      self.wfile.write('{"time": "' + nowstring + '"}')
+      self.wfile.write('{' \
+		        + '"time": "' + nowstring + '",' \
+		        + '"curaz": "' + '%.4f' % ControlPackage.curaz + '",' \
+		        + '"curalt": "' + '%.4f' % ControlPackage.curalt + '",' \
+			+ '"tgaz": "' + '%.4f' % ControlPackage.tgaz + '",' \
+			+ '"tgalt": "' + '%.4f' % ControlPackage.tgalt + '"' \
+			+ '}')
 
     elif None != re.search('/api/startvideo', self.path):	# start video
       print 'GET /api/startvideo'
@@ -300,8 +330,8 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
  
       if not videostarted:
         time.sleep(5)
-        cmdstr = 'sh runvideo.sh ' + str(int(ControlPackage.width/2.1875)) \
-                     + ' ' + str(int(ControlPackage.height/2.1875)) \
+        cmdstr = 'sh runvideo.sh ' + str(int(ControlPackage.width/2.1875*2)) \
+                     + ' ' + str(int(ControlPackage.height/2.1875*2)) \
                      + ' ' + str(ControlPackage.ss) + ' ' + str(ControlPackage.iso) \
                      + ' ' + str(ControlPackage.brightness) \
                      + ' ' + str(ControlPackage.sharpness) + ' ' + str(ControlPackage.contrast) \

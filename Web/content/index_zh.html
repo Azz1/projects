@@ -88,10 +88,28 @@
 	  	 </tr>
 	  	 <tr>
 	    	   <td><span class="param_name"><br />视频时长: </span></td>
-	    	   <td colspan="3"><span class="param_value"><br /><input type="text" name="videolen" id="videolen" tabindex="11" value="10" /> 秒</span></td>
+	    	   <td><span class="param_value"><br /><input type="text" name="videolen" id="videolen" tabindex="11" value="10" /> 秒</span></td>
+	    	   <td><span class="param_name"><br />对焦: </span></td>
+	    	   <td><span class="param_value"><br />
+			<select id="focus_step">
+  				<option value="1">1</option>
+  				<option value="2">2</option>
+  				<option value="4">4</option>
+  				<option value="8">8</option>
+  				<option value="16">16</option>
+			</select>&nbsp;<span id="focus_in" class="smallbutton">&nbsp;+&nbsp;</span>&nbsp;<span id="focus_out" class="smallbutton">&nbsp;-&nbsp;</span></td>
 	  	 </tr>
  		 <tr>
-                   <td colspan="4"><span class="param_name" ><br/><b>星体定位</b></span></td>
+                   <td><span class="param_name" ><br/><b>星体定位</b></span></td>
+                   <td colspan="3"><span class="param_value">
+            	       <br/>当前方位: </span>
+                       AZ: <span class="param_value" id="curaz" ></span>
+                       ALT: <span class="param_value" id="curalt" ></span>
+		       <br/>目标方位: </span>
+                       AZ: <span class="param_value" id="tgaz_l" ></span>
+                       ALT: <span class="param_value" id="tgalt_l" ></span>
+
+		   </td>
                  </tr>
                  <tr>
                    <td><span class="param_name">我的位置: </span></td>
@@ -146,14 +164,15 @@
                    <td>
                         <span class="param_value">AZ Adj: <br/><input type="text" name="tgazadj" id="tgazadj" tabindex="14" value="0.0" /> dg</span>
                    </td><td colspan="2">
-                        <span class="param_value">ALT Adj`: <br/><input type="text" name="tgaltadj" id="tgaltadj" tabindex="15" value="0.0" /> dg</span>
+                        <span class="param_value">ALT Adj: <br/><input type="text" name="tgaltadj" id="tgaltadj" tabindex="15" value="0.0" /> dg</span>
                    </td>
                  </tr>
                  <tr>
                    <td colspan="4"><span class="param_name">
 			<input type="radio" name="altazradec" value="altaz" checked >ALT/AZ&nbsp;
                         <input type="radio" name="altazradec" value="radec">RA/DEC&nbsp;
-			<input type="checkbox" name="tracking">自动定位</span>
+			<input type="checkbox" name="tracking">自动定位</span>&nbsp;
+			<a id="adjoffset" class="smallbutton" href="">偏移校正</a>
                    </td>
                  </tr>
 	  	 <tr>
