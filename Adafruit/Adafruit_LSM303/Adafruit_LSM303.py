@@ -224,7 +224,7 @@ if __name__ == '__main__':
 
     try:
       while True:
-        print lsm.read()
+        # print lsm.read()
         x, y, z, heading = lsm.readmag()
 
 	if x < x_min: x_min = x
