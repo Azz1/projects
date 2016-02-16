@@ -19,8 +19,8 @@ class StepMotor :
   #	Microstep 3 GPIO pin number.
 
   Motor_V_Pin = [12, 16, 20, 21]
-  Motor_H_Pin = [6, 13, 19, 26, 5]
-  Motor_F_Pin = [4, 17, 27, 22, 18]
+  Motor_H_Pin = [6, 13, 19, 26]
+  Motor_F_Pin = [4, 17, 27, 22]
 
   @abstractmethod
   def step(self, steps, dir, style): pass

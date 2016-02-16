@@ -37,7 +37,6 @@ class EDStepMotor(StepMotor) :
     GPIO.setup(self.Motor_Pin[1], GPIO.OUT)	# Direction GPIO pin
     GPIO.setup(self.Motor_Pin[2], GPIO.OUT) 	# Microstep 1 GPIO pin number.
     GPIO.setup(self.Motor_Pin[3], GPIO.OUT) 	# Microstep 2 GPIO pin number.
-    GPIO.setup(self.Motor_Pin[4], GPIO.OUT) 	# Microstep 3 GPIO pin number.
     self.current_step = 0
  
     """
@@ -47,13 +46,12 @@ class EDStepMotor(StepMotor) :
     Direction GPIO pin number.
     Microstep 1 GPIO pin number.
     Microstep 2 GPIO pin number.
-    Microstep 3 GPIO pin number.
     Sleep GPIO pin number.
     Enable GPIO pin number.
     Reset GPIO pin number.
     Name as a string.
     """
-    self.stepper = ed.easydriver(self.Motor_Pin[0], 0.004, self.Motor_Pin[1], self.Motor_Pin[2], self.Motor_Pin[3], self.Motor_Pin[4])
+    self.stepper = ed.easydriver(self.Motor_Pin[0], 0.004, self.Motor_Pin[1], self.Motor_Pin[2], self.Motor_Pin[3])
 
   def setSensor(self, fpin, bpin) :
     self.FWD_pin = fpin
@@ -117,7 +115,7 @@ class EDStepMotor(StepMotor) :
     self.stepper.set_direction(True)
     self.stepper.set_delay(delay)
     if style == "MICROSTEP" :
-      self.stepper.set_sixteenth_step()
+      self.stepper.set_eighth_step()
     else :
       self.stepper.set_full_step()
 

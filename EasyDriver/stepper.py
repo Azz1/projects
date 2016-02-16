@@ -4,6 +4,7 @@
 # Simple example of the easydriver Python library.
 # Dave Finch 2013
 
+import sys
 import easydriver as ed
 
 
@@ -28,16 +29,49 @@ Name as a string.
 
 # Create an instance of the easydriver class.
 # Not using sleep, enable or reset in this example.
-stepper = ed.easydriver(18, 0.004, 23, 24, 17, 25)
+stepper = ed.easydriver(18, 0.004, 23, 24, 17)
 
 # Set motor direction to clockwise.
 stepper.set_direction(cw)
 
+# Set the motor to run in 1 of a step per pulse.
+
+stepper.set_full_step()
+
+# Do some steps.
+for i in range(0,200):
+    stepper.step()
+
+x = raw_input("Press enter for next test")
+
+stepper.set_direction(ccw)
+# Set the motor to run in 1/2 of a step per pulse.
+
+stepper.set_half_step()
+
+# Do some steps.
+for i in range(0,400):
+    stepper.step()
+
+x = raw_input("Press enter for next test")
+
+stepper.set_direction(cw)
+# Set the motor to run in 1/4 of a step per pulse.
+
+stepper.set_quarter_step()
+
+# Do some steps.
+for i in range(0,800):
+    stepper.step()
+
+x = raw_input("Press enter for next test")
+
+stepper.set_direction(ccw)
 # Set the motor to run in 1/8 of a step per pulse.
 stepper.set_eighth_step()
 
 # Do some steps.
-for i in range(0,100):
+for i in range(0,1600):
     stepper.step()
 
 # Clean up (just calls GPIO.cleanup() function.)
