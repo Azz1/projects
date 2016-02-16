@@ -89,7 +89,7 @@ class ControlPackage :
 
   # initialize horizontal step motor
   hspeed = 5
-  hsteps = 8
+  hsteps = 4
 
   # initialize focus step motor
   fspeed = 5
@@ -167,10 +167,8 @@ class MotorControlThread (threading.Thread):
       #from Adafruit_Motor_Driver import AFStepMotor
       #self.motor = AFStepMotor(0x60, debug=False)
 
-      from GPIOStepMotor import GPIOStepMotor
-      self.motor = GPIOStepMotor(0x60, debug=False)
-
-      self.motor.setFreq(1600)
+      from EDStepMotor import EDStepMotor
+      self.motor = EDStepMotor(0x60, debug=False)
       self.motor.setPort("M1M2")
       self.motor.setSensor(ControlPackage.HL_pin, ControlPackage.HR_pin)
 
