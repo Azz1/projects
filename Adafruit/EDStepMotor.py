@@ -65,9 +65,9 @@ class EDStepMotor(StepMotor) :
 
   def release(self):
     self.current_step = 0
-    GPIO.output(self.Motor_Pin[0], 0)
-    GPIO.output(self.Motor_Pin[1], 0)
-    GPIO.output(self.Motor_Pin[2], 0)
+    #GPIO.output(self.Motor_Pin[0], 0)
+    #GPIO.output(self.Motor_Pin[1], 0)
+    #GPIO.output(self.Motor_Pin[2], 0)
     #GPIO.output(self.Motor_Pin[3], 0)
 
   def setSpeed(self, rpm):
@@ -116,10 +116,10 @@ class EDStepMotor(StepMotor) :
   def forward(self, delay, steps, style):  		#H-Left, V-Up, F-In
     self.stepper.set_direction(True)
     self.stepper.set_delay(delay)
-    if style == "MICROSTEP" :
-      self.stepper.set_eighth_step()
-    else :
-      self.stepper.set_full_step()
+    #if style == "MICROSTEP" :
+    #  self.stepper.set_eighth_step()
+    #else :
+    #  self.stepper.set_full_step()
 
     for i in range(0,steps):
       if not self.checklimit("FORWARD") :
