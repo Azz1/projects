@@ -35,8 +35,8 @@ class EDStepMotor(StepMotor) :
  
     GPIO.setup(self.Motor_Pin[0], GPIO.OUT)	# Step GPIO pin
     GPIO.setup(self.Motor_Pin[1], GPIO.OUT)	# Direction GPIO pin
-    GPIO.setup(self.Motor_Pin[2], GPIO.OUT) 	# Microstep 1 GPIO pin number.
-    GPIO.setup(self.Motor_Pin[3], GPIO.OUT) 	# Microstep 2 GPIO pin number.
+    GPIO.setup(self.Motor_Pin[2], GPIO.OUT) 	# Sleep GPIO pin number.
+    #GPIO.setup(self.Motor_Pin[3], GPIO.OUT) 	# Reserved.
     self.current_step = 0
  
     """
@@ -51,7 +51,7 @@ class EDStepMotor(StepMotor) :
     Reset GPIO pin number.
     Name as a string.
     """
-    self.stepper = ed.easydriver(self.Motor_Pin[0], 0.004, self.Motor_Pin[1], self.Motor_Pin[2], self.Motor_Pin[3])
+    self.stepper = ed.easydriver(pin_step=self.Motor_Pin[0], delay=0.004, pin_direction=self.Motor_Pin[1], pin_sleep=self.Motor_Pin[2])
 
   def setSensor(self, fpin, bpin) :
     self.FWD_pin = fpin
@@ -68,16 +68,18 @@ class EDStepMotor(StepMotor) :
     GPIO.output(self.Motor_Pin[0], 0)
     GPIO.output(self.Motor_Pin[1], 0)
     GPIO.output(self.Motor_Pin[2], 0)
-    GPIO.output(self.Motor_Pin[3], 0)
+    #GPIO.output(self.Motor_Pin[3], 0)
 
   def setSpeed(self, rpm):
     self.delay = 60.0 / (50 * rpm) / 8;
 
   def step(self, steps, dir, style):
+    self.stepper.wake()
     if dir == 'FORWARD':
       self.forward(self.delay, steps, style)
     else:
       self.backwards(self.delay, steps, style)
+    self.stepper.sleep()
 
   def checklimit(self, dir):
     #check sensor if reaching the limit
@@ -102,10 +104,10 @@ class EDStepMotor(StepMotor) :
   def backwards(self, delay, steps, style):  		#H-Right, V-Down, F-Out
     self.stepper.set_direction(False)
     self.stepper.set_delay(delay)
-    if style == "MICROSTEP" :
-      self.stepper.set_sixteenth_step()
-    else :
-      self.stepper.set_full_step()
+    #if style == "MICROSTEP" :
+    #  self.stepper.set_sixteenth_step()
+    #else :
+    #  self.stepper.set_full_step()
 
     for i in range(0,steps):
       if not self.checklimit("BACKWARD") :

@@ -37,6 +37,7 @@ select { font-size: 0.8em; }
   background: -moz-linear-gradient( center top, #378de5 5%, #79bbff 100% );
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#378de5', endColorstr='#79bbff');
   background-color: #378de5;
+  cursor: pointer;
 }
 .smallbutton
 {
@@ -68,6 +69,7 @@ select { font-size: 0.8em; }
   font-style: normal;
   height: 15px;
   line-height: 15px;
+  text-decoration: none;
   text-align: center;
   text-shadow: 1px 1px 0px #528ecc;
 }
@@ -81,6 +83,7 @@ select { font-size: 0.8em; }
   background: -moz-linear-gradient( center top, #378de5 5%, #79bbff 100% );
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#378de5', endColorstr='#79bbff');
   background-color: #378de5;
+  cursor: pointer;
 }
 
 .button {
