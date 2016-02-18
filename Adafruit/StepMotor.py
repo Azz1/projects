@@ -212,9 +212,9 @@ class MotorControlThread (threading.Thread):
 	  # LEFT-FWD, RIGHT-BKWD
 	  self.motor.setSpeed(speed)
 	  if dir == "LEFT":
-            self.motor.step(steps, "FORWARD", "MICROSTEP")
-          else:
             self.motor.step(steps, "BACKWARD", "MICROSTEP")
+          else:
+            self.motor.step(steps, "FORWARD", "MICROSTEP")
           self.motor.release()
 
           if dir.upper() == 'LEFT' and GPIO.input(ControlPackage.HL_pin):
