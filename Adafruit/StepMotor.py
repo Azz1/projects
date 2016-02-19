@@ -14,7 +14,7 @@ class StepMotor :
   # For EasyDriver driven motors, the 5 pin seq represents:
   #	Step GPIO pin
   #	Direction GPIO pin
-  #	Sleep GPIO pin number.
+  #	Enable GPIO pin number.
   #	Reserved.
 
   Motor_V_Pin = [12, 16, 20, 21]

@@ -35,7 +35,7 @@ class EDStepMotor(StepMotor) :
  
     GPIO.setup(self.Motor_Pin[0], GPIO.OUT)	# Step GPIO pin
     GPIO.setup(self.Motor_Pin[1], GPIO.OUT)	# Direction GPIO pin
-    GPIO.setup(self.Motor_Pin[2], GPIO.OUT) 	# Sleep GPIO pin number.
+    GPIO.setup(self.Motor_Pin[2], GPIO.OUT) 	# Enable GPIO pin number.
     #GPIO.setup(self.Motor_Pin[3], GPIO.OUT) 	# Reserved.
     self.current_step = 0
  
@@ -51,7 +51,8 @@ class EDStepMotor(StepMotor) :
     Reset GPIO pin number.
     Name as a string.
     """
-    self.stepper = ed.easydriver(pin_step=self.Motor_Pin[0], delay=0.004, pin_direction=self.Motor_Pin[1], pin_sleep=self.Motor_Pin[2])
+    self.stepper = ed.easydriver(pin_step=self.Motor_Pin[0], delay=0.004, pin_direction=self.Motor_Pin[1], pin_enable=self.Motor_Pin[2])
+    self.stepper.disable()
 
   def setSensor(self, fpin, bpin) :
     self.FWD_pin = fpin
@@ -74,12 +75,12 @@ class EDStepMotor(StepMotor) :
     self.delay = 60.0 / (50 * rpm) / 8;
 
   def step(self, steps, dir, style):
-    self.stepper.wake()
+    self.stepper.enable()
     if dir == 'FORWARD':
       self.forward(self.delay, steps, style)
     else:
       self.backwards(self.delay, steps, style)
-    self.stepper.sleep()
+    self.stepper.disable()
 
   def checklimit(self, dir):
     #check sensor if reaching the limit
