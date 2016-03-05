@@ -55,7 +55,6 @@ class ControlPackage :
   GPIO.setup(HR_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
   # initialize the camera 
-  #camera = picamera.PiCamera()
   width = 700
   height = 525
   brightness = 50	#0-100 50 default
@@ -124,8 +123,7 @@ class ControlPackage :
   def release():
     ControlPackage.motorV.release()
     ControlPackage.motorH.release()
-    #ControlPackage.camera.close()
-    #del ControlPackage.camera
+    ControlPackage.camera.release()
 
   @staticmethod
   def Validate():
