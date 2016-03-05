@@ -302,6 +302,7 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
                         ControlPackage.tgdecdg, ControlPackage.tgdecm, ControlPackage.tgdecs,
                         ControlPackage.tgaz, ControlPackage.tgalt, 
                         0, 0, 0, 0)
+	ControlPackage.tgaz, ControlPackage.tgalt = tr.GetTarget()
         ControlPackage.curalt, ControlPackage.curaz = tr.read()
         ControlPackage.curalt += ControlPackage.tgaltadj
         ControlPackage.curaz += ControlPackage.tgazadj
