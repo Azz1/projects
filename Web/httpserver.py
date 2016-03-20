@@ -312,24 +312,26 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
 		        + '"vsteps": "' + str(ControlPackage.vsteps) + '",' \
 		        + '"hspeed": "' + str(ControlPackage.hspeed) + '",' \
 		        + '"hsteps": "' + str(ControlPackage.hsteps) + '",' \
+		        + '"fspeed": "' + str(ControlPackage.fspeed) + '",' \
+		        + '"fsteps": "' + str(ControlPackage.fsteps) + '",' \
 		        + '"ss": "' + str(ControlPackage.ss/1000.0) + '",' \
 		        + '"iso": "' + str(ControlPackage.iso) + '",' \
 		        + '"br": "' + str(ControlPackage.brightness) + '",' \
 		        + '"sh": "' + str(ControlPackage.sharpness) + '",' \
 		        + '"co": "' + str(ControlPackage.contrast) + '",' \
 		        + '"sa": "' + str(ControlPackage.saturation) + '",' \
-			+ '"tgaz": "' + ("" if ControlPackage.tgaz == 0.0 else str(ControlPackage.tgaz)) + '",' \
-			+ '"tgalt": "' + ("" if ControlPackage.tgalt == 0.0 else str(ControlPackage.tgalt)) + '",' \
-			+ '"tgrah": "' + ("" if ControlPackage.tgrah == 0.0 else str(ControlPackage.tgrah)) + '",' \
-			+ '"tgram": "' + ("" if ControlPackage.tgram == 0.0 else str(ControlPackage.tgram)) + '",' \
-			+ '"tgras": "' + ("" if ControlPackage.tgras == 0.0 else str(ControlPackage.tgras)) + '",' \
-			+ '"tgdecdg": "' + ("" if ControlPackage.tgdecdg == 0.0 else str(ControlPackage.tgdecdg)) + '",' \
-			+ '"tgdecm": "' + ("" if ControlPackage.tgdecm == 0.0 else str(ControlPackage.tgdecm)) + '",' \
-			+ '"tgdecs": "' + ("" if ControlPackage.tgdecs == 0.0 else str(ControlPackage.tgdecs)) + '",' \
+			+ '"tgaz": "' + str(ControlPackage.tgaz) + '",' \
+			+ '"tgalt": "' + str(ControlPackage.tgalt) + '",' \
+			+ '"tgrah": "' + str(ControlPackage.tgrah) + '",' \
+			+ '"tgram": "' + str(ControlPackage.tgram) + '",' \
+			+ '"tgras": "' + str(ControlPackage.tgras) + '",' \
+			+ '"tgdecdg": "' + str(ControlPackage.tgdecdg) + '",' \
+			+ '"tgdecm": "' + str(ControlPackage.tgdecm) + '",' \
+			+ '"tgdecs": "' + str(ControlPackage.tgdecs) + '",' \
 			+ '"tgazadj": "' + str(ControlPackage.tgazadj) + '",' \
 			+ '"tgaltadj": "' + str(ControlPackage.tgaltadj) + '",' \
-			+ '"myloclat": "' + ("" if ControlPackage.myloclat == 0.0 else str(ControlPackage.myloclat)) + '",' \
-			+ '"myloclong": "' + ("" if ControlPackage.myloclong == 0.0 else str(ControlPackage.myloclong)) + '"' \
+			+ '"myloclat": "' + str(ControlPackage.myloclat) + '",' \
+			+ '"myloclong": "' + str(ControlPackage.myloclong) + '"' \
 			+ '}')
 
     elif None != re.search('/api/snapshot', self.path):

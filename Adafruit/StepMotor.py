@@ -83,15 +83,15 @@ class ControlPackage :
 
   # initialize vertical step motor
   vspeed = 30
-  vsteps = 100
+  vsteps = 200
 
   # initialize horizontal step motor
   hspeed = 5
-  hsteps = 4
+  hsteps = 8
 
   # initialize focus step motor
   fspeed = 5
-  fsteps = 1
+  fsteps = 48
 
   # Tracking parameters
 
