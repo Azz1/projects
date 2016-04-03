@@ -49,6 +49,8 @@ class RaspiShellCamera(Camera):
     global camera_lock
     global videostarted
 
+    if videostarted: return
+
     try:
       ControlPackage.imageseq = ControlPackage.imageseq + 1
       localtime   = time.localtime()
@@ -102,6 +104,8 @@ class RaspiShellCamera(Camera):
   def snapshot_full(self) : 
     global camera_lock
     global videostarted
+
+    if videostarted: return
 
     try:
       ControlPackage.simageseq = ControlPackage.simageseq + 1
@@ -169,25 +173,29 @@ class RaspiShellCamera(Camera):
   def startvideo(self): 
     global videostarted
     if not videostarted:
-      time.sleep(5)
-      cmdstr = 'sh runvideo.sh ' + str(int(ControlPackage.width/2.1875*2)) \
+      try:
+        camera_lock.acquire();
+        time.sleep(5)
+        cmdstr = 'sh runvideo.sh ' + str(int(ControlPackage.width/2.1875*2)) \
                      + ' ' + str(int(ControlPackage.height/2.1875*2)) \
                      + ' ' + str(ControlPackage.ss) + ' ' + str(ControlPackage.iso) \
                      + ' ' + str(ControlPackage.brightness) \
                      + ' ' + str(ControlPackage.sharpness) + ' ' + str(ControlPackage.contrast) \
                      + ' ' + str(ControlPackage.saturation)
-      print cmdstr
-      os.system( cmdstr )
-      videostarted = True
-      time.sleep(8)
+        print cmdstr
+        os.system( cmdstr )
+        videostarted = True
+        time.sleep(8)
+      finally:
+        camera_lock.release();
 
  
   def stopvideo(self): 
     global videostarted
+    videostarted = False
     cmdstr = 'sh stopvideo.sh'
     print cmdstr
     os.system( cmdstr )
-    videostarted = False
 
  
   def release(self): pass
