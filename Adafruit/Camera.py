@@ -63,7 +63,7 @@ class RaspiShellCamera(Camera):
       #ControlPackage.camera.capture(fname, format='jpeg', resize=(ControlPackage.width,ControlPackage.height))
 
       # to enable -ss option, which is shutter speed, update the firmware sudo rpi-update
-      cmdstr = 'raspistill -o ' + fname + ' -w ' + str(ControlPackage.width) \
+      cmdstr = 'raspistill -o ' + fname + ' -vf -hf -w ' + str(ControlPackage.width) \
                      + ' -h ' + str(ControlPackage.height) \
                      + ' -br ' + str(ControlPackage.brightness) \
                      + ' -ss ' + str(ControlPackage.ss) + ' -ISO ' + str(ControlPackage.iso) \
@@ -120,7 +120,7 @@ class RaspiShellCamera(Camera):
       #time.sleep(0.5)
       #ControlPackage.camera.capture(fname, format='jpeg', resize=(ControlPackage.width,ControlPackage.height))
 
-      cmdstr = 'raspistill -o ' + fname + ' -br ' \
+      cmdstr = 'raspistill -o ' + fname + ' -vf -hf -br ' \
                      + str(ControlPackage.brightness) \
                      + ' -ss ' + str(ControlPackage.ss) + ' -ISO ' + str(ControlPackage.iso) \
                      + ' -sh ' + str(ControlPackage.sharpness) + ' -co ' + str(ControlPackage.contrast) \
@@ -154,7 +154,7 @@ class RaspiShellCamera(Camera):
       # TAKE A PHOTO OF HIGH RESOLUTION
       camera_lock.acquire();
 
-      cmdstr = 'raspivid -o ' + fname + ' -br ' \
+      cmdstr = 'raspivid -o ' + fname + ' -vf -hf -br ' \
                      + str(ControlPackage.brightness) \
                      + ' -ss ' + str(ControlPackage.ss) + ' -ISO ' + str(ControlPackage.iso) \
                      + ' -sh ' + str(ControlPackage.sharpness) + ' -co ' + str(ControlPackage.contrast) \
