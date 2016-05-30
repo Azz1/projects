@@ -54,6 +54,9 @@ class StarTracking:
 	self.v_speed = v_speed
 	self.h_steps = h_steps
 	self.h_speed = h_speed
+
+	if v_steps > 300: self.v_steps = 300
+	if h_steps > 20: self.h_steps = 20
 	
 	ControlPackage.exitFlag.set()
     	self.motor_h = ControlPackage.motorH
