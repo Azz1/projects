@@ -111,7 +111,7 @@ class StarTracking:
 	return sum(alt_arr) / (len(alt_arr)-alt_i), sum(az_arr) / (len(az_arr)-az_i)
 
     def Track(self):
-	min_v_offset = 0.5
+	min_v_offset = 0.2
 	min_h_offset = 0.5
 	last_v_offset = 0.0
 	last_h_offset = 0.0
