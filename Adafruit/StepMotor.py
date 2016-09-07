@@ -137,7 +137,7 @@ class ControlPackage :
     if ControlPackage.saturation < -100: ControlPackage.saturation = -100
     elif ControlPackage.saturation > 100: ControlPackage.saturation = 100
     if ControlPackage.iso < 100: ControlPackage.iso = 100
-    elif ControlPackage.iso > 800: ControlPackage.iso = 800
+    elif ControlPackage.iso > 1600: ControlPackage.iso = 1600
     if ControlPackage.ss < 100 : ControlPackage.ss = 100
 
     if ControlPackage.vspeed <= 0 : ControlPackage.vspeed = 1

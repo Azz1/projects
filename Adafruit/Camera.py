@@ -66,7 +66,7 @@ class RaspiShellCamera(Camera):
       cmdstr = 'raspistill -o ' + fname + ' -vf -hf -w ' + str(ControlPackage.width) \
                      + ' -h ' + str(ControlPackage.height) \
                      + ' -br ' + str(ControlPackage.brightness) \
-                     + (' -ex fireworks -ss ' if ControlPackage.cmode == 'night' else ' -ss ') + str(ControlPackage.ss) + ' -ISO ' + str(ControlPackage.iso) \
+                     + (' -ex night -ss ' if ControlPackage.cmode == 'night' else ' -ss ') + str(ControlPackage.ss) + ' -ISO ' + str(ControlPackage.iso) \
                      + ' -sh ' + str(ControlPackage.sharpness) + ' -co ' + str(ControlPackage.contrast) \
                      + ' -sa ' + str(ControlPackage.saturation)
       print cmdstr
@@ -122,7 +122,7 @@ class RaspiShellCamera(Camera):
 
       cmdstr = 'raspistill -o ' + fname + ' -vf -hf -br ' \
                      + str(ControlPackage.brightness) \
-                     + (' -ex fireworks -ss ' if ControlPackage.cmode == 'night' else ' -ss ') + str(ControlPackage.ss) + ' -ISO ' + str(ControlPackage.iso) \
+                     + (' -ex night -ss ' if ControlPackage.cmode == 'night' else ' -ss ') + str(ControlPackage.ss) + ' -ISO ' + str(ControlPackage.iso) \
                      + ' -sh ' + str(ControlPackage.sharpness) + ' -co ' + str(ControlPackage.contrast) \
                      + ' -sa ' + str(ControlPackage.saturation)
       print cmdstr
