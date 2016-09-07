@@ -54,6 +54,7 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
       ControlPackage.sharpness = int(data['sh'][0])
       ControlPackage.contrast = int(data['co'][0])
       ControlPackage.saturation = int(data['sa'][0])
+      ControlPackage.cmode = data['cmode'][0]
       ControlPackage.Validate()
 
       localtime, imgstr = ControlPackage.camera.snapshot()

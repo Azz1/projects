@@ -75,7 +75,7 @@ $( "#btn_refresh" ).click(function() {
     $("#status_id").html("Refreshing ...");	
     $.post("/api/refresh", {
 			   "ss": $( "#ss" ).val(), "iso": $("#iso").val(), "br": $("#br").val(),
-			   "sh": $( "#sh" ).val(), "co": $("#co").val(), "sa": $("#sa").val() 
+			   "sh": $( "#sh" ).val(), "co": $("#co").val(), "sa": $("#sa").val(), "cmode": ($('input[type=radio][name=cmode]')[1].checked ? 'night' : 'day')
 			   }, function(msg) {
     })
     .done(function(msg) {
@@ -174,7 +174,7 @@ $('input[type=radio][name=cmode]').change(function() {
         }
         else {
 	    $.cookie("cmode", "night");
-	    $("#ss").val('1000');
+	    $("#ss").val('800');
 	    $("#iso").val('800');
         }
 });
