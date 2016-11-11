@@ -39,6 +39,11 @@ jQuery(document).ready(function() {
     else
         $('input[type=checkbox][name=refined]').prop("checked", false);
 
+    if( $.cookie("rawmode") == "true" )
+        $('input[type=checkbox][name=rawmode]').prop("checked", true);
+    else
+        $('input[type=checkbox][name=rawmode]').prop("checked", false);
+
     if( $.cookie("cmode") == "night" ) {
         $('input[type=radio][name=cmode]')[0].checked = false;
         $('input[type=radio][name=cmode]')[1].checked = true;
@@ -75,7 +80,9 @@ $( "#btn_refresh" ).click(function() {
     $("#status_id").html("Refreshing ...");	
     $.post("/api/refresh", {
 			   "ss": $( "#ss" ).val(), "iso": $("#iso").val(), "br": $("#br").val(),
-			   "sh": $( "#sh" ).val(), "co": $("#co").val(), "sa": $("#sa").val(), "cmode": ($('input[type=radio][name=cmode]')[1].checked ? 'night' : 'day')
+			   "sh": $( "#sh" ).val(), "co": $("#co").val(), "sa": $("#sa").val(), 
+                           "cmode": ($('input[type=radio][name=cmode]')[1].checked ? 'night' : 'day'), 
+                           "rawmode": ($('input[type=checkbox][name=rawmode]').is(':checked')? 'true':'false')
 			   }, function(msg) {
     })
     .done(function(msg) {
@@ -184,6 +191,13 @@ $('input[type=checkbox][name=refined]').click( function(){
 	$.cookie("refined", "true");
     else
 	$.cookie("refined", "false");
+});
+
+$('input[type=checkbox][name=rawmode]').click( function(){
+    if( $(this).is(':checked') ) 
+	$.cookie("rawmode", "true");
+    else
+	$.cookie("rawmode", "false");
 });
 
 $('input[type=checkbox][name=norefresh]').click( function(){

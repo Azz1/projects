@@ -110,7 +110,10 @@ class RaspiShellCamera(Camera):
     try:
       ControlPackage.simageseq = ControlPackage.simageseq + 1
       localtime   = time.localtime()
+
       fname = 'temp/snapshot-' + str(ControlPackage.simageseq) + '-' + time.strftime("%Y%m%d-%H%M%S", localtime) + '.jpg'
+      if ControlPackage.rawmode == 'true' :
+        fname = 'temp/snapshot-' + str(ControlPackage.simageseq) + '-' + time.strftime("%Y%m%d-%H%M%S", localtime) + '-raw.jpg'
 
 
       # TAKE A PHOTO OF HIGH RESOLUTION
@@ -120,7 +123,7 @@ class RaspiShellCamera(Camera):
       #time.sleep(0.5)
       #ControlPackage.camera.capture(fname, format='jpeg', resize=(ControlPackage.width,ControlPackage.height))
 
-      cmdstr = 'raspistill -o ' + fname + ' -vf -hf -br ' \
+      cmdstr = 'raspistill ' + (' --raw ' if ControlPackage.rawmode == 'true' else '') + ' -o ' + fname + ' -vf -hf -br ' \
                      + str(ControlPackage.brightness) \
                      + (' -ex night -ss ' if ControlPackage.cmode == 'night' else ' -ss ') + str(ControlPackage.ss) + ' -ISO ' + str(ControlPackage.iso) \
                      + ' -sh ' + str(ControlPackage.sharpness) + ' -co ' + str(ControlPackage.contrast) \

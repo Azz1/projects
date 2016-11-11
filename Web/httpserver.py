@@ -35,6 +35,7 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
       self.cookie['refined'] = 'false'
       self.cookie['norefresh'] = 'false'
       self.cookie['cmode'] = 'day'
+      self.cookie['rawmode'] = 'false'
 
   def __sendCookie(self):
     for c in self.cookie.values():
@@ -55,6 +56,7 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
       ControlPackage.contrast = int(data['co'][0])
       ControlPackage.saturation = int(data['sa'][0])
       ControlPackage.cmode = data['cmode'][0]
+      ControlPackage.rawmode = data['rawmode'][0]
       ControlPackage.Validate()
 
       localtime, imgstr = ControlPackage.camera.snapshot()
