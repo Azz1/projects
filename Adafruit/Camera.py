@@ -111,9 +111,12 @@ class RaspiShellCamera(Camera):
       ControlPackage.simageseq = ControlPackage.simageseq + 1
       localtime   = time.localtime()
 
-      fname = 'temp/snapshot-' + str(ControlPackage.simageseq) + '-' + time.strftime("%Y%m%d-%H%M%S", localtime) + '.jpg'
+      fname = 'temp/snapshot-' + str(ControlPackage.simageseq) + '-' + time.strftime("%Y%m%d-%H%M%S", localtime) 
+      if  ControlPackage.timelapse > 1:
+        fname = fname + '-%d'
       if ControlPackage.rawmode == 'true' :
-        fname = 'temp/snapshot-' + str(ControlPackage.simageseq) + '-' + time.strftime("%Y%m%d-%H%M%S", localtime) + '-raw.jpg'
+        fname = fname + '-raw'
+      fname = fname + '.jpg'
 
 
       # TAKE A PHOTO OF HIGH RESOLUTION
@@ -123,11 +126,17 @@ class RaspiShellCamera(Camera):
       #time.sleep(0.5)
       #ControlPackage.camera.capture(fname, format='jpeg', resize=(ControlPackage.width,ControlPackage.height))
 
+      ts = ''
+      tl = ControlPackage.ss + 1000
+      tt = tl * (ControlPackage.timelapse-1)
+      if ControlPackage.timelapse > 1:
+        ts = '-tl ' + str(tl) + ' -t ' +  str(tt)
+        
       cmdstr = 'raspistill ' + (' --raw ' if ControlPackage.rawmode == 'true' else '') + ' -o ' + fname + ' -vf -hf -br ' \
                      + str(ControlPackage.brightness) \
                      + (' -ex night -ss ' if ControlPackage.cmode == 'night' else ' -ss ') + str(ControlPackage.ss) + ' -ISO ' + str(ControlPackage.iso) \
                      + ' -sh ' + str(ControlPackage.sharpness) + ' -co ' + str(ControlPackage.contrast) \
-                     + ' -sa ' + str(ControlPackage.saturation)
+                     + ' -sa ' + str(ControlPackage.saturation) + ' ' + ts
       print cmdstr
       os.system( cmdstr )
 
@@ -143,6 +152,7 @@ class RaspiShellCamera(Camera):
     if ControlPackage.simageseq > ControlPackage.max_keep_snapshots:
       os.system('rm -f temp/snapshot-' + str(ControlPackage.simageseq-ControlPackage.max_keep_snapshots) + '-*.jpg')
 
+    fname = fname.replace('-%d', '-1')
     return fname
 
   def videoshot(self): 

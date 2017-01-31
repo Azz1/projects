@@ -71,7 +71,8 @@ $( "#btn_videoshot" ).click(function() {
 
 $( "#btn_snapshot" ).click(function() {
     popImage('/api/snapshot/' + $("#ss").val() + '/' + $("#iso").val() + '/' + $("#br").val() + '/'
-	                      + $("#sh").val() + '/' + $("#co").val() + '/' + $("#sa").val()
+	                      + $("#sh").val() + '/' + $("#co").val() + '/' + $("#sa").val() + '/'
+			      + $("#timelapse").val()
 		,'Snapshot Image');
     return false;
 });

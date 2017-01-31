@@ -339,12 +339,13 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
 
     elif None != re.search('/api/snapshot', self.path):
       print 'GET /api/snapshot'
-      ControlPackage.ss = int(float(self.path.split('/')[-6]) * 1000)
-      ControlPackage.iso = int(self.path.split('/')[-5])
-      ControlPackage.brightness = int(self.path.split('/')[-4])
-      ControlPackage.sharpness = int(self.path.split('/')[-3])
-      ControlPackage.contrast = int(self.path.split('/')[-2])
-      ControlPackage.saturation = int(self.path.split('/')[-1])
+      ControlPackage.ss = int(float(self.path.split('/')[-7]) * 1000)
+      ControlPackage.iso = int(self.path.split('/')[-6])
+      ControlPackage.brightness = int(self.path.split('/')[-5])
+      ControlPackage.sharpness = int(self.path.split('/')[-4])
+      ControlPackage.contrast = int(self.path.split('/')[-3])
+      ControlPackage.saturation = int(self.path.split('/')[-2])
+      ControlPackage.timelapse = int(self.path.split('/')[-1])
 
       ControlPackage.Validate()
       fname = ControlPackage.camera.snapshot_full()

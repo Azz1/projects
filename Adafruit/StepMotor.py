@@ -66,6 +66,7 @@ class ControlPackage :
   ss = 4000		#microsecond
   iso = 400		#100-800 400 default
   videolen = 20		#video length
+  timelapse = 1		#number of timelapse snapshot photos
   imageseq = 0		#sequence id of refresh image
   simageseq = 0		#sequence id of snapshot image
   videoseq = 0		#sequence id of video snapshots
