@@ -113,7 +113,7 @@ class RaspiShellCamera(Camera):
 
       fname = 'temp/snapshot-' + str(ControlPackage.simageseq) + '-' + time.strftime("%Y%m%d-%H%M%S", localtime) 
       if  ControlPackage.timelapse > 1:
-        fname = fname + '-%d'
+        fname = fname + '-%02d'
       if ControlPackage.rawmode == 'true' :
         fname = fname + '-raw'
       fname = fname + '.jpg'
@@ -152,7 +152,7 @@ class RaspiShellCamera(Camera):
     if ControlPackage.simageseq > ControlPackage.max_keep_snapshots:
       os.system('rm -f temp/snapshot-' + str(ControlPackage.simageseq-ControlPackage.max_keep_snapshots) + '-*.jpg')
 
-    fname = fname.replace('-%d', '-1')
+    fname = fname.replace('-%02d', '-01')
     return fname
 
   def videoshot(self): 
