@@ -55,6 +55,7 @@ class ControlPackage :
   GPIO.setup(HR_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
   # initialize the camera 
+  cameraonly = 'false'
   rawmode = 'false'
   cmode = 'day'
   width = 700

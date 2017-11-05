@@ -219,7 +219,7 @@ $('input[type=checkbox][name=norefresh]').click( function(){
 	    //context.scale(2.1875, 2.1875);
     
             // Setup the WebSocket connection and start the player
-            var client = new WebSocket( 'ws://jupiter8.dyndns.org:8084/' );
+            var client = new WebSocket( 'ws://192.168.111.80:8084/' );
             var player = new jsmpeg(client, {canvas:canvas});
 
 	});

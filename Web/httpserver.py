@@ -237,21 +237,22 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
       dts = dt.strftime('%Y-%m-%d %H:%M:%S')  # %Z (timezone) would be empty
       nowstring="%s%s" % (dts,mytz)
 
-      s = self.path.split('/')[-2]
-      if s != "": ControlPackage.tgazadj = float(s)
-      s = self.path.split('/')[-1]
-      if s != "": ControlPackage.tgaltadj = float(s)
- 
-      if not ControlPackage.isTracking.is_set():
-        tr = StarTracking(ControlPackage.myloclat, ControlPackage.myloclong, ControlPackage.altazradec,
+      if ControlPackage.cameraonly == "false":
+        s = self.path.split('/')[-2]
+        if s != "": ControlPackage.tgazadj = float(s)
+        s = self.path.split('/')[-1]
+        if s != "": ControlPackage.tgaltadj = float(s)
+   
+        if not ControlPackage.isTracking.is_set():
+          tr = StarTracking(ControlPackage.myloclat, ControlPackage.myloclong, ControlPackage.altazradec,
                         ControlPackage.tgrah, ControlPackage.tgram, ControlPackage.tgras, 
                         ControlPackage.tgdecdg, ControlPackage.tgdecm, ControlPackage.tgdecs,
                         ControlPackage.tgaz, ControlPackage.tgalt, 
                         0, 0, 0, 0)
-	ControlPackage.tgaz, ControlPackage.tgalt = tr.GetTarget()
-        ControlPackage.curalt, ControlPackage.curaz = tr.read()
-        ControlPackage.curalt += ControlPackage.tgaltadj
-        ControlPackage.curaz += ControlPackage.tgazadj
+	  ControlPackage.tgaz, ControlPackage.tgalt = tr.GetTarget()
+          ControlPackage.curalt, ControlPackage.curaz = tr.read()
+          ControlPackage.curalt += ControlPackage.tgaltadj
+          ControlPackage.curaz += ControlPackage.tgazadj
 
       self.send_response(200)
       self.send_header('Content-Type', 'application/json')
@@ -478,10 +479,17 @@ if __name__=='__main__':
   parser = argparse.ArgumentParser(description='HTTP Server')
   parser.add_argument('port', type=int, help='Listening port for HTTP Server')
   parser.add_argument('ip', help='HTTP Server IP')
+  parser.add_argument('camonly', help='Camera Only Mode')
   args = parser.parse_args()
  
-  server = SimpleHttpServer(args.ip, args.port)
   print 'HTTP Server Running...........'
+  if args.camonly  == 'Y': 
+    ControlPackage.cameraonly = "true"
+    print '!!!!!!!!!!!!!!!!!! in Camer Only Mode !!!!!!!!!!!!!!!!!!!!!!!!'
+  else :
+    ControlPackage.cameraonly = "false"
+    
+  server = SimpleHttpServer(args.ip, args.port)
   try:
     server.start()
     #server.waitForThread()
