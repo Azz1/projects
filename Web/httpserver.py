@@ -219,6 +219,13 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
       self.end_headers()
       self.wfile.write('{"azadj": "' + ("%.2f" % azadj) + '", "altadj": "' + ("%.2f" % altadj) + '"}')
 
+    elif None != re.search('/api/halt', self.path): # Halt the system
+      print 'POST /api/halt'
+      if ControlPackage.ip.startswith('192') :
+        print 'Halting the system ...'
+        ControlPackage.camera.haltsys()
+
+
     else:
       self.send_response(403)
       self.send_header('Content-Type', 'application/json')
@@ -436,6 +443,7 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
       self.end_headers()
       with open(filepath, 'r') as content_file:
         content = content_file.read()
+        content = content.replace('[IPADDRESS]', ControlPackage.ip)
         self.wfile.write(content)
         return True
     else :
@@ -488,6 +496,8 @@ if __name__=='__main__':
     print '!!!!!!!!!!!!!!!!!! in Camer Only Mode !!!!!!!!!!!!!!!!!!!!!!!!'
   else :
     ControlPackage.cameraonly = "false"
+
+  ControlPackage.ip = args.ip
     
   server = SimpleHttpServer(args.ip, args.port)
   try:

@@ -56,6 +56,7 @@ class ControlPackage :
 
   # initialize the camera 
   cameraonly = 'false'
+  ip = ''
   rawmode = 'false'
   cmode = 'day'
   width = 700

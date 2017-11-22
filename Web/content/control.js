@@ -219,7 +219,7 @@ $('input[type=checkbox][name=norefresh]').click( function(){
 	    //context.scale(2.1875, 2.1875);
     
             // Setup the WebSocket connection and start the player
-            var client = new WebSocket( 'ws://192.168.111.80:8084/' );
+            var client = new WebSocket( 'ws://[IPADDRESS]:8084/' );
             var player = new jsmpeg(client, {canvas:canvas});
 
 	});
@@ -331,5 +331,20 @@ $( "#focus_out" ).click(function() {
     .always(function() {
     });
     return false;
+});
+
+
+$( "#halt" ).click(function() {
+  $.post("/api/halt", {}, function(data) {
+    })
+    .done(function(data) {
+    })
+    .fail(function() {
+      $("#status_id").html("Invalid operation, no permission!" );
+    })
+    .always(function() {
+    });
+
+  return false;
 });
 

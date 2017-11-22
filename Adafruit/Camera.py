@@ -210,6 +210,11 @@ class RaspiShellCamera(Camera):
     print cmdstr
     os.system( cmdstr )
 
+  def haltsys(self): 
+    cmdstr = 'sudo halt'
+    print cmdstr
+    os.system( cmdstr )
+
  
   def release(self): pass
 
