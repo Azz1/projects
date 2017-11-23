@@ -221,8 +221,8 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
 
     elif None != re.search('/api/halt', self.path): # Halt the system
       print 'POST /api/halt'
-      if ControlPackage.ip.startswith('192') :
-        print 'Halting the system ...'
+      if self.client_address[0].startswith('192') :	# halt system request only enabled from local IPs
+        print 'Halting the system from ' + self.client_address[0] + ' ...'
         ControlPackage.camera.haltsys()
 
 
