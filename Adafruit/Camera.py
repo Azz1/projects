@@ -63,10 +63,13 @@ class RaspiShellCamera(Camera):
       #ControlPackage.camera.capture(fname, format='jpeg', resize=(ControlPackage.width,ControlPackage.height))
 
       # to enable -ss option, which is shutter speed, update the firmware sudo rpi-update
+      ss = ControlPackage.ss 
+      if ss > 1000000: ss = 1000000
+
       cmdstr = 'raspistill -o ' + fname + ' -vf -hf -w ' + str(ControlPackage.width) \
                      + ' -h ' + str(ControlPackage.height) \
                      + ' -br ' + str(ControlPackage.brightness) \
-                     + (' -ex night -ss ' if ControlPackage.cmode == 'night' else ' -ss ') + str(ControlPackage.ss) + ' -ISO ' + str(ControlPackage.iso) \
+                     + (' -ex night -ss ' if ControlPackage.cmode == 'night' else ' -ss ') + str(ss) + ' -ISO ' + str(ControlPackage.iso) \
                      + ' -sh ' + str(ControlPackage.sharpness) + ' -co ' + str(ControlPackage.contrast) \
                      + ' -sa ' + str(ControlPackage.saturation)
       print cmdstr
