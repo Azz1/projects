@@ -59,8 +59,16 @@ class ControlPackage :
   ip = ''
   rawmode = 'false'
   cmode = 'day'
+
   width = 700
   height = 525
+
+#picamera v1.3
+  #roi_l = 0
+#picamera v2
+  roi_l = 0.2
+  roi_w = (1 - roi_l)**2
+
   brightness = 50	#0-100 50 default
   sharpness = 20	#-100-100 0 default
   contrast = 20		#-100-100 0 default

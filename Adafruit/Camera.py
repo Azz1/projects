@@ -66,8 +66,9 @@ class RaspiShellCamera(Camera):
       ss = ControlPackage.ss 
       if ss > 1000000: ss = 1000000
 
+      roistr = ' -roi ' + str(ControlPackage.roi_l) + ',' + str(ControlPackage.roi_l) + ',' + str(ControlPackage.roi_w) + ',' + str(ControlPackage.roi_w) 
       cmdstr = 'raspistill -o ' + fname + ' -vf -hf -w ' + str(ControlPackage.width) \
-                     + ' -h ' + str(ControlPackage.height) \
+                     + ' -h ' + str(ControlPackage.height) + roistr \
                      + ' -br ' + str(ControlPackage.brightness) \
                      + (' -ex night -ss ' if ControlPackage.cmode == 'night' else ' -ss ') + str(ss) + ' -ISO ' + str(ControlPackage.iso) \
                      + ' -sh ' + str(ControlPackage.sharpness) + ' -co ' + str(ControlPackage.contrast) \
@@ -135,8 +136,9 @@ class RaspiShellCamera(Camera):
       if ControlPackage.timelapse > 1:
         ts = '-tl ' + str(tl) + ' -t ' +  str(tt)
         
+      roistr = ' -roi ' + str(ControlPackage.roi_l) + ',' + str(ControlPackage.roi_l) + ',' + str(ControlPackage.roi_w) + ',' + str(ControlPackage.roi_w) 
       cmdstr = 'raspistill ' + (' --raw ' if ControlPackage.rawmode == 'true' else '') + ' -o ' + fname + ' -vf -hf -br ' \
-                     + str(ControlPackage.brightness) \
+                     + str(ControlPackage.brightness) + roistr \
                      + (' -ex night -ss ' if ControlPackage.cmode == 'night' else ' -ss ') + str(ControlPackage.ss) + ' -ISO ' + str(ControlPackage.iso) \
                      + ' -sh ' + str(ControlPackage.sharpness) + ' -co ' + str(ControlPackage.contrast) \
                      + ' -sa ' + str(ControlPackage.saturation) + ' ' + ts
@@ -170,8 +172,9 @@ class RaspiShellCamera(Camera):
       # TAKE A PHOTO OF HIGH RESOLUTION
       camera_lock.acquire();
 
+      roistr = ' -roi ' + str(ControlPackage.roi_l) + ',' + str(ControlPackage.roi_l) + ',' + str(ControlPackage.roi_w) + ',' + str(ControlPackage.roi_w) 
       cmdstr = 'raspivid -o ' + fname + ' -vf -hf -br ' \
-                     + str(ControlPackage.brightness) \
+                     + str(ControlPackage.brightness) + roistr \
                      + ' -ss ' + str(ControlPackage.ss) + ' -ISO ' + str(ControlPackage.iso) \
                      + ' -sh ' + str(ControlPackage.sharpness) + ' -co ' + str(ControlPackage.contrast) \
                      + ' -sa ' + str(ControlPackage.saturation) + ' -t ' + str(ControlPackage.videolen*1000)
@@ -197,7 +200,9 @@ class RaspiShellCamera(Camera):
                      + ' ' + str(ControlPackage.ss) + ' ' + str(ControlPackage.iso) \
                      + ' ' + str(ControlPackage.brightness) \
                      + ' ' + str(ControlPackage.sharpness) + ' ' + str(ControlPackage.contrast) \
-                     + ' ' + str(ControlPackage.saturation)
+                     + ' ' + str(ControlPackage.saturation) \
+                     + ' ' + str(ControlPackage.roi_l) \
+                     + ' ' + str(ControlPackage.roi_w) 
         print cmdstr
         os.system( cmdstr )
         videostarted = True
