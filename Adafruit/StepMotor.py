@@ -3,6 +3,7 @@ import time
 import math
 import threading
 import Queue
+import serial
 from abc import ABCMeta, abstractmethod
 
 # Abstract base class for stepper motor
@@ -37,6 +38,15 @@ class StepMotor :
   def release(self): pass
 
 class ControlPackage :
+
+  SerialData = serial.Serial(
+               port='/dev/ttyACM0',
+               baudrate = 9600,
+               parity=serial.PARITY_NONE,
+               stopbits=serial.STOPBITS_ONE,
+               bytesize=serial.EIGHTBITS,
+               timeout=1
+           )
 
   # Touch sensor GPIO pins
   VL_pin = 24
@@ -137,6 +147,7 @@ class ControlPackage :
     ControlPackage.motorV.release()
     ControlPackage.motorH.release()
     ControlPackage.camera.release()
+    ControlPackage.SerialData.close()
 
   @staticmethod
   def Validate():
@@ -179,6 +190,10 @@ class MotorControlThread (threading.Thread):
 
       from EDStepMotor import EDStepMotor
       self.motor = EDStepMotor(0x60, debug=False)
+
+      #from ArduinoSerialStepMotor import ArduinoSerialStepMotor
+      #self.motor = ArduinoSerialStepMotor(0x60, debug=False)
+
       self.motor.setPort("M1M2")
       self.motor.setSensor(ControlPackage.HL_pin, ControlPackage.HR_pin)
 
