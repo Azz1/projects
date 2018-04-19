@@ -4,7 +4,6 @@ import math
 import threading
 import Queue
 import serial
-import os.path
 from abc import ABCMeta, abstractmethod
 
 # Abstract base class for stepper motor
@@ -40,7 +39,7 @@ class StepMotor :
 
 class ControlPackage :
 
-  if os.path.isfile('/dev/ttyACM0') :
+  try:
     SerialData = serial.Serial(
                port='/dev/ttyACM0',
                baudrate = 9600,
@@ -49,6 +48,8 @@ class ControlPackage :
                bytesize=serial.EIGHTBITS,
                timeout=1
            )
+  except serial.serialutil.SerialException:
+    pass
 
   # Touch sensor GPIO pins
   VL_pin = 24
@@ -149,8 +150,10 @@ class ControlPackage :
     ControlPackage.motorV.release()
     ControlPackage.motorH.release()
     ControlPackage.camera.release()
-    if os.path.isfile('/dev/ttyACM0') :
+    try:
       ControlPackage.SerialData.close()
+    except serial.serialutil.SerialException:
+      pass
 
   @staticmethod
   def Validate():

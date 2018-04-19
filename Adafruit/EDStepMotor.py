@@ -36,7 +36,7 @@ class EDStepMotor(StepMotor) :
     GPIO.setup(self.Motor_Pin[0], GPIO.OUT)	# Step GPIO pin
     GPIO.setup(self.Motor_Pin[1], GPIO.OUT)	# Direction GPIO pin
     GPIO.setup(self.Motor_Pin[2], GPIO.OUT) 	# Enable GPIO pin number.
-    GPIO.setup(self.Motor_Pin[3], GPIO.OUT) 	# Reserved.
+    #GPIO.setup(self.Motor_Pin[3], GPIO.OUT) 	# Reserved.
     self.current_step = 0
  
     """
