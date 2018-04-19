@@ -29,7 +29,7 @@ Name as a string.
 
 # Create an instance of the easydriver class.
 # Not using sleep, enable or reset in this example.
-stepper = ed.easydriver(18, 0.004, 23, 24, 17)
+stepper = ed.easydriver(4, 0.004, 17, 27, 22)
 
 # Set motor direction to clockwise.
 stepper.set_direction(cw)

@@ -36,7 +36,7 @@ class EDStepMotor(StepMotor) :
     GPIO.setup(self.Motor_Pin[0], GPIO.OUT)	# Step GPIO pin
     GPIO.setup(self.Motor_Pin[1], GPIO.OUT)	# Direction GPIO pin
     GPIO.setup(self.Motor_Pin[2], GPIO.OUT) 	# Enable GPIO pin number.
-    #GPIO.setup(self.Motor_Pin[3], GPIO.OUT) 	# Reserved.
+    GPIO.setup(self.Motor_Pin[3], GPIO.OUT) 	# Reserved.
     self.current_step = 0
  
     """
@@ -106,7 +106,7 @@ class EDStepMotor(StepMotor) :
     self.stepper.set_direction(False)
     self.stepper.set_delay(delay)
     #if style == "MICROSTEP" :
-    #  self.stepper.set_sixteenth_step()
+    #  self.stepper.set_half_step()
     #else :
     #  self.stepper.set_full_step()
 
@@ -118,7 +118,7 @@ class EDStepMotor(StepMotor) :
     self.stepper.set_direction(True)
     self.stepper.set_delay(delay)
     #if style == "MICROSTEP" :
-    #  self.stepper.set_eighth_step()
+    #  self.stepper.set_half_step()
     #else :
     #  self.stepper.set_full_step()
 
