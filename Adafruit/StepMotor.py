@@ -41,7 +41,8 @@ class ControlPackage :
 
   try:
     SerialData = serial.Serial(
-               port='/dev/ttyACM0',
+               #port='/dev/ttyACM0',
+               port='/dev/ttyUSB0',
                baudrate = 9600,
                parity=serial.PARITY_NONE,
                stopbits=serial.STOPBITS_ONE,
@@ -208,6 +209,10 @@ class MotorControlThread (threading.Thread):
 
       from GPIOStepMotor import GPIOStepMotor
       self.motor = GPIOStepMotor(0x60, debug=False)
+
+      #from ArduinoSerialStepMotor import ArduinoSerialStepMotor
+      #self.motor = ArduinoSerialStepMotor(0x60, debug=False)
+
 
       self.motor.setFreq(1600)
       self.motor.setPort("M3M4")
