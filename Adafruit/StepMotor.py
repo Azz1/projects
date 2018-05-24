@@ -78,9 +78,9 @@ class ControlPackage :
   height = 525
 
 #picamera v1.3
-  #roi_l = 0
+  roi_l = 0
 #picamera v2
-  roi_l = 0.2
+  #roi_l = 0.2
   roi_w = (1 - roi_l)**2
 
   brightness = 50	#0-100 50 default
@@ -195,11 +195,11 @@ class MotorControlThread (threading.Thread):
       #from Adafruit_Motor_Driver import AFStepMotor
       #self.motor = AFStepMotor(0x60, debug=False)
 
-      from EDStepMotor import EDStepMotor
-      self.motor = EDStepMotor(0x60, debug=False)
+      #from EDStepMotor import EDStepMotor
+      #self.motor = EDStepMotor(0x60, debug=False)
 
-      #from ArduinoSerialStepMotor import ArduinoSerialStepMotor
-      #self.motor = ArduinoSerialStepMotor(0x60, debug=False)
+      from ArduinoSerialStepMotor import ArduinoSerialStepMotor
+      self.motor = ArduinoSerialStepMotor(0x60, debug=False)
 
       self.motor.setPort("M1M2")
       self.motor.setSensor(ControlPackage.HL_pin, ControlPackage.HR_pin)
@@ -207,11 +207,11 @@ class MotorControlThread (threading.Thread):
     elif self.threadName == "V-Motor":
       self.q = ControlPackage.v_cmdqueue
 
-      from GPIOStepMotor import GPIOStepMotor
-      self.motor = GPIOStepMotor(0x60, debug=False)
+      #from GPIOStepMotor import GPIOStepMotor
+      #self.motor = GPIOStepMotor(0x60, debug=False)
 
-      #from ArduinoSerialStepMotor import ArduinoSerialStepMotor
-      #self.motor = ArduinoSerialStepMotor(0x60, debug=False)
+      from ArduinoSerialStepMotor import ArduinoSerialStepMotor
+      self.motor = ArduinoSerialStepMotor(0x60, debug=False)
 
 
       self.motor.setFreq(1600)
