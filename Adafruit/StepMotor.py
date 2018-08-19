@@ -264,9 +264,9 @@ class MotorControlThread (threading.Thread):
 	  # UP-FWD, DOWN-BKWD
 	  self.motor.setSpeed(speed)
 	  if dir == "UP":
-            self.motor.step(steps, "FORWARD", "SINGLE")
+            self.motor.step(steps, "FORWARD", "DOUBLE")
           else:
-            self.motor.step(steps, "BACKWARD", "SINGLE")
+            self.motor.step(steps, "BACKWARD", "DOUBLE")
           self.motor.release()
 
           if dir.upper() == 'UP' and GPIO.input(ControlPackage.VH_pin):
