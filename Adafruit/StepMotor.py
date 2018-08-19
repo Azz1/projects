@@ -109,11 +109,11 @@ class ControlPackage :
   f_cmdqueue = Queue.Queue()      
 
   # initialize vertical step motor
-  vspeed = 30
+  vspeed = 10
   vsteps = 200
 
   # initialize horizontal step motor
-  hspeed = 5
+  hspeed = 1
   hsteps = 8
 
   # initialize focus step motor
