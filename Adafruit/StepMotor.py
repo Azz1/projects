@@ -113,8 +113,8 @@ class ControlPackage :
   vsteps = 200
 
   # initialize horizontal step motor
-  hspeed = 1
-  hsteps = 8
+  hspeed = 20000
+  hsteps = 100
 
   # initialize focus step motor
   fspeed = 5
