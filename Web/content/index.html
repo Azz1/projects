@@ -38,11 +38,13 @@
 	    	   <td colspan="2"><span class="param_value">&nbsp;</span></td>
 	  	 </tr>
 	  	 <tr>
-	    	   <td colspan="4"><span class="param_name" ><b>Motor Control Parameters</b></span></td>
+	    	   <td colspan="2"><span class="param_name" ><b>Motor Control Parameters</b></span></td>
+	    	   <td><span class="param_name">H-Adj: </span></td>
+ 		   <td><span class="param_value"><input type="text" name="hadj" id="hadj" tabindex="1" value="400" />us</span></td>
 	  	 </tr>
 	  	 <tr>
 	    	   <td><span class="param_name">V-Speed: </span></td>
-	    	   <td><span class="param_value"><input type="text" name="vspeed" id="vspeed" tabindex="1" value="10" /> rpm</span></td>
+	    	   <td><span class="param_value"><input type="text" name="vspeed" id="vspeed" tabindex="2" value="10" /> rpm</span></td>
 	    	   <td><span class="param_name">H-Speed: </span></td>
 	    	   <td><span class="param_value">
 			<select name="hspeed" id="hspeed" tabindex="3">  
@@ -70,10 +72,10 @@
 	  	 </tr>
 	  	 <tr>
 	    	   <td><span class="param_name">V-Steps: </span></td>
-	    	   <td><span class="param_value"><input type="text" name="vsteps" id="vsteps" tabindex="2" value="200" /> steps</span></td>
+	    	   <td><span class="param_value"><input type="text" name="vsteps" id="vsteps" tabindex="4" value="200" /> steps</span></td>
 	    	   <td><span class="param_name">H-Steps: </span></td>
 	    	   <td><span class="param_value">
-			<select name="hsteps" id="hsteps" tabindex="4" >
+			<select name="hsteps" id="hsteps" tabindex="5" >
 				<option value="1" >1</option>
 				<option value="2" >2</option>
 				<option value="4" >4</option>
@@ -104,21 +106,21 @@
 	  	 </tr>
 	  	 <tr>
 	    	   <td><span class="param_name">Shutter Speed: </span></td>
-	    	   <td><span class="param_value"><input type="text" name="ss" id="ss" tabindex="5" value="4" /> ms</span></td>
+	    	   <td><span class="param_value"><input type="text" name="ss" id="ss" tabindex="6" value="4" /> ms</span></td>
 	    	   <td><span class="param_name">ISO: </span></td>
-	    	   <td><span class="param_value"><input type="text" name="iso" id="iso" tabindex="6" value="400" /></span></td>
+	    	   <td><span class="param_value"><input type="text" name="iso" id="iso" tabindex="7" value="400" /></span></td>
 	  	 </tr>
 	  	 <tr>
 	    	   <td><span class="param_name">Brightness: </span></td>
-	    	   <td><span class="param_value"><input type="text" name="br" id="br" tabindex="7" value="60" />(0-100)</span></td>
+	    	   <td><span class="param_value"><input type="text" name="br" id="br" tabindex="8" value="60" />(0-100)</span></td>
 	    	   <td><span class="param_name">Sharpness: </span></td>
-	    	   <td><span class="param_value"><input type="text" name="sh" id="sh" tabindex="8" value="20" />(-100-100)</span></td>
+	    	   <td><span class="param_value"><input type="text" name="sh" id="sh" tabindex="9" value="20" />(-100-100)</span></td>
 	  	 </tr>
 	  	 <tr>
 	    	   <td><span class="param_name">Contrast: </span></td>
-	    	   <td><span class="param_value"><input type="text" name="co" id="co" tabindex="9" value="20" />(-100-100)</span></td>
+	    	   <td><span class="param_value"><input type="text" name="co" id="co" tabindex="10" value="20" />(-100-100)</span></td>
 	    	   <td><span class="param_name">Saturation: </span></td>
-	    	   <td><span class="param_value"><input type="text" name="sa" id="sa" tabindex="10" value="20" />(-100-100)</span></td>
+	    	   <td><span class="param_value"><input type="text" name="sa" id="sa" tabindex="11" value="20" />(-100-100)</span></td>
 	  	 </tr>
 	  	 <tr>
 	    	   <td colspan='4'><span class="param_name" >
@@ -129,8 +131,8 @@
 	  	 </tr>
 	  	 <tr>
 	    	   <td><span class="param_name"><br />Video Length: </span><br /><span class="param_name">Time Lapses: </span></td>
-	    	   <td><span class="param_value"><br /><input type="text" name="videolen" id="videolen" tabindex="11" value="10" /> s</span>
-	    	       <span class="param_value"><br /><input type="text" name="timelapse" id="timelapse" tabindex="12" value="1" /> pics</span></td>
+	    	   <td><span class="param_value"><br /><input type="text" name="videolen" id="videolen" tabindex="12" value="10" /> s</span>
+	    	       <span class="param_value"><br /><input type="text" name="timelapse" id="timelapse" tabindex="13" value="1" /> pics</span></td>
 	    	   <td><span class="param_name"><br />Focus: </span></td>
 	    	   <td><span class="param_value"><br />
 			<select id="fsteps">
@@ -154,17 +156,17 @@
 	  	 <tr>
 	    	   <td><span class="param_name">My Location: </span></td>
 	    	   <td>
-			<span class="param_value">LAT: <br/><input type="text" name="myloclat" id="myloclat" tabindex="13" value="42.27" /> dg</span>
+			<span class="param_value">LAT: <br/><input type="text" name="myloclat" id="myloclat" tabindex="14" value="42.27" /> dg</span>
 		   </td><td colspan="2">
-			<span class="param_value">LONG: <br/><input type="text" name="myloclong" id="myloclong" tabindex="14" value="-83.04" /> dg</span>
+			<span class="param_value">LONG: <br/><input type="text" name="myloclong" id="myloclong" tabindex="15" value="-83.04" /> dg</span>
 		   </td>
 	  	 </tr>
 	  	 <tr>
 	    	   <td><span class="param_name">Target: </span></td>
 	    	   <td>
-			<span class="param_value">AZ: <br/><input type="text" name="tgaz" id="tgaz" tabindex="15" value="" /> dg</span>
+			<span class="param_value">AZ: <br/><input type="text" name="tgaz" id="tgaz" tabindex="16" value="" /> dg</span>
 		   </td><td colspan="2">
-			<span class="param_value">ALT: <br/><input type="text" name="tgalt" id="tgalt" tabindex="16" value="" /> dg</span>
+			<span class="param_value">ALT: <br/><input type="text" name="tgalt" id="tgalt" tabindex="17" value="" /> dg</span>
 		   </td>
 		 </tr>
 	  	 <tr>
@@ -178,33 +180,33 @@
 	  	 <tr>
 	    	   <td><span class="param_name"></span></td>
 	    	   <td>
-			<span class="param_value"><input type="text" name="tgrah" id="tgrah" tabindex="17" value="" /> h</span>
+			<span class="param_value"><input type="text" name="tgrah" id="tgrah" tabindex="18" value="" /> h</span>
 		   </td><td colspan="2">
-			<span class="param_value"><input type="text" name="tgdecdg" id="tgdecdg" tabindex="20" value="" /> dg</span>
+			<span class="param_value"><input type="text" name="tgdecdg" id="tgdecdg" tabindex="21" value="" /> dg</span>
 		   </td>
 	  	 </tr>
 	  	 <tr>
 	    	   <td><span class="param_name"></span></td>
 	    	   <td>
-			<span class="param_value"><input type="text" name="tgram" id="tgram" tabindex="18" value="" /> m</span>
+			<span class="param_value"><input type="text" name="tgram" id="tgram" tabindex="19" value="" /> m</span>
 		   </td><td colspan="2">
-			<span class="param_value"><input type="text" name="tgdecm" id="tgdecm" tabindex="21" value="" /> m</span>
+			<span class="param_value"><input type="text" name="tgdecm" id="tgdecm" tabindex="22" value="" /> m</span>
 		   </td>
 	  	 </tr>
 	  	 <tr>
 	    	   <td><span class="param_name"></span></td>
 	    	   <td>
-			<span class="param_value"><input type="text" name="tgras" id="tgras" tabindex="19" value="" /> s</span>
+			<span class="param_value"><input type="text" name="tgras" id="tgras" tabindex="20" value="" /> s</span>
 		   </td><td colspan="2">
-			<span class="param_value"><input type="text" name="tgdecs" id="tgdecs" tabindex="22" value="" /> s</span>
+			<span class="param_value"><input type="text" name="tgdecs" id="tgdecs" tabindex="23" value="" /> s</span>
 		   </td>
 	  	 </tr>
 	  	 <tr>
 	    	   <td><span class="param_name"></span></td>
 	    	   <td>
-			<span class="param_value">AZ Adj: <br/><input type="text" name="tgazadj" id="tgazadj" tabindex="23" value="0.0" /> dg</span>
+			<span class="param_value">AZ Adj: <br/><input type="text" name="tgazadj" id="tgazadj" tabindex="24" value="0.0" /> dg</span>
 		   </td><td colspan="2">
-			<span class="param_value">ALT Adj: <br/><input type="text" name="tgaltadj" id="tgaltadj" tabindex="24" value="0.0" /> dg</span>
+			<span class="param_value">ALT Adj: <br/><input type="text" name="tgaltadj" id="tgaltadj" tabindex="25" value="0.0" /> dg</span>
 		   </td>
 		 </tr>
 	  	 <tr>
