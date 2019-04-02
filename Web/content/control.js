@@ -145,7 +145,7 @@ $( "#btn_down" ).click(function() {
 });
 
 $( "#btn_left" ).click(function() {
-    $.post("/api/motor/h/forward", {"speed": $( "#hspeed" ).val(),  "adj": 0, "steps": $("#hsteps").val()}, function(data) {
+    $.post("/api/motor/h/forward", {"speed": $( "#hspeed" ).val(),  "adj": $( "#hadj" ).val(), "steps": $("#hsteps").val()}, function(data) {
     })
     .done(function(data) {
 	if( data["detai"] != "")
@@ -160,7 +160,7 @@ $( "#btn_left" ).click(function() {
 });
 
 $( "#btn_right" ).click(function() {
-    $.post("/api/motor/h/backward", {"speed": $( "#hspeed" ).val(),  "adj": 0, "steps": $("#hsteps").val()}, function(data) {
+    $.post("/api/motor/h/backward", {"speed": $( "#hspeed" ).val(),  "adj": $( "#hadj" ).val(), "steps": $("#hsteps").val()}, function(data) {
     })
     .done(function(data) {
 	if( data["detai"] != "")
