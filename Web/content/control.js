@@ -183,7 +183,7 @@ $('input[type=radio][name=cmode]').change(function() {
         else {
 	    $.cookie("cmode", "night");
 	    $("#ss").val('800');
-	    $("#iso").val('800');
+	    $("#iso").val('1600');
         }
 });
 
