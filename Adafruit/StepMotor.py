@@ -32,7 +32,7 @@ class StepMotor :
   def setPort(self, port): pass
 
   @abstractmethod
-  def setSpeed(self, rpm): pass
+  def setSpeed(self, rpm, adj=0): pass
  
   @abstractmethod
   def release(self): pass
