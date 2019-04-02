@@ -110,14 +110,17 @@ class ControlPackage :
 
   # initialize vertical step motor
   vspeed = 10
+  vadj = 0
   vsteps = 200
 
   # initialize horizontal step motor
   hspeed = 20000
+  hadj = 400
   hsteps = 100
 
   # initialize focus step motor
   fspeed = 5
+  fadj = 0
   fsteps = 48
 
   # Tracking parameters
@@ -236,18 +239,19 @@ class MotorControlThread (threading.Thread):
       dir = ""
       speed = 0
       steps = 0
+      adj = 0
 	  
       ControlPackage.threadLock.acquire()
       if not self.q.empty():
-    	(dir, speed, steps) = self.q.get()
+    	(dir, speed, adj, steps) = self.q.get()
       ControlPackage.threadLock.release()
 	   
       if dir != "" : 
-        print self.threadName + ' ' + dir + ' Speed: ' + str(speed) + ' Steps: ' + str(steps)
+        print self.threadName + ' ' + dir + ' Speed: ' + str(speed) + ' Adj: ' + str(adj) + ' Steps: ' + str(steps)
 
         if self.threadName == "H-Motor":
 	  # LEFT-FWD, RIGHT-BKWD
-	  self.motor.setSpeed(speed)
+	  self.motor.setSpeed(speed, adj)
 	  if dir == "LEFT":
             self.motor.step(steps, "BACKWARD", "MICROSTEP")
           else:
@@ -262,7 +266,7 @@ class MotorControlThread (threading.Thread):
 	      	
         elif self.threadName == "V-Motor":
 	  # UP-FWD, DOWN-BKWD
-	  self.motor.setSpeed(speed)
+	  self.motor.setSpeed(speed, adj)
 	  if dir == "UP":
             self.motor.step(steps, "FORWARD", "DOUBLE")
           else:
@@ -276,7 +280,7 @@ class MotorControlThread (threading.Thread):
             print 'Vertical lowest limit reached!'	
 	else:
 	  # IN-FWD, OUT-BKWD
-	  self.motor.setSpeed(speed)
+	  self.motor.setSpeed(speed, adj)
 	  if dir == "IN":
             self.motor.step(steps, "FORWARD", "MICROSTEP")
           else:
