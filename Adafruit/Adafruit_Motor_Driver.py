@@ -254,7 +254,7 @@ class AFStepMotor(StepMotor) :
     else:
       self._setPWM(pin, 4096, 0)
 
-  def setSpeed(self, rpm):
+  def setSpeed(self, rpm, adj=0):
     self.usperstep = 60000000 / (self.revsteps * rpm);
     self.steppingcounter = 0;
 
