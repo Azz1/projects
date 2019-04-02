@@ -78,7 +78,7 @@ class GPIOStepMotor(StepMotor) :
     GPIO.output(self.Motor_Pin[2], 0)
     GPIO.output(self.Motor_Pin[3], 0)
 
-  def setSpeed(self, rpm):
+  def setSpeed(self, rpm, adj=0):
     self.delay = 60.0 / (50 * rpm) / self.StepCount;
 
   def step(self, steps, dir, style):
