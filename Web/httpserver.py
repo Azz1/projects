@@ -72,6 +72,7 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
       length = int(self.headers.getheader('content-length'))
       data = cgi.parse_qs(self.rfile.read(length), keep_blank_values=1)
       speed = int(data['speed'][0])
+      adj = int(data['adj'][0])
       steps = int(data['steps'][0])
       motorid = self.path.split('/')[-2]
       dir = self.path.split('/')[-1]
@@ -89,12 +90,13 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
       	    move_method = 'DOUBLE'
 
 	ControlPackage.vspeed = speed
+	ControlPackage.vadj = adj
 	ControlPackage.vsteps = steps
 
 	ControlPackage.threadLock.acquire()
 	if dir.upper() == 'FORWARD' : v_dir = 'UP'
 	else : v_dir = 'DOWN'
-        ControlPackage.v_cmdqueue.put((v_dir, speed, steps))
+        ControlPackage.v_cmdqueue.put((v_dir, speed, adj, steps))
         ControlPackage.threadLock.release()
 
         if dir.upper() == 'FORWARD' and GPIO.input(ControlPackage.VH_pin):
@@ -107,12 +109,13 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
 
       elif motorid.lower() == 'h':
 	ControlPackage.hspeed = speed
+	ControlPackage.hadj = adj
 	ControlPackage.hsteps = steps
 
 	ControlPackage.threadLock.acquire()
 	if dir.upper() == 'FORWARD' : h_dir = 'LEFT'
 	else : h_dir = 'RIGHT'
-        ControlPackage.h_cmdqueue.put((h_dir, speed, steps))
+        ControlPackage.h_cmdqueue.put((h_dir, speed, adj, steps))
         ControlPackage.threadLock.release()
 
         if dir.upper() == 'FORWARD' and GPIO.input(ControlPackage.HL_pin):
@@ -125,12 +128,13 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
 
       else:
 	ControlPackage.fspeed = speed
+	ControlPackage.fadj = adj
 	ControlPackage.fsteps = steps
 
 	ControlPackage.threadLock.acquire()
 	if dir.upper() == 'FORWARD' : f_dir = 'IN'
 	else : f_dir = 'OUT'
-        ControlPackage.f_cmdqueue.put((f_dir, speed, steps))
+        ControlPackage.f_cmdqueue.put((f_dir, speed, adj, steps))
         ControlPackage.threadLock.release()
 
       self.send_response(200)
