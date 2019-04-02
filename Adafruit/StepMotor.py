@@ -115,7 +115,7 @@ class ControlPackage :
 
   # initialize horizontal step motor
   hspeed = 80000
-  hadj = 400
+  hadj = 300
   hsteps = 100
 
   # initialize focus step motor
