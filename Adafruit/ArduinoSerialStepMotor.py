@@ -44,8 +44,8 @@ class ArduinoSerialStepMotor(StepMotor) :
   def release(self):
     self.current_step = 0
 
-  def setSpeed(self, rpm):
-    self.serial.write('<stepspeed ' + str(self.Motor_No) + ' ' + str(rpm) + '>')
+  def setSpeed(self, rpm, adj=0):
+    self.serial.write('<stepspeed ' + str(self.Motor_No) + ' ' + str(rpm) + ' ' + str(adj)'>')
 
   def step(self, steps, dir, style):
     self.serial.write('<touch 0>')	# enable onboard touch sensors
