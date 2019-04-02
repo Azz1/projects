@@ -115,7 +115,7 @@ $( "#btn_refresh" ).click(function() {
 });
 
 $( "#btn_up" ).click(function() {
-    $.post("/api/motor/v/forward", {"speed": $( "#vspeed" ).val(), "steps": $("#vsteps").val()}, function(data) {
+    $.post("/api/motor/v/forward", {"speed": $( "#vspeed" ).val(), "adj": 0, "steps": $("#vsteps").val()}, function(data) {
     })
     .done(function(data) {
 	if( data["detai"] != "")
@@ -130,7 +130,7 @@ $( "#btn_up" ).click(function() {
 });
 
 $( "#btn_down" ).click(function() {
-    $.post("/api/motor/v/backward", {"speed": $( "#vspeed" ).val(), "steps": $("#vsteps").val()}, function(data) {
+    $.post("/api/motor/v/backward", {"speed": $( "#vspeed" ).val(),  "adj": 0, "steps": $("#vsteps").val()}, function(data) {
     })
     .done(function(data) {
 	if( data["detai"] != "")
@@ -145,7 +145,7 @@ $( "#btn_down" ).click(function() {
 });
 
 $( "#btn_left" ).click(function() {
-    $.post("/api/motor/h/forward", {"speed": $( "#hspeed" ).val(), "steps": $("#hsteps").val()}, function(data) {
+    $.post("/api/motor/h/forward", {"speed": $( "#hspeed" ).val(),  "adj": 0, "steps": $("#hsteps").val()}, function(data) {
     })
     .done(function(data) {
 	if( data["detai"] != "")
@@ -160,7 +160,7 @@ $( "#btn_left" ).click(function() {
 });
 
 $( "#btn_right" ).click(function() {
-    $.post("/api/motor/h/backward", {"speed": $( "#hspeed" ).val(), "steps": $("#hsteps").val()}, function(data) {
+    $.post("/api/motor/h/backward", {"speed": $( "#hspeed" ).val(),  "adj": 0, "steps": $("#hsteps").val()}, function(data) {
     })
     .done(function(data) {
 	if( data["detai"] != "")
@@ -304,7 +304,7 @@ $( "#adjoffset" ).click(function() {
 });
 
 $( "#focus_in" ).click(function() {
-    $.post("/api/motor/f/forward", {"speed": 5, "steps": $("#fsteps").val()}, function(data) {
+    $.post("/api/motor/f/forward", {"speed": 5,  "adj": 0, "steps": $("#fsteps").val()}, function(data) {
     })
     .done(function(data) {
         if( data["detai"] != "")
@@ -319,7 +319,7 @@ $( "#focus_in" ).click(function() {
 });
 
 $( "#focus_out" ).click(function() {
-    $.post("/api/motor/f/backward", {"speed": 5, "steps": $("#fsteps").val()}, function(data) {
+    $.post("/api/motor/f/backward", {"speed": 5,  "adj": 0, "steps": $("#fsteps").val()}, function(data) {
     })
     .done(function(data) {
         if( data["detai"] != "")
