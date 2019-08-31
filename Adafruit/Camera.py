@@ -67,7 +67,10 @@ class RaspiShellCamera(Camera):
       if ss > 1000000: ss = 1000000
 
       roistr = ' -roi ' + str(ControlPackage.roi_l) + ',' + str(ControlPackage.roi_l) + ',' + str(ControlPackage.roi_w) + ',' + str(ControlPackage.roi_w) 
-      cmdstr = 'raspistill -o ' + fname + ' -vf -hf -w ' + str(ControlPackage.width) \
+      cmdstr = 'raspistill -o ' + fname \
+                     + (' -vf ' if ControlPackage.vflip == 'true' else '') \
+                     + (' -hf ' if ControlPackage.hflip == 'true' else '') \
+                     + ' -w ' + str(ControlPackage.width) \
                      + ' -h ' + str(ControlPackage.height) + roistr \
                      + ' -br ' + str(ControlPackage.brightness) \
                      + (' -ex night -ss ' if ControlPackage.cmode == 'night' else ' -ss ') + str(ss) + ' -ISO ' + str(ControlPackage.iso) \
@@ -137,8 +140,10 @@ class RaspiShellCamera(Camera):
         ts = '-tl ' + str(tl) + ' -t ' +  str(tt)
         
       roistr = ' -roi ' + str(ControlPackage.roi_l) + ',' + str(ControlPackage.roi_l) + ',' + str(ControlPackage.roi_w) + ',' + str(ControlPackage.roi_w) 
-      cmdstr = 'raspistill ' + (' --raw ' if ControlPackage.rawmode == 'true' else '') + ' -o ' + fname + ' -vf -hf -br ' \
-                     + str(ControlPackage.brightness) + roistr \
+      cmdstr = 'raspistill ' + (' --raw ' if ControlPackage.rawmode == 'true' else '') + ' -o ' + fname \
+		     + (' -vf ' if ControlPackage.vflip == 'true' else '') \
+		     + (' -hf ' if ControlPackage.hflip == 'true' else '') \
+		     + ' -br ' + str(ControlPackage.brightness) + roistr \
                      + (' -ex night -ss ' if ControlPackage.cmode == 'night' else ' -ss ') + str(ControlPackage.ss) + ' -ISO ' + str(ControlPackage.iso) \
                      + ' -sh ' + str(ControlPackage.sharpness) + ' -co ' + str(ControlPackage.contrast) \
                      + ' -sa ' + str(ControlPackage.saturation) + ' ' + ts
@@ -173,8 +178,10 @@ class RaspiShellCamera(Camera):
       camera_lock.acquire();
 
       roistr = ' -roi ' + str(ControlPackage.roi_l) + ',' + str(ControlPackage.roi_l) + ',' + str(ControlPackage.roi_w) + ',' + str(ControlPackage.roi_w) 
-      cmdstr = 'raspivid -o ' + fname + ' -vf -hf -br ' \
-                     + str(ControlPackage.brightness) + roistr \
+      cmdstr = 'raspivid -o ' + fname \
+                     + (' -vf ' if ControlPackage.vflip == 'true' else '') \
+                     + (' -hf ' if ControlPackage.hflip == 'true' else '') \
+                     + ' -br ' + str(ControlPackage.brightness) + roistr \
                      + ' -ss ' + str(ControlPackage.ss) + ' -ISO ' + str(ControlPackage.iso) \
                      + ' -sh ' + str(ControlPackage.sharpness) + ' -co ' + str(ControlPackage.contrast) \
                      + ' -sa ' + str(ControlPackage.saturation) + ' -t ' + str(ControlPackage.videolen*1000)
@@ -202,7 +209,9 @@ class RaspiShellCamera(Camera):
                      + ' ' + str(ControlPackage.sharpness) + ' ' + str(ControlPackage.contrast) \
                      + ' ' + str(ControlPackage.saturation) \
                      + ' ' + str(ControlPackage.roi_l) \
-                     + ' ' + str(ControlPackage.roi_w) 
+                     + ' ' + str(ControlPackage.roi_w) \
+                     + (' -vf ' if ControlPackage.vflip == 'true' else '') \
+                     + (' -hf ' if ControlPackage.hflip == 'true' else '')
         print cmdstr
         os.system( cmdstr )
         videostarted = True
