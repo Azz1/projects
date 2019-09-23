@@ -42,8 +42,8 @@ class ControlPackage :
   try:
     SerialData = serial.Serial(
                #port='/dev/ttyACM0',
-               port='/dev/ttyAMA0',
-               #port='/dev/ttyUSB0',
+               #port='/dev/ttyAMA0',
+               port='/dev/ttyUSB0',
                baudrate = 9600,
                parity=serial.PARITY_NONE,
                stopbits=serial.STOPBITS_ONE,
@@ -83,7 +83,7 @@ class ControlPackage :
 #picamera v1.3
   roi_l = 0
 #picamera v2
-  roi_l = 0.2
+  #roi_l = 0.2
   roi_w = (1 - roi_l)**2
 
   brightness = 50	#0-100 50 default
