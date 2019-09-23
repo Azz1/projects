@@ -53,8 +53,8 @@ class ArduinoSerialStepMotor(StepMotor) :
       self.serial.write('<stepper ' + str(self.Motor_No) + ' ' + str(steps) + ' F ' + style[0:1] + '>')
     else:
       self.serial.write('<stepper ' + str(self.Motor_No) + ' ' + str(steps) + ' B ' + style[0:1] + '>')
-    time.sleep(1)
-    self.serial.write('<steprel ' + str(self.Motor_No) + '>')
+    #time.sleep(1)
+    #self.serial.write('<steprel ' + str(self.Motor_No) + '>')
 
   def checklimit(self, dir):
     #check sensor if reaching the limit
