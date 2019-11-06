@@ -114,7 +114,7 @@ class ControlPackage :
   # initialize vertical step motor
   vspeed = 10
   vadj = 0
-  vsteps = 200
+  vsteps = 50
 
   # initialize horizontal step motor
   hspeed = 80000
