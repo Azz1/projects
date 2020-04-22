@@ -134,7 +134,7 @@ class RaspiShellCamera(Camera):
       #ControlPackage.camera.capture(fname, format='jpeg', resize=(ControlPackage.width,ControlPackage.height))
 
       ts = ''
-      tl = ControlPackage.ss/2000 + 2000
+      tl = ControlPackage.ss/1000 + 2000
       tt = tl * (ControlPackage.timelapse-1)
       if ControlPackage.timelapse > 1:
         ts = '-tl ' + str(tl) + ' -t ' +  str(tt)
