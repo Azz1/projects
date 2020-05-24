@@ -112,7 +112,7 @@ class ControlPackage :
   f_cmdqueue = Queue.Queue()      
 
   # initialize vertical step motor
-  vspeed = 10
+  vspeed = 1000
   vadj = 0
   vsteps = 50
 
@@ -271,9 +271,9 @@ class MotorControlThread (threading.Thread):
 	  # UP-FWD, DOWN-BKWD
 	  self.motor.setSpeed(speed, adj)
 	  if dir == "UP":
-            self.motor.step(steps, "FORWARD", "DOUBLE")
+            self.motor.step(steps, "FORWARD", "MICROSTEP")
           else:
-            self.motor.step(steps, "BACKWARD", "DOUBLE")
+            self.motor.step(steps, "BACKWARD", "MICROSTEP")
           self.motor.release()
 
           if dir.upper() == 'UP' and GPIO.input(ControlPackage.VH_pin):
