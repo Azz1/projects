@@ -1,12 +1,13 @@
 #!/usr/bin/python
 
-from BaseHTTPServer import BaseHTTPRequestHandler,HTTPServer
-from SocketServer import ThreadingMixIn
+#from BaseHTTPServer import BaseHTTPRequestHandler,HTTPServer
+from http.server import BaseHTTPRequestHandler,HTTPServer
+from socketserver import ThreadingMixIn
 import threading
-import Queue
+import queue
 import argparse
 import json
-import Cookie
+import http.cookies
 import time, datetime
 import re
 import os
@@ -29,9 +30,9 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
  
   def __getCookie(self):
     if "Cookie" in self.headers:
-      self.cookie = Cookie.SimpleCookie(self.headers["Cookie"])
+      self.cookie = http.cookies.SimpleCookie(self.headers["Cookie"])
     else:
-      self.cookie = Cookie.SimpleCookie()
+      self.cookie = http.cookie.SimpleCookie()
       self.cookie['refined'] = 'false'
       self.cookie['norefresh'] = 'false'
       self.cookie['cmode'] = 'day'
@@ -48,9 +49,9 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
     self.__getCookie()
 
     if None != re.search('/api/refresh$', self.path):
-      print 'POST /api/refresh'
-      length = int(self.headers.getheader('content-length'))
-      data = cgi.parse_qs(self.rfile.read(length), keep_blank_values=1)
+      print( 'POST /api/refresh' )
+      length = int(self.headers['content-length'])
+      data = cgi.parse_qs(self.rfile.read(length).decode('UTF-8'), keep_blank_values=1)
       ControlPackage.ss = int(float(data['ss'][0]) * 1000)
       ControlPackage.iso = int(data['iso'][0])
       ControlPackage.brightness = int(data['br'][0])
@@ -69,12 +70,12 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
       self.send_header('Content-Type', 'application/json')
       self.__sendCookie()
       self.end_headers()
-      self.wfile.write('{"seq": ' + str(ControlPackage.imageseq) + ', "timestamp": "'+  time.strftime("%Y%m%d-%H%M%S", localtime) +'", "image": "' + imgstr + '"}')
+      self.wfile.write(bytes('{"seq": ' + str(ControlPackage.imageseq) + ', "timestamp": "'+  time.strftime("%Y%m%d-%H%M%S", localtime) +'", "image": "' + imgstr + '"}', 'UTF-8'))
 
     elif None != re.search('/api/motor/*', self.path): # motor control
       ControlPackage.isTracking.clear()
-      length = int(self.headers.getheader('content-length'))
-      data = cgi.parse_qs(self.rfile.read(length), keep_blank_values=1)
+      length = int(self.headers['content-length'])
+      data = cgi.parse_qs(self.rfile.read(length).decode('utf-8'), keep_blank_values=1)
       speed = int(data['speed'][0])
       adj = int(data['adj'][0])
       steps = int(data['steps'][0])
@@ -93,13 +94,13 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
         except:
       	    move_method = 'DOUBLE'
 
-	ControlPackage.vspeed = speed
-	ControlPackage.vadj = adj
-	ControlPackage.vsteps = steps
+        ControlPackage.vspeed = speed
+        ControlPackage.vadj = adj
+        ControlPackage.vsteps = steps
 
-	ControlPackage.threadLock.acquire()
-	if dir.upper() == 'FORWARD' : v_dir = 'UP'
-	else : v_dir = 'DOWN'
+        ControlPackage.threadLock.acquire()
+        if dir.upper() == 'FORWARD' : v_dir = 'UP'
+        else : v_dir = 'DOWN'
         ControlPackage.v_cmdqueue.put((v_dir, speed, adj, steps))
         ControlPackage.threadLock.release()
 
@@ -112,13 +113,13 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
           statstr = 'Vertical lowest limit reached!'
 
       elif motorid.lower() == 'h':
-	ControlPackage.hspeed = speed
-	ControlPackage.hadj = adj
-	ControlPackage.hsteps = steps
+        ControlPackage.hspeed = speed
+        ControlPackage.hadj = adj
+        ControlPackage.hsteps = steps
 
-	ControlPackage.threadLock.acquire()
-	if dir.upper() == 'FORWARD' : h_dir = 'LEFT'
-	else : h_dir = 'RIGHT'
+        ControlPackage.threadLock.acquire()
+        if dir.upper() == 'FORWARD' : h_dir = 'LEFT'
+        else : h_dir = 'RIGHT'
         ControlPackage.h_cmdqueue.put((h_dir, speed, adj, steps))
         ControlPackage.threadLock.release()
 
@@ -131,13 +132,13 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
           statstr = 'Horizontal rightmost limit reached!'
 
       else:
-	ControlPackage.fspeed = speed
-	ControlPackage.fadj = adj
-	ControlPackage.fsteps = steps
+        ControlPackage.fspeed = speed
+        ControlPackage.fadj = adj
+        ControlPackage.fsteps = steps
 
-	ControlPackage.threadLock.acquire()
-	if dir.upper() == 'FORWARD' : f_dir = 'IN'
-	else : f_dir = 'OUT'
+        ControlPackage.threadLock.acquire()
+        if dir.upper() == 'FORWARD' : f_dir = 'IN'
+        else : f_dir = 'OUT'
         ControlPackage.f_cmdqueue.put((f_dir, speed, adj, steps))
         ControlPackage.threadLock.release()
 
@@ -145,12 +146,12 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
       self.send_header('Content-Type', 'application/json')
       self.__sendCookie()
       self.end_headers()
-      self.wfile.write('{"status": "' + str(status) + '", "detail": "' + statstr + '"}')
+      self.wfile.write(bytes('{"status": "' + str(status) + '", "detail": "' + statstr + '"}', 'UTF-8'))
 
     elif None != re.search('/api/starttracking', self.path): # motor control
-      print 'POST /api/statrtracking'
-      length = int(self.headers.getheader('content-length'))
-      data = cgi.parse_qs(self.rfile.read(length), keep_blank_values=1)
+      print( 'POST /api/statrtracking' )
+      length = int(self.headers['content-length'])
+      data = cgi.parse_qs(self.rfile.read(length).decode('utf-8'), keep_blank_values=1)
 
       if data['myloclat'][0] == "" or data['myloclong'][0] == "" \
         or data['tgazadj'][0] == "" or data['tgaltadj'][0] == "" \
@@ -178,11 +179,11 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
         ControlPackage.tgaltadj = float(data['tgaltadj'][0])
 
         if data['altazradec'][0] == "ALTAZ":
-	   ControlPackage.altazradec = 'ALTAZ'
+           ControlPackage.altazradec = 'ALTAZ'
            ControlPackage.tgaz = float(data['tgaz'][0])
            ControlPackage.tgalt = float(data['tgalt'][0])
         else:
-	   ControlPackage.altazradec = 'RADEC'
+           ControlPackage.altazradec = 'RADEC'
            ControlPackage.tgrah = float(data['tgrah'][0]) 
            ControlPackage.tgram = float(data['tgram'][0])
            ControlPackage.tgras = float(data['tgras'][0])
@@ -200,7 +201,7 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
                         ControlPackage.tgaz, ControlPackage.tgalt, 
                         vspeed, vsteps, hspeed, hsteps)
 
-        print 'Start star tracking ...'
+        print( 'Start star tracking ...' )
         t = threading.Thread(target=tr.Track, args = ())
         t.daemon = True
         ControlPackage.isTracking.set()
@@ -209,15 +210,15 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
         status = True	# start uccess
         statstr = 'Star Tracking Started.'
 
-      print statstr
+      print( statstr )
       self.send_response(200)
       self.send_header('Content-Type', 'application/json')
       self.__sendCookie()
       self.end_headers()
-      self.wfile.write('{"status": "' + str(status) + '", "detail": "' + statstr + '"}')
+      self.wfile.write(bytes('{"status": "' + str(status) + '", "detail": "' + statstr + '"}','utf-8'))
 
     elif None != re.search('/api/adjoffset', self.path): # Direction offset adjustmnet 
-      print 'POST /api/adjoffset'
+      print( 'POST /api/adjoffset' )
 
       azadj, altadj = ControlPackage.newadj()
 
@@ -225,12 +226,12 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
       self.send_header('Content-Type', 'application/json')
       self.__sendCookie()
       self.end_headers()
-      self.wfile.write('{"azadj": "' + ("%.2f" % azadj) + '", "altadj": "' + ("%.2f" % altadj) + '"}')
+      self.wfile.write(bytes('{"azadj": "' + ("%.2f" % azadj) + '", "altadj": "' + ("%.2f" % altadj) + '"}','utf-8'))
 
     elif None != re.search('/api/halt', self.path): # Halt the system
-      print 'POST /api/halt'
+      print( 'POST /api/halt' )
       if self.client_address[0].startswith('192') :	# halt system request only enabled from local IPs
-        print 'Halting the system from ' + self.client_address[0] + ' ...'
+        print( 'Halting the system from ' + self.client_address[0] + ' ...' )
         ControlPackage.camera.haltsys()
 
 
@@ -264,7 +265,7 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
                         ControlPackage.tgdecdg, ControlPackage.tgdecm, ControlPackage.tgdecs,
                         ControlPackage.tgaz, ControlPackage.tgalt, 
                         0, 0, 0, 0)
-	  ControlPackage.tgaz, ControlPackage.tgalt = tr.GetTarget()
+          ControlPackage.tgaz, ControlPackage.tgalt = tr.GetTarget()
           ControlPackage.curalt, ControlPackage.curaz = tr.read()
           ControlPackage.curalt += ControlPackage.tgaltadj
           ControlPackage.curaz += ControlPackage.tgazadj
@@ -273,16 +274,16 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
       self.send_header('Content-Type', 'application/json')
       self.__sendCookie()
       self.end_headers()
-      self.wfile.write('{' \
+      self.wfile.write(bytes('{' \
 		        + '"time": "' + nowstring + '",' \
 		        + '"curaz": "' + '%.4f' % ControlPackage.curaz + '",' \
 		        + '"curalt": "' + '%.4f' % ControlPackage.curalt + '",' \
 			+ '"tgaz": "' + '%.4f' % ControlPackage.tgaz + '",' \
 			+ '"tgalt": "' + '%.4f' % ControlPackage.tgalt + '"' \
-			+ '}')
+			+ '}', 'UTF-8'))
 
     elif None != re.search('/api/startvideo', self.path):	# start video
-      print 'GET /api/startvideo'
+      print( 'GET /api/startvideo')
 
       ControlPackage.ss = int(float(self.path.split('/')[-6]) * 1000)
       ControlPackage.iso = int(self.path.split('/')[-5])
@@ -297,10 +298,10 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
       self.send_header('Content-Type', 'application/json')
       self.__sendCookie()
       self.end_headers()
-      self.wfile.write('{"status": "' + 'true' + '"}')
+      self.wfile.write(bytes('{"status": "' + 'true' + '"}','utf-8'))
 
     elif None != re.search('/api/stopvideo$', self.path):	# stop video
-      print 'GET /api/stopvideo'
+      print( 'GET /api/stopvideo')
  
       ControlPackage.camera.stopvideo()
 
@@ -308,10 +309,10 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
       self.send_header('Content-Type', 'application/json')
       self.__sendCookie()
       self.end_headers()
-      self.wfile.write('{"status": "' + 'true' + '"}')
+      self.wfile.write(bytes('{"status": "' + 'true' + '"}','utf-8'))
 
     elif None != re.search('/api/stoptracking$', self.path):	# stop tracking
-      print 'GET /api/stoptracking'
+      print( 'GET /api/stoptracking')
  
       ControlPackage.isTracking.clear()
 
@@ -319,14 +320,14 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
       self.send_header('Content-Type', 'application/json')
       self.__sendCookie()
       self.end_headers()
-      self.wfile.write('{"status": "' + 'true' + '"}')
+      self.wfile.write(bytes('{"status": "' + 'true' + '"}','utf-8'))
 
     elif None != re.search('/api/init$', self.path):	# load initial params
       self.send_response(200)
       self.send_header('Content-Type', 'application/json')
       self.__sendCookie()
       self.end_headers()
-      self.wfile.write('{' \
+      self.wfile.write(bytes('{' \
 		        + '"vspeed": "' + str(ControlPackage.vspeed) + '",' \
 		        + '"vsteps": "' + str(ControlPackage.vsteps) + '",' \
 		        + '"hspeed": "' + str(ControlPackage.hspeed) + '",' \
@@ -351,10 +352,10 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
 			+ '"tgaltadj": "' + str(ControlPackage.tgaltadj) + '",' \
 			+ '"myloclat": "' + str(ControlPackage.myloclat) + '",' \
 			+ '"myloclong": "' + str(ControlPackage.myloclong) + '"' \
-			+ '}')
+			+ '}', 'utf-8'))
 
     elif None != re.search('/api/snapshot', self.path):
-      print 'GET /api/snapshot'
+      print( 'GET /api/snapshot')
       ControlPackage.ss = int(float(self.path.split('/')[-7]) * 1000)
       ControlPackage.iso = int(self.path.split('/')[-6])
       ControlPackage.brightness = int(self.path.split('/')[-5])
@@ -372,12 +373,12 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
 
       self.__sendCookie()
       self.end_headers()
-      with open(fname, 'r') as content_file:
+      with open(fname, 'rb') as content_file:
         content = content_file.read()
         self.wfile.write(content)
 
     elif None != re.search('/api/videoshot', self.path):
-      print 'GET /api/videoshot'
+      print( 'GET /api/videoshot')
       ControlPackage.ss = int(float(self.path.split('/')[-7]) * 1000)
       ControlPackage.iso = int(self.path.split('/')[-6])
       ControlPackage.brightness = int(self.path.split('/')[-5])
@@ -395,7 +396,7 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
 
       self.__sendCookie()
       self.end_headers()
-      with open(fname, 'r') as content_file:
+      with open(fname, 'rb') as content_file:
         content = content_file.read()
         self.wfile.write(content)
 
@@ -442,7 +443,7 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
   def __retrieveFile(self, filename, contenttype) :
     fullpath = os.path.realpath(__file__)
     filepath = os.path.dirname(fullpath) + '/content/' + filename
-    print "retrieve file " + filepath
+    print( "retrieve file " + filepath)
 
     if os.path.isfile(filepath) :
       self.send_response(200)
@@ -452,7 +453,7 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
       with open(filepath, 'r') as content_file:
         content = content_file.read()
         content = content.replace('[IPADDRESS]', ControlPackage.ip)
-        self.wfile.write(content)
+        self.wfile.write(content.encode('utf-8'))
         return True
     else :
       self.send_response(403)
@@ -498,10 +499,10 @@ if __name__=='__main__':
   parser.add_argument('camonly', help='Camera Only Mode')
   args = parser.parse_args()
  
-  print 'HTTP Server Running...........'
+  print( 'HTTP Server Running...........')
   if args.camonly  == 'Y': 
     ControlPackage.cameraonly = "true"
-    print '!!!!!!!!!!!!!!!!!! in Camer Only Mode !!!!!!!!!!!!!!!!!!!!!!!!'
+    print( '!!!!!!!!!!!!!!!!!! in Camer Only Mode !!!!!!!!!!!!!!!!!!!!!!!!')
   else :
     ControlPackage.cameraonly = "false"
 

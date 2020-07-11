@@ -1,13 +1,13 @@
 import time
 import math
 import os
-import Queue
+import queue
 import picamera
 import threading
 import PIL
 from PIL import Image
 import base64
-from cStringIO import StringIO
+from io import BytesIO
 from StepMotor import ControlPackage
 from abc import ABCMeta, abstractmethod
 
@@ -76,7 +76,7 @@ class RaspiShellCamera(Camera):
                      + (' -ex night -ss ' if ControlPackage.cmode == 'night' else ' -ss ') + str(ss) + ' -ISO ' + str(ControlPackage.iso) \
                      + ' -sh ' + str(ControlPackage.sharpness) + ' -co ' + str(ControlPackage.contrast) \
                      + ' -sa ' + str(ControlPackage.saturation)
-      print cmdstr
+      print( cmdstr)
       os.system( cmdstr )
 
     except:   # use last available image if snapshot failed
@@ -97,9 +97,9 @@ class RaspiShellCamera(Camera):
     #img = img.resize((basewidth,hsize), PIL.Image.ANTIALIAS)
     #img = img.transpose(Image.ROTATE_180)
 
-    output = StringIO()
+    output = BytesIO()
     img.save(output, format='JPEG')
-    imgstr = base64.b64encode(output.getvalue())
+    imgstr = base64.b64encode(output.getvalue()).decode("utf-8") 
     del img
 
     if ControlPackage.imageseq > ControlPackage.max_keep_snapshots:
@@ -147,7 +147,7 @@ class RaspiShellCamera(Camera):
                      + (' -ex night -ss ' if ControlPackage.cmode == 'night' else ' -ss ') + str(ControlPackage.ss) + ' -ISO ' + str(ControlPackage.iso) \
                      + ' -sh ' + str(ControlPackage.sharpness) + ' -co ' + str(ControlPackage.contrast) \
                      + ' -sa ' + str(ControlPackage.saturation) + ' ' + ts
-      print cmdstr
+      print( cmdstr)
       os.system( cmdstr )
 
     finally:
@@ -185,7 +185,7 @@ class RaspiShellCamera(Camera):
                      + ' -ss ' + str(ControlPackage.ss) + ' -ISO ' + str(ControlPackage.iso) \
                      + ' -sh ' + str(ControlPackage.sharpness) + ' -co ' + str(ControlPackage.contrast) \
                      + ' -sa ' + str(ControlPackage.saturation) + ' -t ' + str(ControlPackage.videolen*1000)
-      print cmdstr
+      print( cmdstr)
       os.system( cmdstr )
 
     finally:
@@ -212,7 +212,7 @@ class RaspiShellCamera(Camera):
                      + ' ' + str(ControlPackage.roi_w) \
                      + (' -vf ' if ControlPackage.vflip == 'true' else '') \
                      + (' -hf ' if ControlPackage.hflip == 'true' else '')
-        print cmdstr
+        print( cmdstr)
         os.system( cmdstr )
         videostarted = True
         time.sleep(8)
@@ -224,12 +224,12 @@ class RaspiShellCamera(Camera):
     global videostarted
     videostarted = False
     cmdstr = 'sh stopvideo.sh'
-    print cmdstr
+    print( cmdstr)
     os.system( cmdstr )
 
   def haltsys(self): 
     cmdstr = 'sudo halt'
-    print cmdstr
+    print( cmdstr)
     os.system( cmdstr )
 
  

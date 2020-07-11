@@ -26,7 +26,7 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 
-import ConfigParser, os
+import configparser, os
 import math
 from Adafruit_I2C import Adafruit_I2C
 
@@ -83,21 +83,21 @@ class Adafruit_LSM303(Adafruit_I2C):
 
         fullpath = os.path.realpath(__file__)
         filepath = os.path.dirname(fullpath) + '/../../magcalibrate.conf' 
-        config = ConfigParser.ConfigParser()
+        config = configparser.ConfigParser()
         config.readfp(open(filepath))
-	self.MX_MIN = config.getfloat('mag', 'XMIN')
-	self.MX_MAX = config.getfloat('mag', 'XMAX')
-	self.MY_MIN = config.getfloat('mag', 'YMIN')
-	self.MY_MAX = config.getfloat('mag', 'YMAX')
-	self.MZ_MIN = config.getfloat('mag', 'ZMIN')
-	self.MZ_MAX = config.getfloat('mag', 'ZMAX')
-	#print "Read from config file:"
-	#print "\tXMIN: {0}".format(self.MX_MIN)
-	#print "\tXMAX: {0}".format(self.MX_MAX)
-	#print "\tYMIN: {0}".format(self.MY_MIN)
-	#print "\tYMAX: {0}".format(self.MY_MAX)
-	#print "\tZMIN: {0}".format(self.MZ_MIN)
-	#print "\tZMAX: {0}".format(self.MZ_MAX)
+        self.MX_MIN = config.getfloat('mag', 'XMIN')
+        self.MX_MAX = config.getfloat('mag', 'XMAX')
+        self.MY_MIN = config.getfloat('mag', 'YMIN')
+        self.MY_MAX = config.getfloat('mag', 'YMAX')
+        self.MZ_MIN = config.getfloat('mag', 'ZMIN')
+        self.MZ_MAX = config.getfloat('mag', 'ZMAX')
+        #print( "Read from config file:")
+        #print( "\tXMIN: {0}".format(self.MX_MIN))
+        #print( "\tXMAX: {0}".format(self.MX_MAX))
+        #print( "\tYMIN: {0}".format(self.MY_MIN))
+        #print( "\tYMAX: {0}".format(self.MY_MAX))
+        #print( "\tZMIN: {0}".format(self.MZ_MIN))
+        #print( "\tZMAX: {0}".format(self.MZ_MAX))
 
 
     # Interpret signed 12-bit acceleration component from list
@@ -119,50 +119,50 @@ class Adafruit_LSM303(Adafruit_I2C):
         list = self.accel.readList(
           self.LSM303_REGISTER_ACCEL_OUT_X_L_A | 0x80, 6)
 
-	x = self.accel12(list, 0)
-	y = self.accel12(list, 2)
-	z = self.accel12(list, 4)
+        x = self.accel12(list, 0)
+        y = self.accel12(list, 2)
+        z = self.accel12(list, 4)
 
         #print 'raw acc readings: ({0} {1} {2})'.format(x, y, z)
 
         xAngle = math.atan2( x, (math.sqrt(y*y + z*z)))
-   	yAngle = math.atan2( y, (math.sqrt(x*x + z*z)))
-   	zAngle = math.atan2( math.sqrt(x*x + y*y), z)	
+        yAngle = math.atan2( y, (math.sqrt(x*x + z*z)))
+        zAngle = math.atan2( math.sqrt(x*x + y*y), z)	
 
-	alpha = xAngle
-	gamma = yAngle
+        alpha = xAngle
+        gamma = yAngle
 
         # Read the magnetometer
         list = self.mag.readList(self.LSM303_REGISTER_MAG_OUT_X_H_M, 6)
 
-	#x = self.mag16(list, 0)
-	#y = self.mag16(list, 2)
-	#z = self.mag16(list, 4)
-	x = self.mag16(list, 0)
-	z = self.mag16(list, 2)
-	y = self.mag16(list, 4)
+        #x = self.mag16(list, 0)
+        #y = self.mag16(list, 2)
+        #z = self.mag16(list, 4)
+        x = self.mag16(list, 0)
+        z = self.mag16(list, 2)
+        y = self.mag16(list, 4)
 
-	#x1 = x
-	#y1 = y
-	#z1 = z
-	x1 = self.normalize(x, self.MX_MIN, self.MX_MAX)
-	y1 = self.normalize(y, self.MY_MIN, self.MY_MAX)
-	z1 = self.normalize(z, self.MZ_MIN, self.MZ_MAX)
+        #x1 = x
+        #y1 = y
+        #z1 = z
+        x1 = self.normalize(x, self.MX_MIN, self.MX_MAX)
+        y1 = self.normalize(y, self.MY_MIN, self.MY_MAX)
+        z1 = self.normalize(z, self.MZ_MIN, self.MZ_MAX)
 
-	#title compensate
-	xh = x1*math.cos(alpha) + y1*math.sin(alpha)*math.sin(gamma) - z1*math.cos(gamma)*math.sin(alpha);
-  	yh = y1*math.cos(gamma) + z1*math.sin(gamma);
+        #title compensate
+        xh = x1*math.cos(alpha) + y1*math.sin(alpha)*math.sin(gamma) - z1*math.cos(gamma)*math.sin(alpha);
+        yh = y1*math.cos(gamma) + z1*math.sin(gamma);
 
-	#heading = (math.atan2(y1,x1) * 180) / math.pi 	#sensor is pointed backward
-	heading = (math.atan2(yh,xh) * 180) / math.pi  	#sensor is pointed backward
+        #heading = (math.atan2(y1,x1) * 180) / math.pi 	#sensor is pointed backward
+        heading = (math.atan2(yh,xh) * 180) / math.pi  	#sensor is pointed backward
 
-	if heading > 0 : heading = heading - 360
-	heading += 360	
+        if heading > 0 : heading = heading - 360
+        heading += 360	
   
-	#convert accelerometer x, y, z angle to degree
-   	xAngle *= 180.00 / math.pi 
-	yAngle *= 180.00 / math.pi  
-	zAngle *= 180.00 / math.pi
+        #convert accelerometer x, y, z angle to degree
+        xAngle *= 180.00 / math.pi 
+        yAngle *= 180.00 / math.pi  
+        zAngle *= 180.00 / math.pi
 
         res = ( xAngle, yAngle, zAngle, heading )
 
@@ -178,24 +178,24 @@ class Adafruit_LSM303(Adafruit_I2C):
         # Read the magnetometer
         list = self.mag.readList(self.LSM303_REGISTER_MAG_OUT_X_H_M, 6)
 
-	#x = self.mag16(list, 0)
-	#y = self.mag16(list, 2)
-	#z = self.mag16(list, 4)
-	x = self.mag16(list, 0)
-	z = self.mag16(list, 2)
-	y = self.mag16(list, 4)
+        #x = self.mag16(list, 0)
+        #y = self.mag16(list, 2)
+        #z = self.mag16(list, 4)
+        x = self.mag16(list, 0)
+        z = self.mag16(list, 2)
+        y = self.mag16(list, 4)
 
-	#x1 = x
-	#y1 = y
-	#z1 = z
-	x1 = self.normalize(x, self.MX_MIN, self.MX_MAX)
-	y1 = self.normalize(y, self.MY_MIN, self.MY_MAX)
-	z1 = self.normalize(z, self.MZ_MIN, self.MZ_MAX)
+        #x1 = x
+        #y1 = y
+        #z1 = z
+        x1 = self.normalize(x, self.MX_MIN, self.MX_MAX)
+        y1 = self.normalize(y, self.MY_MIN, self.MY_MAX)
+        z1 = self.normalize(z, self.MZ_MIN, self.MZ_MAX)
 
-	heading = (math.atan2(y1,x1) * 180) / math.pi  
+        heading = (math.atan2(y1,x1) * 180) / math.pi  
 
-	if heading > 0 : heading = heading - 360
-	heading += 360	
+        if heading > 0 : heading = heading - 360
+        heading += 360	
 
         res = ( x, y, z, heading )
 
@@ -213,7 +213,7 @@ if __name__ == '__main__':
 
     lsm = Adafruit_LSM303()
 
-    print '[(Accelerometer X, Y, Z), (Magnetometer X, Y, Z, orientation)]'
+    print( '[(Accelerometer X, Y, Z), (Magnetometer X, Y, Z, orientation)]')
 
     x_max = 0.0
     x_min = 0.0
@@ -227,24 +227,24 @@ if __name__ == '__main__':
         # print lsm.read()
         x, y, z, heading = lsm.readmag()
 
-	if x < x_min: x_min = x
-	if x > x_max: x_max = x
+        if x < x_min: x_min = x
+        if x > x_max: x_max = x
 
-	if y < y_min: y_min = y
-	if y > y_max: y_max = y
+        if y < y_min: y_min = y
+        if y > y_max: y_max = y
 
-	if z < z_min: z_min = z
-	if z > z_max: z_max = z
+        if z < z_min: z_min = z
+        if z > z_max: z_max = z
 
-        print '({0}, {1}, {2}) - heading: {3}'.format(x,y,z,heading)
+        print( '({0}, {1}, {2}) - heading: {3}'.format(x,y,z,heading))
         sleep(1) # Output is fun to watch if this is commented out
 
     except KeyboardInterrupt:
-        print "Interruption accepted, exiting ...\n"
-        print "XMIN={0}".format(x_min)
-        print "XMAX={0}".format(x_max)
-        print "YMIN={0}".format(y_min)
-        print "YMAX={0}".format(y_max)
-        print "ZMIN={0}".format(z_min)
-        print "ZMAX={0}".format(z_max)
+        print( "Interruption accepted, exiting ...\n")
+        print( "XMIN={0}".format(x_min))
+        print( "XMAX={0}".format(x_max))
+        print( "YMIN={0}".format(y_min))
+        print( "YMAX={0}".format(y_max))
+        print( "ZMIN={0}".format(z_min))
+        print( "ZMAX={0}".format(z_max))
 

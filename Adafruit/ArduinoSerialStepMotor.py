@@ -45,16 +45,16 @@ class ArduinoSerialStepMotor(StepMotor) :
     self.current_step = 0
 
   def setSpeed(self, rpm, adj=0):
-    self.serial.write('<stepspeed ' + str(self.Motor_No) + ' ' + str(rpm) + ' ' + str(adj) + '>')
+    self.serial.write(bytes('<stepspeed ' + str(self.Motor_No) + ' ' + str(rpm) + ' ' + str(adj) + '>','ascii'))
 
   def step(self, steps, dir, style):
-    self.serial.write('<touch 0>')	# enable onboard touch sensors
+    self.serial.write(bytes('<touch 0>', 'ascii'))	# enable onboard touch sensors
     if dir == 'FORWARD':
-      self.serial.write('<stepper ' + str(self.Motor_No) + ' ' + str(steps) + ' F ' + style[0:1] + '>')
+      self.serial.write(bytes('<stepper ' + str(self.Motor_No) + ' ' + str(steps) + ' F ' + style[0:1] + '>','ascii'))
     else:
-      self.serial.write('<stepper ' + str(self.Motor_No) + ' ' + str(steps) + ' B ' + style[0:1] + '>')
+      self.serial.write(bytes('<stepper ' + str(self.Motor_No) + ' ' + str(steps) + ' B ' + style[0:1] + '>','ascii'))
     time.sleep(1)
-    self.serial.write('<steprel ' + str(self.Motor_No) + '>')
+    self.serial.write(bytes('<steprel ' + str(self.Motor_No) + '>','ascii'))
 
   def checklimit(self, dir):
     #check sensor if reaching the limit
