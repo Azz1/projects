@@ -40,7 +40,8 @@ class CV2Helper :
         # perform a connected component analysis on the thresholded
         # image, then initialize a mask to store only the "large"
         # components
-        labels = measure.label(thresh, connectivity=2, background=0)
+        #labels = measure.label(thresh, connectivity=2, background=0)
+        labels = measure.label(thresh, neighbors=8, background=0)
         mask = np.zeros(thresh.shape, dtype="uint8")
         # loop over the unique components
         for label in np.unique(labels):
