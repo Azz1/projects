@@ -104,6 +104,8 @@ $( "#btn_refresh" ).click(function() {
 
 	var canvas = $('#canvas')[0];
         var context = canvas.getContext('2d');
+	var bkcanvas = $('#bkcanvas')[0];
+        var contextb = bkcanvas.getContext('2d');
         //context.restore();
 
         var img = new Image();
@@ -111,6 +113,10 @@ $( "#btn_refresh" ).click(function() {
         img.onload = function() {
             $("#status_id").html("Refreshed");	
             context.drawImage(this, 0, 0);
+        
+            // save main canvas contents
+            contextb.drawImage(this, 0,0);
+
             if( $.cookie("norefresh") != "true" )
                 v_updimage = setTimeout(updateImage, 1000); // 1 * 1000 miliseconds
         }
