@@ -95,7 +95,8 @@ $( "#btn_refresh" ).click(function() {
                            "cmode": ($('input[type=radio][name=cmode]')[1].checked ? 'night' : 'day'), 
                            "rawmode": ($('input[type=checkbox][name=rawmode]').is(':checked')? 'true':'false'),
                            "vflip": ($('input[type=checkbox][name=vflip]').is(':checked')? 'true':'false'),
-                           "hflip": ($('input[type=checkbox][name=hflip]').is(':checked')? 'true':'false')
+                           "hflip": ($('input[type=checkbox][name=hflip]').is(':checked')? 'true':'false'),
+		           "refpoints": $('#refsel').val()
 			   }, function(msg) {
     })
     .done(function(msg) {

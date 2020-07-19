@@ -62,6 +62,18 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
       ControlPackage.rawmode = data['rawmode'][0]
       ControlPackage.vflip = data['vflip'][0]
       ControlPackage.hflip = data['hflip'][0]
+
+      if data['refpoints'][0] != "":
+        x = data['refpoints'][0].split(",")
+        ControlPackage.ref0_x = float(x[0])
+        ControlPackage.ref0_y = float(x[1])
+        ControlPackage.ref1_x = float(x[2])
+        ControlPackage.ref1_y = float(x[3])
+        #print( 'Star tracking Ref Point ('+ str(ControlPackage.ref0_x) + ',' 
+        #                                  + str(ControlPackage.ref0_y) + ') - ('
+        #                                  + str(ControlPackage.ref1_x) + ','
+        #                                  + str(ControlPackage.ref1_y) + ')' )
+
       ControlPackage.Validate()
 
       localtime, imgstr = ControlPackage.camera.snapshot()
@@ -208,16 +220,16 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
         hspeed = int(data['hspeed'][0])
         hsteps = int(data['hsteps'][0])
 
-        tr = StarTracking(ControlPackage.myloclat, ControlPackage.myloclong, ControlPackage.altazradec,
-                        ControlPackage.tgrah, ControlPackage.tgram, ControlPackage.tgras, ControlPackage.tgdecdg, ControlPackage.tgdecm, ControlPackage.tgdecs,
-                        ControlPackage.tgaz, ControlPackage.tgalt, 
-                        vspeed, vsteps, hspeed, hsteps)
+        #tr = StarTracking(ControlPackage.myloclat, ControlPackage.myloclong, ControlPackage.altazradec,
+        #                ControlPackage.tgrah, ControlPackage.tgram, ControlPackage.tgras, ControlPackage.tgdecdg, ControlPackage.tgdecm, ControlPackage.tgdecs,
+        #                ControlPackage.tgaz, ControlPackage.tgalt, 
+        #                vspeed, vsteps, hspeed, hsteps)
 
-        print( 'Start star tracking ...' )
-        t = threading.Thread(target=tr.Track, args = ())
-        t.daemon = True
+        #print( 'Start star tracking ...' )
+        #t = threading.Thread(target=tr.Track, args = ())
+        #t.daemon = True
+        #t.start()
         ControlPackage.isTracking.set()
-        t.start()
 
         status = True	# start uccess
         statstr = 'Star Tracking Started.'

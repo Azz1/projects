@@ -1,15 +1,22 @@
 import time
 import math
 import os
+import sys
+import cv2
 import queue
 import picamera
 import threading
 import PIL
+import numpy as np
 from PIL import Image
 import base64
 from io import BytesIO
 from StepMotor import ControlPackage
 from abc import ABCMeta, abstractmethod
+
+cv2lib_path = os.path.abspath('../cv2')
+sys.path.append(cv2lib_path)
+from detect_bright_spots import CV2Helper
 
 camera_lock = threading.Lock()
 videostarted = False
@@ -90,17 +97,36 @@ class RaspiShellCamera(Camera):
       camera_lock.release();
 
     #READ IMAGE AND PUT ON SCREEN
-    img = Image.open(fname)
-    #basewidth = 800
-    #wpercent = (basewidth/float(img.size[0]))
-    #hsize = int((float(img.size[1])*float(wpercent)))
-    #img = img.resize((basewidth,hsize), PIL.Image.ANTIALIAS)
-    #img = img.transpose(Image.ROTATE_180)
+    imgstr = ""
+    if ControlPackage.isTracking.is_set():	#tracking mode, show tracking config
+      cvhelper = CV2Helper( blur_limit = 9, thresh_limit = 35 )
+      # load the image, convert it to grayscale, and blur it
+      img = cvhelper.loadimage(fname)
+      [centers, radius, img] = cvhelper.processimage(mark = True)
+      cvhelper.printcenters()
+      cvhelper.setref(ControlPackage.ref0_x, ControlPackage.ref0_y, ControlPackage.ref1_x, ControlPackage.ref1_y)
+      [idx, cntr, img] = cvhelper.find_nearest_point(True)
+      print("Nearest Point ", "#{}".format(idx+1), "- (", int(cntr[0]), ",", int(cntr[1]), ") ")
 
-    output = BytesIO()
-    img.save(output, format='JPEG')
-    imgstr = base64.b64encode(output.getvalue()).decode("utf-8") 
-    del img
+      r, d = cvhelper.calc_offset(cntr[0], cntr[1])
+      print("\nDelta-RA:", r, " Delta-Dec:", d)
+
+      ret, buf = cv2.imencode( '.jpg', img )
+      imgstr = base64.b64encode( np.array(buf) ).decode("utf-8") 
+
+    else :
+      img = Image.open(fname)
+
+      #basewidth = 800
+      #wpercent = (basewidth/float(img.size[0]))
+      #hsize = int((float(img.size[1])*float(wpercent)))
+      #img = img.resize((basewidth,hsize), PIL.Image.ANTIALIAS)
+      #img = img.transpose(Image.ROTATE_180)
+
+      output = BytesIO()
+      img.save(output, format='JPEG')
+      imgstr = base64.b64encode(output.getvalue()).decode("utf-8") 
+      del img
 
     if ControlPackage.imageseq > ControlPackage.max_keep_snapshots:
       os.system('rm -f temp/image-' + str(ControlPackage.imageseq-ControlPackage.max_keep_snapshots) + '-*.jpg')
