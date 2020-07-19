@@ -153,6 +153,18 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
       length = int(self.headers['content-length'])
       data = cgi.parse_qs(self.rfile.read(length).decode('utf-8'), keep_blank_values=1)
 
+      if data['refpoints'][0] != "":
+        x = data['refpoints'][0].split(",")
+        ControlPackage.ref0_x = float(x[0])
+        ControlPackage.ref0_y = float(x[1])
+        ControlPackage.ref1_x = float(x[2])
+        ControlPackage.ref1_y = float(x[3])
+        print( 'Star tracking Ref Point ('+ str(ControlPackage.ref0_x) + ',' 
+                                          + str(ControlPackage.ref0_y) + ') - ('
+                                          + str(ControlPackage.ref1_x) + ','
+                                          + str(ControlPackage.ref1_y) + ')' )
+
+
       if data['myloclat'][0] == "" or data['myloclong'][0] == "" \
         or data['tgazadj'][0] == "" or data['tgaltadj'][0] == "" \
         or (data['altazradec'][0] == "ALTAZ"  \

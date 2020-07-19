@@ -293,7 +293,8 @@ $('input[type=checkbox][name=tracking]').click( function(){
 		"vspeed": $( "#vspeed" ).val(), 
 		"vsteps": $("#vsteps").val(),
 		"hspeed": $( "#hspeed" ).val(), 
-		"hsteps": $("#hsteps").val()
+		"hsteps": $("#hsteps").val(),
+		"refpoints": $('#refsel').val()
 		}, function(data) {
         })
         .done(function(data) {

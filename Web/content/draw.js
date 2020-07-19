@@ -47,10 +47,11 @@ $(function() {
         startPos = { x: e.pageX - canvasOffset.left, y: e.pageY - canvasOffset.top};
     });
 
-    $(window).mouseup(function() {
+    $('#canvas').mouseup(function() {
         clearCanvas();
         // Replace with var that is second canvas
         line(ctx);
+	$('#refsel').val(startPos.x.toString() + "," + startPos.y.toString() + "," + finalPos.x.toString() + "," + finalPos.y.toString());
         finalPos = {x:0, y:0};
         startPos = {x:0, y:0};
         drawLine = false;

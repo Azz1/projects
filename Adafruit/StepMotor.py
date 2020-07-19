@@ -150,6 +150,12 @@ class ControlPackage :
   tgazadj = 0.0
   tgaltadj = 0.0
 
+  #ref points
+  ref0_x = 0.0
+  ref0_y = 0.0
+  ref1_x = 0.0
+  ref1_y = 0.0
+
   altazradec = 'ALTAZ'
 
   @staticmethod
