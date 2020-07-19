@@ -155,6 +155,8 @@ class ControlPackage :
   ref0_y = 0.0
   ref1_x = 0.0
   ref1_y = 0.0
+  tk_delta_ra = 0.0
+  tk_delta_dec = 0.0
 
   altazradec = 'ALTAZ'
 

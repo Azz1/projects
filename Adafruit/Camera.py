@@ -108,8 +108,8 @@ class RaspiShellCamera(Camera):
       [idx, cntr, img] = cvhelper.find_nearest_point(True)
       print("Nearest Point ", "#{}".format(idx+1), "- (", int(cntr[0]), ",", int(cntr[1]), ") ")
 
-      r, d = cvhelper.calc_offset(cntr[0], cntr[1])
-      print("\nDelta-RA:", r, " Delta-Dec:", d)
+      ControlPackage.tk_delta_ra, ControlPackage.tk_delta_dec = cvhelper.calc_offset(cntr[0], cntr[1])
+      print("\nDelta-RA:", ControlPackage.tk_delta_ra, " Delta-Dec:", ControlPackage.tk_delta_dec)
 
       ret, buf = cv2.imencode( '.jpg', img )
       imgstr = base64.b64encode( np.array(buf) ).decode("utf-8") 
