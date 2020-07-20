@@ -95,7 +95,8 @@ $( "#btn_refresh" ).click(function() {
                            "cmode": ($('input[type=radio][name=cmode]')[1].checked ? 'night' : 'day'), 
                            "rawmode": ($('input[type=checkbox][name=rawmode]').is(':checked')? 'true':'false'),
                            "vflip": ($('input[type=checkbox][name=vflip]').is(':checked')? 'true':'false'),
-                           "hflip": ($('input[type=checkbox][name=hflip]').is(':checked')? 'true':'false')
+                           "hflip": ($('input[type=checkbox][name=hflip]').is(':checked')? 'true':'false'),
+		           "refpoints": $('#refsel').val()
 			   }, function(msg) {
     })
     .done(function(msg) {
@@ -104,6 +105,8 @@ $( "#btn_refresh" ).click(function() {
 
 	var canvas = $('#canvas')[0];
         var context = canvas.getContext('2d');
+	var bkcanvas = $('#bkcanvas')[0];
+        var contextb = bkcanvas.getContext('2d');
         //context.restore();
 
         var img = new Image();
@@ -111,6 +114,10 @@ $( "#btn_refresh" ).click(function() {
         img.onload = function() {
             $("#status_id").html("Refreshed");	
             context.drawImage(this, 0, 0);
+        
+            // save main canvas contents
+            contextb.drawImage(this, 0,0);
+
             if( $.cookie("norefresh") != "true" )
                 v_updimage = setTimeout(updateImage, 1000); // 1 * 1000 miliseconds
         }
@@ -287,7 +294,8 @@ $('input[type=checkbox][name=tracking]').click( function(){
 		"vspeed": $( "#vspeed" ).val(), 
 		"vsteps": $("#vsteps").val(),
 		"hspeed": $( "#hspeed" ).val(), 
-		"hsteps": $("#hsteps").val()
+		"hsteps": $("#hsteps").val(),
+		"refpoints": $('#refsel').val()
 		}, function(data) {
         })
         .done(function(data) {

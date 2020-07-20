@@ -2,7 +2,7 @@ import RPi.GPIO as GPIO
 import time
 import math
 import threading
-import Queue
+import queue
 import serial
 from abc import ABCMeta, abstractmethod
 
@@ -105,11 +105,11 @@ class ControlPackage :
   isTracking = threading.Event()
   threadLock = threading.Lock()
   #queue of objects (dir=UP/DOWN, speed, steps) UP-FWD, DOWN-BKWD
-  v_cmdqueue = Queue.Queue()      
+  v_cmdqueue = queue.Queue()      
   #queue of objects (dir=LEFT/RIGHT, speed, steps) LEFT-FWD, RIGHT-BKWD
-  h_cmdqueue = Queue.Queue()      
+  h_cmdqueue = queue.Queue()      
   #queue of objects (dir=IN/OUT, speed, steps) IN-FWD, OUT-BKWD
-  f_cmdqueue = Queue.Queue()      
+  f_cmdqueue = queue.Queue()      
 
   # initialize vertical step motor
   vspeed = 1000
@@ -149,6 +149,14 @@ class ControlPackage :
   #error adjustment
   tgazadj = 0.0
   tgaltadj = 0.0
+
+  #ref points
+  ref0_x = 0.0
+  ref0_y = 0.0
+  ref1_x = 0.0
+  ref1_y = 0.0
+  tk_delta_ra = 0.0
+  tk_delta_dec = 0.0
 
   altazradec = 'ALTAZ'
 
@@ -237,7 +245,7 @@ class MotorControlThread (threading.Thread):
     self.motor.release()
 
   def run(self):
-    print "Starting " + self.threadName
+    print( "Starting " + self.threadName)
     while ControlPackage.exitFlag.is_set():
       dir = ""
       speed = 0
@@ -246,45 +254,52 @@ class MotorControlThread (threading.Thread):
 	  
       ControlPackage.threadLock.acquire()
       if not self.q.empty():
-    	(dir, speed, adj, steps) = self.q.get()
+          dir, speed, adj, steps = self.q.get()
       ControlPackage.threadLock.release()
 	   
       if dir != "" : 
-        print self.threadName + ' ' + dir + ' Speed: ' + str(speed) + ' Adj: ' + str(adj) + ' Steps: ' + str(steps)
+        print( self.threadName + ' ' + dir + ' Speed: ' + str(speed) + ' Adj: ' + str(adj) + ' Steps: ' + str(steps))
 
         if self.threadName == "H-Motor":
 	  # LEFT-FWD, RIGHT-BKWD
-	  self.motor.setSpeed(speed, adj)
-	  if dir == "LEFT":
+          self.motor.setSpeed(speed, adj)
+          if dir == "LEFT":
             self.motor.step(steps, "BACKWARD", "MICROSTEP")
           else:
             self.motor.step(steps, "FORWARD", "MICROSTEP")
           self.motor.release()
 
           if dir.upper() == 'LEFT' and GPIO.input(ControlPackage.HL_pin):
-            print 'Horizontal leftmost limit reached!'
+            print( 'Horizontal leftmost limit reached!')
 
           if dir.upper() == 'RIGHT' and GPIO.input(ControlPackage.HR_pin):
-            print 'Horizontal rightmost limit reached!'	
-	      	
+            print( 'Horizontal rightmost limit reached!')
+      	
         elif self.threadName == "V-Motor":
+<<<<<<< HEAD
 	  # UP-FWD, DOWN-BKWD
 	  self.motor.setSpeed(speed, adj)
 	  if dir == "UP":
             self.motor.step(steps, "FORWARD", "MICROSTEP")
+=======
+          # UP-FWD, DOWN-BKWD
+          self.motor.setSpeed(speed, adj)
+          if dir == "UP":
+            self.motor.step(steps, "FORWARD", "DOUBLE")
+>>>>>>> 8ac96256336a8424ff9a19254d95f5dbcab2a4e8
           else:
             self.motor.step(steps, "BACKWARD", "MICROSTEP")
           self.motor.release()
 
           if dir.upper() == 'UP' and GPIO.input(ControlPackage.VH_pin):
-            print 'Vertical highest limit reached!'
+            print( 'Vertical highest limit reached!')
 
           if dir.upper() == 'DOWN' and GPIO.input(ControlPackage.VL_pin):
-            print 'Vertical lowest limit reached!'	
-	else:
-	  # IN-FWD, OUT-BKWD
-	  self.motor.setSpeed(speed, adj)
-	  if dir == "IN":
+            print( 'Vertical lowest limit reached!')
+        else:
+          # IN-FWD, OUT-BKWD
+          self.motor.setSpeed(speed, adj)
+          if dir == "IN":
             self.motor.step(steps, "FORWARD", "MICROSTEP")
           else:
             self.motor.step(steps, "BACKWARD", "MICROSTEP")
@@ -292,7 +307,7 @@ class MotorControlThread (threading.Thread):
 
       time.sleep(0.1)
 
-    print "Exiting " + self.threadName
+    print( "Exiting " + self.threadName)
 
 ControlPackage.motorH = MotorControlThread("H-Motor")
 ControlPackage.motorV = MotorControlThread("V-Motor")

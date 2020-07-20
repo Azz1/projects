@@ -19,4 +19,4 @@ done
 myip=`python ./getip.py`
 echo "current ip: " $myip
 sudo nodejs  ../nodejs/stream-server.js soul &
-sudo python httpserver.py 8080 $myip $cameraonly
+sudo python3 httpserver.py 8080 $myip $cameraonly
