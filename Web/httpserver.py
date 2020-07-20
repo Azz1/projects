@@ -32,7 +32,7 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
     if "Cookie" in self.headers:
       self.cookie = http.cookies.SimpleCookie(self.headers["Cookie"])
     else:
-      self.cookie = http.cookie.SimpleCookie()
+      self.cookie = http.cookies.SimpleCookie()
       self.cookie['refined'] = 'false'
       self.cookie['norefresh'] = 'false'
       self.cookie['cmode'] = 'day'
@@ -65,14 +65,15 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
 
       if data['refpoints'][0] != "":
         x = data['refpoints'][0].split(",")
-        ControlPackage.ref0_x = float(x[0])
-        ControlPackage.ref0_y = float(x[1])
-        ControlPackage.ref1_x = float(x[2])
-        ControlPackage.ref1_y = float(x[3])
-        #print( 'Star tracking Ref Point ('+ str(ControlPackage.ref0_x) + ',' 
-        #                                  + str(ControlPackage.ref0_y) + ') - ('
-        #                                  + str(ControlPackage.ref1_x) + ','
-        #                                  + str(ControlPackage.ref1_y) + ')' )
+        if abs(float(x[0]) - float(x[2])) > 1.0 or abs(float(x[1]) - float(x[3])) > 1.0 :
+          ControlPackage.ref0_x = float(x[0])
+          ControlPackage.ref0_y = float(x[1])
+          ControlPackage.ref1_x = float(x[2])
+          ControlPackage.ref1_y = float(x[3])
+          #print( 'Star tracking Ref Point ('+ str(ControlPackage.ref0_x) + ',' 
+          #                                  + str(ControlPackage.ref0_y) + ') - ('
+          #                                  + str(ControlPackage.ref1_x) + ','
+          #                                  + str(ControlPackage.ref1_y) + ')' )
 
       ControlPackage.Validate()
 
@@ -167,11 +168,12 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
 
       if data['refpoints'][0] != "":
         x = data['refpoints'][0].split(",")
-        ControlPackage.ref0_x = float(x[0])
-        ControlPackage.ref0_y = float(x[1])
-        ControlPackage.ref1_x = float(x[2])
-        ControlPackage.ref1_y = float(x[3])
-        print( 'Star tracking Ref Point ('+ str(ControlPackage.ref0_x) + ',' 
+        if abs(float(x[0]) - float(x[2])) > 1.0 or abs(float(x[1]) - float(x[3])) > 1.0 :
+          ControlPackage.ref0_x = float(x[0])
+          ControlPackage.ref0_y = float(x[1])
+          ControlPackage.ref1_x = float(x[2])
+          ControlPackage.ref1_y = float(x[3])
+          print( 'Star tracking Ref Point ('+ str(ControlPackage.ref0_x) + ',' 
                                           + str(ControlPackage.ref0_y) + ') - ('
                                           + str(ControlPackage.ref1_x) + ','
                                           + str(ControlPackage.ref1_y) + ')' )
@@ -183,7 +185,7 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
          and ( data['tgaz'][0] == "" or data['tgalt'][0] == "" )) \
         or (data['altazradec'][0] == "RADEC" \
          and ( data['tgrah'][0] == "" or data['tgram'][0] == "" or data['tgras'][0] == "" \
-          or data['tgdecdg'][0] == "" or data['tgdecm'][0] == "" or data['tgdecs'][0] == "")): 
+          or data['tgdecdg'][0] == "" or data['tgdecm'][0] == "" or data['tgdecs'][0] == "") ) : 
         status = False	
         statstr = 'Star Tacking not started, check parameters!'
 

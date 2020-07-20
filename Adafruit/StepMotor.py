@@ -276,17 +276,10 @@ class MotorControlThread (threading.Thread):
             print( 'Horizontal rightmost limit reached!')
       	
         elif self.threadName == "V-Motor":
-<<<<<<< HEAD
-	  # UP-FWD, DOWN-BKWD
-	  self.motor.setSpeed(speed, adj)
-	  if dir == "UP":
-            self.motor.step(steps, "FORWARD", "MICROSTEP")
-=======
           # UP-FWD, DOWN-BKWD
           self.motor.setSpeed(speed, adj)
           if dir == "UP":
-            self.motor.step(steps, "FORWARD", "DOUBLE")
->>>>>>> 8ac96256336a8424ff9a19254d95f5dbcab2a4e8
+            self.motor.step(steps, "FORWARD", "MICROSTEP")
           else:
             self.motor.step(steps, "BACKWARD", "MICROSTEP")
           self.motor.release()
