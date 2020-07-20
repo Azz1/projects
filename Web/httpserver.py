@@ -479,7 +479,7 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
       with open(filepath, 'r') as content_file:
         content = content_file.read()
         content = content.replace('[IPADDRESS]', ControlPackage.ip)
-        self.wfile.write(content.encode('utf-8'))
+        self.wfile.write(content.encode('iso-8859-1'))
         return True
     else :
       self.send_response(403)
