@@ -61,8 +61,8 @@ $(function() {
             // Replace with var that is second canvas
             line(ctx);
 	    $('#refsel').val(startPos.x.toString() + "," + startPos.y.toString() + "," + finalPos.x.toString() + "," + finalPos.y.toString());
-            finalPos = {x:0, y:0};
-            startPos = {x:0, y:0};
+            //finalPos = {x:0, y:0};
+            //startPos = {x:0, y:0};
             drawLine = false;
 	    break;
         case 3:	//Right click
