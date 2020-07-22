@@ -115,6 +115,7 @@ class ControlPackage :
   vspeed = 1000
   vadj = 0
   vsteps = 50
+  move_method = "DOUBLE"
 
   # initialize horizontal step motor
   hspeed = 80000
@@ -157,6 +158,8 @@ class ControlPackage :
   ref1_y = 0.0
   tk_delta_ra = 0.0
   tk_delta_dec = 0.0
+  tk_blur_limit = 9
+  tk_thresh_limit = 35
 
   altazradec = 'ALTAZ'
 
@@ -279,9 +282,9 @@ class MotorControlThread (threading.Thread):
           # UP-FWD, DOWN-BKWD
           self.motor.setSpeed(speed, adj)
           if dir == "UP":
-            self.motor.step(steps, "FORWARD", "MICROSTEP")
+            self.motor.step(steps, "FORWARD", ControlPackage.move_method)
           else:
-            self.motor.step(steps, "BACKWARD", "MICROSTEP")
+            self.motor.step(steps, "BACKWARD", ControlPackage.move_method)
           self.motor.release()
 
           if dir.upper() == 'UP' and GPIO.input(ControlPackage.VH_pin):

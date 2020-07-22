@@ -33,7 +33,7 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
       self.cookie = http.cookies.SimpleCookie(self.headers["Cookie"])
     else:
       self.cookie = http.cookies.SimpleCookie()
-      self.cookie['refined'] = 'false'
+      self.cookie['refined'] = 'true'
       self.cookie['norefresh'] = 'false'
       self.cookie['cmode'] = 'day'
       self.cookie['rawmode'] = 'false'
@@ -99,13 +99,13 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
       status = True	# move success
       statstr = 'Motor move complete.'
 
-      move_method = 'DOUBLE'
+      ControlPackage.move_method = 'DOUBLE'
       if motorid.lower() == 'v':
         try:
           if self.cookie['refined'].value == 'true':
-      	    move_method = 'MICROSTEP'
+      	    ControlPackage.move_method = 'MICROSTEP'
         except:
-      	    move_method = 'DOUBLE'
+      	    ControlPackage.move_method = 'DOUBLE'
 
         ControlPackage.vspeed = speed
         ControlPackage.vadj = adj

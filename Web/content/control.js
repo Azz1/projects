@@ -276,6 +276,9 @@ $('input[type=checkbox][name=norefresh]').click( function(){
 $('input[type=checkbox][name=tracking]').click( function(){
     if( $(this).is(':checked') ) {
 	$.cookie("tracking", "true");
+        trackingwin = window.open(window.location.href.substring(0,window.location.href.lastIndexOf("/")+1)+"tracking.html",
+                    "_blank",
+                    "titlebar=no,location=no,menubar=no,toobar=no,top=400,left=600,width=600,height=100");
 
         $.post("/api/starttracking", {
 		"myloclat": $( "#myloclat" ).val(), 
@@ -311,6 +314,7 @@ $('input[type=checkbox][name=tracking]').click( function(){
         });
     } else {
 	$.cookie("tracking", "false");
+        trackingwin.close(); 
 
 	$.getJSON( "/api/stoptracking", function( data ) {
             $("#status_id").html("tracking stopped!" );
