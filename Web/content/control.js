@@ -278,7 +278,7 @@ $('input[type=checkbox][name=tracking]').click( function(){
 	$.cookie("tracking", "true");
         trackingwin = window.open(window.location.href.substring(0,window.location.href.lastIndexOf("/")+1)+"tracking.html",
                     "_blank",
-                    "titlebar=no,location=no,menubar=no,toobar=no,top=400,left=600,width=600,height=100");
+                    "titlebar=no,location=no,menubar=no,toobar=no,top=400,left=600,width=600,height=160");
 
         $.post("/api/starttracking", {
 		"myloclat": $( "#myloclat" ).val(), 
