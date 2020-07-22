@@ -96,7 +96,9 @@ $( "#btn_refresh" ).click(function() {
                            "rawmode": ($('input[type=checkbox][name=rawmode]').is(':checked')? 'true':'false'),
                            "vflip": ($('input[type=checkbox][name=vflip]').is(':checked')? 'true':'false'),
                            "hflip": ($('input[type=checkbox][name=hflip]').is(':checked')? 'true':'false'),
-		           "refpoints": $('#refsel').val()
+		           "refpoints": $('#refsel').val(),
+                           "tk_blur_limit": (typeof trackingwin === 'undefined')? '' : $('#blurlimit', trackingwin.document).val(),
+                           "tk_thresh_limit": (typeof trackingwin === 'undefined')? '' : $('#thresh', trackingwin.document).val()
 			   }, function(msg) {
     })
     .done(function(msg) {

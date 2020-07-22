@@ -75,6 +75,11 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
           #                                  + str(ControlPackage.ref1_x) + ','
           #                                  + str(ControlPackage.ref1_y) + ')' )
 
+      if data['tk_blur_limit'][0] != "":
+          ControlPackage.tk_blur_limit = int(data['tk_blur_limit'][0])
+      if data['tk_thresh_limit'][0] != "":
+          ControlPackage.tk_thresh_limit = int(data['tk_thresh_limit'][0])
+
       ControlPackage.Validate()
 
       localtime, imgstr = ControlPackage.camera.snapshot()
