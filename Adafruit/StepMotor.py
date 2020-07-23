@@ -4,6 +4,7 @@ import math
 import threading
 import queue
 import serial
+from collections import deque
 from abc import ABCMeta, abstractmethod
 
 # Abstract base class for stepper motor
@@ -110,6 +111,8 @@ class ControlPackage :
   h_cmdqueue = queue.Queue()      
   #queue of objects (dir=IN/OUT, speed, steps) IN-FWD, OUT-BKWD
   f_cmdqueue = queue.Queue()      
+  #queue of tracking points (time, d-RA, d-Dec) 
+  tk_queue = deque(maxlen = 20)      
 
   # initialize vertical step motor
   vspeed = 1000

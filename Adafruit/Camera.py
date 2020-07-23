@@ -12,6 +12,7 @@ from PIL import Image
 import base64
 from io import BytesIO
 from StepMotor import ControlPackage
+from collections import deque
 from abc import ABCMeta, abstractmethod
 
 cv2lib_path = os.path.abspath('../cv2')
@@ -111,6 +112,9 @@ class RaspiShellCamera(Camera):
 
       ControlPackage.tk_delta_ra, ControlPackage.tk_delta_dec = cvhelper.calc_offset(cntr[0], cntr[1])
       print("\nDelta-RA:", ControlPackage.tk_delta_ra, " Delta-Dec:", ControlPackage.tk_delta_dec)
+      if len(ControlPackage.tk_queue) >= ControlPackage.tk_queue.maxlen:
+          ControlPackage.tk_queue.popleft()
+      ControlPackage.tk_queue.append([localtime, ControlPackage.tk_delta_ra, ControlPackage.tk_delta_dec])
 
       ret, buf = cv2.imencode( '.jpg', img )
       imgstr = base64.b64encode( np.array(buf) ).decode("utf-8") 

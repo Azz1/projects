@@ -3,6 +3,7 @@
 #from BaseHTTPServer import BaseHTTPRequestHandler,HTTPServer
 from http.server import BaseHTTPRequestHandler,HTTPServer
 from socketserver import ThreadingMixIn
+from collections import deque
 import threading
 import queue
 import argparse
@@ -66,14 +67,25 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
       if data['refpoints'][0] != "":
         x = data['refpoints'][0].split(",")
         if abs(float(x[0]) - float(x[2])) > 1.0 or abs(float(x[1]) - float(x[3])) > 1.0 :
-          ControlPackage.ref0_x = float(x[0])
-          ControlPackage.ref0_y = float(x[1])
-          ControlPackage.ref1_x = float(x[2])
-          ControlPackage.ref1_y = float(x[3])
-          #print( 'Star tracking Ref Point ('+ str(ControlPackage.ref0_x) + ',' 
-          #                                  + str(ControlPackage.ref0_y) + ') - ('
-          #                                  + str(ControlPackage.ref1_x) + ','
-          #                                  + str(ControlPackage.ref1_y) + ')' )
+          ref0_x = float(x[0])
+          ref0_y = float(x[1])
+          ref1_x = float(x[2])
+          ref1_y = float(x[3])
+
+          if ref0_x != ControlPackage.ref0_x or \
+             ref0_y != ControlPackage.ref0_y or \
+             ref1_x != ControlPackage.ref1_x or \
+             ref1_y != ControlPackage.ref1_y :      #ref point changed, update and clear queue
+
+             ControlPackage.tk_queue.clear() 
+             ControlPackage.ref0_x = ref0_x
+             ControlPackage.ref0_y = ref0_y
+             ControlPackage.ref1_x = ref1_x
+             ControlPackage.ref1_y = ref1_y
+             #print( 'Star tracking Ref Point ('+ str(ControlPackage.ref0_x) + ',' 
+             #                                  + str(ControlPackage.ref0_y) + ') - ('
+             #                                  + str(ControlPackage.ref1_x) + ','
+             #                                  + str(ControlPackage.ref1_y) + ')' )
 
       if data['tk_blur_limit'][0] != "":
           ControlPackage.tk_blur_limit = int(data['tk_blur_limit'][0])
@@ -88,7 +100,17 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
       self.send_header('Content-Type', 'application/json')
       self.__sendCookie()
       self.end_headers()
-      self.wfile.write(bytes('{"seq": ' + str(ControlPackage.imageseq) + ', "timestamp": "'+  time.strftime("%Y%m%d-%H%M%S", localtime) +'", "image": "' + imgstr + '"}', 'UTF-8'))
+
+      pstr = '"trackinghistory": ['
+      fst = True
+      for p in ControlPackage.tk_queue :
+        if not fst : pstr += ", "
+        else: fst = False
+
+        pstr += '{"timestamp": "' + time.strftime("%Y%m%d-%H%M%S", p[0]) + '", "d_ra": ' + str(p[1]) +  ', "d_dec": ' + str(p[2]) + '}'
+      pstr += '], '
+
+      self.wfile.write(bytes('{"seq": ' + str(ControlPackage.imageseq) + ', "timestamp": "'+  time.strftime("%Y%m%d-%H%M%S", localtime) +'", ' + pstr + ' "image": "' + imgstr + '"}', 'UTF-8'))
 
     elif None != re.search('/api/motor/*', self.path): # motor control
       ControlPackage.isTracking.clear()
@@ -174,11 +196,22 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
       if data['refpoints'][0] != "":
         x = data['refpoints'][0].split(",")
         if abs(float(x[0]) - float(x[2])) > 1.0 or abs(float(x[1]) - float(x[3])) > 1.0 :
-          ControlPackage.ref0_x = float(x[0])
-          ControlPackage.ref0_y = float(x[1])
-          ControlPackage.ref1_x = float(x[2])
-          ControlPackage.ref1_y = float(x[3])
-          print( 'Star tracking Ref Point ('+ str(ControlPackage.ref0_x) + ',' 
+          ref0_x = float(x[0])
+          ref0_y = float(x[1])
+          ref1_x = float(x[2])
+          ref1_y = float(x[3])
+
+          if ref0_x != ControlPackage.ref0_x or \
+             ref0_y != ControlPackage.ref0_y or \
+             ref1_x != ControlPackage.ref1_x or \
+             ref1_y != ControlPackage.ref1_y :      #ref point changed, update and clear queue
+
+             ControlPackage.tk_queue.clear() 
+             ControlPackage.ref0_x = ref0_x
+             ControlPackage.ref0_y = ref0_y
+             ControlPackage.ref1_x = ref1_x
+             ControlPackage.ref1_y = ref1_y
+             print( 'Star tracking Ref Point ('+ str(ControlPackage.ref0_x) + ',' 
                                           + str(ControlPackage.ref0_y) + ') - ('
                                           + str(ControlPackage.ref1_x) + ','
                                           + str(ControlPackage.ref1_y) + ')' )
