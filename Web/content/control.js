@@ -530,10 +530,13 @@ function drawgrid(points) {
     ctx.lineWidth = 1;
     ctx.strokeStyle = "#a97919";
     for( i in points ) {
+	var d_ra = points[i].d_ra;
+	if(d_ra >= canvas_height/2) d_ra = canvas_height/2-1;
+	if(d_ra <= -canvas_height/2) d_ra = -canvas_height/2+1;
 	if( i== 0 )
-	  ctx.moveTo(i*grid_size, -1*points[i].d_ra);
+	  ctx.moveTo(i*grid_size, -1*d_ra);
 	else
-	  ctx.lineTo(i*grid_size, -1*points[i].d_ra);
+	  ctx.lineTo(i*grid_size, -1*d_ra);
     }
     ctx.stroke();
 
@@ -542,10 +545,13 @@ function drawgrid(points) {
     ctx.lineWidth = 1;
     ctx.strokeStyle = "#39e9e9";
     for( i in points ) {
+	var d_dec = points[i].d_dec;
+	if(d_dec >= canvas_height/2) d_dec = canvas_height/2-1;
+	if(d_dec <= -canvas_height/2) d_dec = -canvas_height/2+1;
 	if( i== 0 )
-	  ctx.moveTo(i*grid_size, -1*points[i].d_dec);
+	  ctx.moveTo(i*grid_size, -1*d_dec);
 	else
-	  ctx.lineTo(i*grid_size, -1*points[i].d_dec);
+	  ctx.lineTo(i*grid_size, -1*d_dec);
     }
     ctx.stroke();
 
