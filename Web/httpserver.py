@@ -107,7 +107,7 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
         if not fst : pstr += ", "
         else: fst = False
 
-        pstr += '{"timestamp": "' + time.strftime("%Y%m%d-%H%M%S", p[0]) + '", "d_ra": ' + str(p[1]) +  ', "d_dec": ' + str(p[2]) + '}'
+        pstr += '{"timestamp": "' + time.strftime("%Y%m%d-%H%M%S", p[0]) + '", "d_ra": ' + "{:.2f}".format(p[1]) +  ', "d_dec": ' + "{:.2f}".format(p[2]) + '}'
       pstr += '], '
 
       self.wfile.write(bytes('{"seq": ' + str(ControlPackage.imageseq) + ', "timestamp": "'+  time.strftime("%Y%m%d-%H%M%S", localtime) +'", ' + pstr + ' "image": "' + imgstr + '"}', 'UTF-8'))

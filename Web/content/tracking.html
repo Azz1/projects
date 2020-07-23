@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>My Telescope Project</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="user-scalable=yes, initial-scale=1.0, maximum-scale=1.0, width=device-width" />
+  <link rel="stylesheet" href="default.css" />
+  <script type="text/javascript" src="jquery-1.6.js"></script>
+  <script type="text/javascript" src="jquery.cookie.js"></script>
+  <style> 
+     div.scroll { 
+                margin:4px, 4px; 
+                padding:4px; 
+                border: 1px solid gray;
+                width: 160px; 
+                height: 53px; 
+                overflow-x: hidden; 
+                overflow-y: auto; 
+		font-size: smaller;
+                text-align:left; 
+            } 
+   </style> 
+</head>
+<body>
+  <form action="/" method="post" id="form_id">
+     <div class="panel" width="100%">
+      <table style="width:100%;border: 0px">
+        <tr>
+          <td valign='top'>
+            <canvas id='canvastr' width='330' height='90'>
+                    Canvas not supported
+            </canvas>
+          </td>
+          <td class="params" align="left">
+	    <table>
+	  	 <tr>
+	    	   <td><span class="param_name">Blur-Limit: </span></td>
+	    	   <td><span class="param_value">
+			<select name="blurlimit" id="blurlimit" tabindex="1">  
+				<option value="5">5</option>
+				<option value="9" selected>9</option>
+				<option value="13">13</option>
+				<option value="18">18</option>
+				<option value="25">25</option>
+			</select> </span>
+                   </td>
+	  	 </tr>
+	  	 <tr>
+	    	   <td><span class="param_name">Threshold: </span></td>
+	    	   <td><span class="param_value">
+			<select name="thresh" id="thresh" tabindex="2">  
+				<option value="15">10</option>
+				<option value="25">25</option>
+				<option value="35" selected>35</option>
+				<option value="45">45</option>
+				<option value="55">55</option>
+				<option value="65">65</option>
+				<option value="75">75</option>
+				<option value="95">95</option>
+			</select> </span></td>
+	  	 </tr>
+		 <tr>
+		   <td colspan="2"><div class="scroll" id="log">...tracking log</div></td>
+		 </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+     </div>
+  </form>
+</body>
+</html>
