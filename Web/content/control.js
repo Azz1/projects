@@ -307,8 +307,10 @@ $('input[type=checkbox][name=tracking]').click( function(){
 		"tgdecm": $("#tgdecm").val(), 
 		"tgdecs": $("#tgdecs").val(),
 		"vspeed": $( "#vspeed" ).val(), 
+		"vadj": 0, 
 		"vsteps": $("#vsteps").val(),
 		"hspeed": $( "#hspeed" ).val(), 
+		"hadj": $( "#hadj" ).val(), 
 		"hsteps": $("#hsteps").val(),
 		"refpoints": $('#refsel').val()
 		}, function(data) {

@@ -24,7 +24,8 @@ trackinglib_path = os.path.abspath('../StarLocator')
 sys.path.append(trackinglib_path)
 
 from StepMotor import ControlPackage
-from StarTracking import StarTracking
+from StarTracking import AccStarTracking
+from StarTracking import EQStarTracking
 import Camera
  
 class HTTPRequestHandler(BaseHTTPRequestHandler):
@@ -111,6 +112,10 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
       pstr += '], '
 
       self.wfile.write(bytes('{"seq": ' + str(ControlPackage.imageseq) + ', "timestamp": "'+  time.strftime("%Y%m%d-%H%M%S", localtime) +'", ' + pstr + ' "image": "' + imgstr + '"}', 'UTF-8'))
+
+      if ControlPackage.isTracking.is_set():	# tracking mode
+        tr = EQStarTracking()
+        tr.Track()
 
     elif None != re.search('/api/motor/*', self.path): # motor control
       ControlPackage.isTracking.clear()
@@ -255,17 +260,18 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
            ControlPackage.tgdecm = float(data['tgdecm'][0])
            ControlPackage.tgdecs = float(data['tgdecs'][0])
 
-        vspeed = int(data['vspeed'][0])
-        vsteps = int(data['vsteps'][0])
-        hspeed = int(data['hspeed'][0])
-        hsteps = int(data['hsteps'][0])
+        ControlPackage.vspeed = int(data['vspeed'][0])
+        ControlPackage.vsteps = int(data['vsteps'][0])
+        ControlPackage.vadj = int(data['vadj'][0])
+        ControlPackage.hspeed = int(data['hspeed'][0])
+        ControlPackage.hsteps = int(data['hsteps'][0])
+        ControlPackage.hadj = int(data['hadj'][0])
 
-        #tr = StarTracking(ControlPackage.myloclat, ControlPackage.myloclong, ControlPackage.altazradec,
+        #tr = AccStarTracking(ControlPackage.myloclat, ControlPackage.myloclong, ControlPackage.altazradec,
         #                ControlPackage.tgrah, ControlPackage.tgram, ControlPackage.tgras, ControlPackage.tgdecdg, ControlPackage.tgdecm, ControlPackage.tgdecs,
-        #                ControlPackage.tgaz, ControlPackage.tgalt, 
-        #                vspeed, vsteps, hspeed, hsteps)
+        #                ControlPackage.tgaz, ControlPackage.tgalt)
 
-        #print( 'Start star tracking ...' )
+        print( 'Start star tracking ...' )
         #t = threading.Thread(target=tr.Track, args = ())
         #t.daemon = True
         #t.start()
@@ -324,11 +330,10 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
         if s != "": ControlPackage.tgaltadj = float(s)
    
         if not ControlPackage.isTracking.is_set():
-          tr = StarTracking(ControlPackage.myloclat, ControlPackage.myloclong, ControlPackage.altazradec,
+          tr = AccStarTracking(ControlPackage.myloclat, ControlPackage.myloclong, ControlPackage.altazradec,
                         ControlPackage.tgrah, ControlPackage.tgram, ControlPackage.tgras, 
                         ControlPackage.tgdecdg, ControlPackage.tgdecm, ControlPackage.tgdecs,
-                        ControlPackage.tgaz, ControlPackage.tgalt, 
-                        0, 0, 0, 0)
+                        ControlPackage.tgaz, ControlPackage.tgalt)
           ControlPackage.tgaz, ControlPackage.tgalt = tr.GetTarget()
           ControlPackage.curalt, ControlPackage.curaz = tr.read()
           ControlPackage.curalt += ControlPackage.tgaltadj
