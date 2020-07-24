@@ -63,7 +63,7 @@ class EQStarTracking(ITracking):
 
         if h_dir != "": 	# RA Motor control
           ControlPackage.threadLock.acquire()
-          ControlPackage.h_cmdqueue.put((h_dir, new_h_speed, ControlPackage.hadj, 3000))
+          ControlPackage.h_cmdqueue.put((h_dir, new_h_speed, ControlPackage.hadj, ControlPackage.hsteps))
           ControlPackage.threadLock.release()
           time.sleep(3.0)
           
