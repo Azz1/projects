@@ -99,7 +99,9 @@ class RaspiShellCamera(Camera):
 
     #READ IMAGE AND PUT ON SCREEN
     imgstr = ""
-    if ControlPackage.isTracking.is_set():	#tracking mode, show tracking config
+    #if ControlPackage.isTracking.is_set():	#tracking mode, show tracking config
+    if ControlPackage.ref0_x != ControlPackage.ref1_x or ControlPackage.ref0_y != ControlPackage.ref1_y:
+                                                #Ref point defined, show tracking config
       print("Blur Limit: ", "{}".format(ControlPackage.tk_blur_limit), " Thresh Limit: ", "{}".format(ControlPackage.tk_thresh_limit))
       cvhelper = CV2Helper( ControlPackage.tk_blur_limit, ControlPackage.tk_thresh_limit )
       # load the image, convert it to grayscale, and blur it
