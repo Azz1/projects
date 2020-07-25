@@ -88,11 +88,11 @@ class EQStarTracking(ITracking):
           elif avg_d_y < -thresh_limit: v_dir = "UP"
           
           if v_dir != "" :	# Vertical Motor control
-            ControlPackage.v_cmdqueue.put((v_dir, ControlPackage.vspeed, ControlPackage.vadj, int(avg_d_y*10)))
+            ControlPackage.v_cmdqueue.put((v_dir, ControlPackage.vspeed, ControlPackage.vadj, abs(int(avg_d_y*10))))
             time.sleep(3.0)
 
           if h_dir != "": 	# Horizontal Motor control
-            ControlPackage.h_cmdqueue.put((h_dir, ControlPackage.hspeed, ControlPackage.hadj, int(avg_d_x/2)))
+            ControlPackage.h_cmdqueue.put((h_dir, ControlPackage.hspeed, ControlPackage.hadj, abs(int(avg_d_x/2))))
             time.sleep(3.0)
           
         else :      # EQ mode

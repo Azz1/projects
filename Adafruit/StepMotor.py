@@ -118,7 +118,7 @@ class ControlPackage :
   vspeed = 1000
   vadj = 0
   vsteps = 50
-  move_method = "DOUBLE"
+  move_method = "MICROSTEP"
 
   # initialize horizontal step motor
   hspeed = 80000
