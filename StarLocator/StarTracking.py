@@ -41,7 +41,7 @@ class EQStarTracking(ITracking):
 
     def Track(self): 	# Track is called after each time refresh is done
         thresh_limit = 5
-        trace_ref_cnt = 5
+        trace_ref_cnt = 2
 
         #get average delta RA and DEC
         avg_d_ra = 0
@@ -83,7 +83,7 @@ class EQStarTracking(ITracking):
           if avg_d_x > thresh_limit : h_dir = "RIGHT"
           elif avg_d_x < -thresh_limit: h_dir = "LEFT"
 
-          hsteps = abs(int(avg_d_x/2))
+          hsteps = math.ceil(abs(avg_d_x/50))
           
           v_dir = ""
           if avg_d_y > thresh_limit : v_dir = "DOWN"

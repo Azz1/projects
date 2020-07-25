@@ -102,24 +102,39 @@ class RaspiShellCamera(Camera):
     #if ControlPackage.isTracking.is_set():	#tracking mode, show tracking config
     if ControlPackage.ref0_x != ControlPackage.ref1_x or ControlPackage.ref0_y != ControlPackage.ref1_y:
                                                 #Ref point defined, show tracking config
-      print("Blur Limit: ", "{}".format(ControlPackage.tk_blur_limit), " Thresh Limit: ", "{}".format(ControlPackage.tk_thresh_limit))
-      cvhelper = CV2Helper( ControlPackage.tk_blur_limit, ControlPackage.tk_thresh_limit )
-      # load the image, convert it to grayscale, and blur it
-      img = cvhelper.loadimage(fname)
-      [centers, radius, img] = cvhelper.processimage(mark = True)
-      cvhelper.printcenters()
-      cvhelper.setref(ControlPackage.ref0_x, ControlPackage.ref0_y, ControlPackage.ref1_x, ControlPackage.ref1_y)
-      [idx, cntr, img] = cvhelper.find_nearest_point(True)
-      print("Nearest Point ", "#{}".format(idx+1), "- (", int(cntr[0]), ",", int(cntr[1]), ") ")
+      try:
+        print("Blur Limit: ", "{}".format(ControlPackage.tk_blur_limit), " Thresh Limit: ", "{}".format(ControlPackage.tk_thresh_limit))
+        cvhelper = CV2Helper( ControlPackage.tk_blur_limit, ControlPackage.tk_thresh_limit )
+        # load the image, convert it to grayscale, and blur it
+        img = cvhelper.loadimage(fname)
+        [centers, radius, img] = cvhelper.processimage(mark = True)
+        cvhelper.printcenters()
+        cvhelper.setref(ControlPackage.ref0_x, ControlPackage.ref0_y, ControlPackage.ref1_x, ControlPackage.ref1_y)
+        [idx, cntr, img] = cvhelper.find_nearest_point(True)
+        print("Nearest Point ", "#{}".format(idx+1), "- (", int(cntr[0]), ",", int(cntr[1]), ") ")
 
-      ControlPackage.tk_delta_ra, ControlPackage.tk_delta_dec = cvhelper.calc_offset(cntr[0], cntr[1])
-      print("\nDelta-RA:", ControlPackage.tk_delta_ra, " Delta-Dec:", ControlPackage.tk_delta_dec)
-      if len(ControlPackage.tk_queue) >= ControlPackage.tk_queue.maxlen:
-          ControlPackage.tk_queue.popleft()
-      ControlPackage.tk_queue.append([localtime, ControlPackage.tk_delta_ra, ControlPackage.tk_delta_dec, cntr[0], cntr[1]])
+        ControlPackage.tk_delta_ra, ControlPackage.tk_delta_dec = cvhelper.calc_offset(cntr[0], cntr[1])
+        print("\nDelta-RA:", ControlPackage.tk_delta_ra, " Delta-Dec:", ControlPackage.tk_delta_dec)
+        if len(ControlPackage.tk_queue) >= ControlPackage.tk_queue.maxlen:
+            ControlPackage.tk_queue.popleft()
+        ControlPackage.tk_queue.append([localtime, ControlPackage.tk_delta_ra, ControlPackage.tk_delta_dec, cntr[0], cntr[1]])
 
-      ret, buf = cv2.imencode( '.jpg', img )
-      imgstr = base64.b64encode( np.array(buf) ).decode("utf-8") 
+        ret, buf = cv2.imencode( '.jpg', img )
+        imgstr = base64.b64encode( np.array(buf) ).decode("utf-8") 
+
+      except:
+        img = Image.open(fname)
+
+        #basewidth = 800
+        #wpercent = (basewidth/float(img.size[0]))
+        #hsize = int((float(img.size[1])*float(wpercent)))
+        #img = img.resize((basewidth,hsize), PIL.Image.ANTIALIAS)
+        #img = img.transpose(Image.ROTATE_180)
+
+        output = BytesIO()
+        img.save(output, format='JPEG')
+        imgstr = base64.b64encode(output.getvalue()).decode("utf-8") 
+        del img
 
     else :
       img = Image.open(fname)
