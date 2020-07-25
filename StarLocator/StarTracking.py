@@ -41,30 +41,84 @@ class EQStarTracking(ITracking):
 
     def Track(self): 	# Track is called after each time refresh is done
         thresh_limit = 5
+        trace_ref_cnt = 5
 
-        v_dir = ""
-        if ControlPackage.tk_delta_dec > thresh_limit : v_dir = "DOWN"
-        elif ControlPackage.tk_delta_dec < -thresh_limit: v_dir = "UP"
+        #get average delta RA and DEC
+        avg_d_ra = 0
+        cnt = 0
+        for i in range(len(ControlPackage.tk_queue), 0, -1) :
+          avg_d_ra += ControlPackage.tk_queue[i-1][1]
+          cnt += 1
+          if cnt == trace_ref_cnt: break
+        if cnt > 0: avg_d_ra /= cnt
+        
+        avg_d_dec = 0
+        cnt = 0
+        for i in range(len(ControlPackage.tk_queue), 0, -1) :
+          avg_d_dec += ControlPackage.tk_queue[i-1][2]
+          cnt += 1
+          if cnt == trace_ref_cnt: break
+        if cnt > 0: avg_d_dec /= cnt
 
-        h_dir = ""
-        if ControlPackage.tk_delta_ra > thresh_limit : 
-          h_dir = "LEFT"
-          new_h_speed = ControlPackage.vspeed * 2
-        elif ControlPackage.tk_delta_ra < -thresh_limit : 
-          h_dir = "LEFT"
-          new_h_speed = ControlPackage.vspeed / 2
-
-
-        if v_dir != "" :	# Dec Motor control
-          ControlPackage.v_cmdqueue.put((v_dir, ControlPackage.vspeed, ControlPackage.vadj, ControlPackage.vsteps))
-          time.sleep(1.0)
-
-        if h_dir != "": 	# RA Motor control
-          ControlPackage.h_cmdqueue.put((h_dir, new_h_speed, ControlPackage.hadj, ControlPackage.hsteps))
-          time.sleep(3.0)
+        #get average delta x - y offset
+        avg_d_x = 0
+        cnt = 0
+        for i in range(len(ControlPackage.tk_queue), 0, -1) :
+          avg_d_x += ControlPackage.tk_queue[i-1][3] - ControlPackage.ref0_x
+          cnt += 1
+          if cnt == trace_ref_cnt: break
+        if cnt > 0: avg_d_x /= cnt
+        
+        avg_d_y = 0
+        cnt = 0
+        for i in range(len(ControlPackage.tk_queue), 0, -1) :
+          avg_d_y += ControlPackage.tk_queue[i-1][4] - ControlPackage.ref0_y
+          cnt += 1
+          if cnt == trace_ref_cnt: break
+        if cnt > 0: avg_d_y /= cnt
+        
+        #determine move directions
+        if ControlPackage.altazradec == "ALTAZ":   #ALT-AZ mode
+          h_dir = ""
+          if avg_d_x > thresh_limit : h_dir = "RIGHT"
+          elif avg_d_x < -thresh_limit: h_dir = "LEFT"
           
-        # Default motion RA Left with default speed
-        ControlPackage.h_cmdqueue.put(("LEFT", ControlPackage.vspeed, ControlPackage.hadj, 10000))
+          v_dir = ""
+          if avg_d_y > thresh_limit : v_dir = "DOWN"
+          elif avg_d_y < -thresh_limit: v_dir = "UP"
+          
+          if v_dir != "" :	# Vertical Motor control
+            ControlPackage.v_cmdqueue.put((v_dir, ControlPackage.vspeed, ControlPackage.vadj, int(avg_d_y*10)))
+            time.sleep(3.0)
+
+          if h_dir != "": 	# Horizontal Motor control
+            ControlPackage.h_cmdqueue.put((h_dir, ControlPackage.hspeed, ControlPackage.hadj, int(avg_d_x/2)))
+            time.sleep(3.0)
+          
+        else :      # EQ mode
+          v_dir = ""
+          if avg_d_dec > thresh_limit : v_dir = "DOWN"
+          elif avg_d_dec < -thresh_limit: v_dir = "UP"
+
+          h_dir = ""
+          if avg_d_ra > thresh_limit : 
+            h_dir = "LEFT"
+            new_h_speed = ControlPackage.vspeed * 2
+          elif avg_d_ra < -thresh_limit : 
+            h_dir = "LEFT"
+            new_h_speed = ControlPackage.vspeed / 2
+
+
+          if v_dir != "" :	# Dec Motor control
+            ControlPackage.v_cmdqueue.put((v_dir, ControlPackage.vspeed, ControlPackage.vadj, ControlPackage.vsteps))
+            time.sleep(1.0)
+
+          if h_dir != "": 	# RA Motor control
+            ControlPackage.h_cmdqueue.put((h_dir, new_h_speed, ControlPackage.hadj, ControlPackage.hsteps))
+            time.sleep(3.0)
+          
+          # Default motion RA Left with default speed
+          ControlPackage.h_cmdqueue.put(("LEFT", ControlPackage.vspeed, ControlPackage.hadj, 10000))
 
 
 class AccStarTracking(ITracking):

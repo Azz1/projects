@@ -116,7 +116,7 @@ class RaspiShellCamera(Camera):
       print("\nDelta-RA:", ControlPackage.tk_delta_ra, " Delta-Dec:", ControlPackage.tk_delta_dec)
       if len(ControlPackage.tk_queue) >= ControlPackage.tk_queue.maxlen:
           ControlPackage.tk_queue.popleft()
-      ControlPackage.tk_queue.append([localtime, ControlPackage.tk_delta_ra, ControlPackage.tk_delta_dec])
+      ControlPackage.tk_queue.append([localtime, ControlPackage.tk_delta_ra, ControlPackage.tk_delta_dec, cntr[0], cntr[1]])
 
       ret, buf = cv2.imencode( '.jpg', img )
       imgstr = base64.b64encode( np.array(buf) ).decode("utf-8") 
