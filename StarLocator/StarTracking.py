@@ -82,23 +82,28 @@ class EQStarTracking(ITracking):
           h_dir = ""
           if avg_d_x > thresh_limit : h_dir = "RIGHT"
           elif avg_d_x < -thresh_limit: h_dir = "LEFT"
+
+          hsteps = abs(int(avg_d_x/2))
           
           v_dir = ""
           if avg_d_y > thresh_limit : v_dir = "DOWN"
           elif avg_d_y < -thresh_limit: v_dir = "UP"
           
+          vsteps = abs(int(avg_d_y*10))
+
           if v_dir != "" :	# Vertical Motor control
-            ControlPackage.v_cmdqueue.put((v_dir, ControlPackage.vspeed, ControlPackage.vadj, abs(int(avg_d_y*10))))
-            time.sleep(3.0)
+            ControlPackage.v_cmdqueue.put((v_dir, ControlPackage.vspeed, ControlPackage.vadj, vsteps))
+            time.sleep(2.0)
 
           if h_dir != "": 	# Horizontal Motor control
-            ControlPackage.h_cmdqueue.put((h_dir, ControlPackage.hspeed, ControlPackage.hadj, abs(int(avg_d_x/2))))
-            time.sleep(3.0)
+            ControlPackage.h_cmdqueue.put((h_dir, ControlPackage.hspeed, ControlPackage.hadj, hsteps))
+            time.sleep(2.0)
           
         else :      # EQ mode
           v_dir = ""
           if avg_d_dec > thresh_limit : v_dir = "DOWN"
           elif avg_d_dec < -thresh_limit: v_dir = "UP"
+          vsteps = abs(int(avg_d_dec/5))
 
           h_dir = ""
           if avg_d_ra > thresh_limit : 
@@ -107,14 +112,15 @@ class EQStarTracking(ITracking):
           elif avg_d_ra < -thresh_limit : 
             h_dir = "LEFT"
             new_h_speed = ControlPackage.vspeed / 2
+          hsteps = abs(int(avg_d_ra*10))
 
 
           if v_dir != "" :	# Dec Motor control
-            ControlPackage.v_cmdqueue.put((v_dir, ControlPackage.vspeed, ControlPackage.vadj, ControlPackage.vsteps))
+            ControlPackage.v_cmdqueue.put((v_dir, ControlPackage.vspeed, ControlPackage.vadj, vsteps))
             time.sleep(1.0)
 
           if h_dir != "": 	# RA Motor control
-            ControlPackage.h_cmdqueue.put((h_dir, new_h_speed, ControlPackage.hadj, ControlPackage.hsteps))
+            ControlPackage.h_cmdqueue.put((h_dir, new_h_speed, ControlPackage.hadj, hsteps))
             time.sleep(3.0)
           
           # Default motion RA Left with default speed
