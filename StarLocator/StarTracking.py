@@ -42,6 +42,7 @@ class EQStarTracking(ITracking):
     def Track(self): 	# Track is called after each time refresh is done
         thresh_limit = 5
         trace_ref_cnt = 2
+        ControlPackage.move_method = "MICROSTEP"
 
         #get average delta RA and DEC
         avg_d_ra = 0
