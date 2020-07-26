@@ -193,10 +193,14 @@ class RaspiShellCamera(Camera):
 		     + (' -vf ' if ControlPackage.vflip == 'true' else '') \
 		     + (' -hf ' if ControlPackage.hflip == 'true' else '') \
 		     + ' -br ' + str(ControlPackage.brightness) + roistr \
-                     + (' -ex night -ag 8.0 -dg 4.0 -ss ' if ControlPackage.cmode == 'night' else ' -ss ') + str(ControlPackage.ss) \
-                     + (' -ISO auto ' if ControlPackage.cmode == 'night' else (' -ISO ' + str(ControlPackage.iso))) \
+                     + (' -ex night -ss ' if ControlPackage.cmode == 'night' else ' -ss ') + str(ControlPackage.ss) \
+                     + ' -ISO ' + str(ControlPackage.iso) \
                      + ' -sh ' + str(ControlPackage.sharpness) + ' -co ' + str(ControlPackage.contrast) \
                      + ' -sa ' + str(ControlPackage.saturation) + ' ' + ts
+
+                     #replacement parameters
+                     #+ (' -ex night -ag 8.0 -dg 4.0 -ss ' if ControlPackage.cmode == 'night' else ' -ss ') + str(ControlPackage.ss) \
+                     #+ (' -ISO auto ' if ControlPackage.cmode == 'night' else (' -ISO ' + str(ControlPackage.iso))) \
       print( cmdstr)
       os.system( cmdstr )
 
