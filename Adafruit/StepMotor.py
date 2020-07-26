@@ -186,7 +186,7 @@ class ControlPackage :
     elif ControlPackage.contrast > 100: ControlPackage.contrast = 100
     if ControlPackage.saturation < -100: ControlPackage.saturation = -100
     elif ControlPackage.saturation > 100: ControlPackage.saturation = 100
-    if ControlPackage.iso < 100: ControlPackage.iso = 100
+    if ControlPackage.iso < 60: ControlPackage.iso = 60
     elif ControlPackage.iso > 1600: ControlPackage.iso = 1600
     if ControlPackage.ss < 100 : ControlPackage.ss = 100
 
