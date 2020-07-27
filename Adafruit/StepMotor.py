@@ -161,8 +161,8 @@ class ControlPackage :
   ref1_y = 0.0
   tk_delta_ra = 0.0
   tk_delta_dec = 0.0
-  tk_blur_limit = 9
-  tk_thresh_limit = 35
+  tk_blur_limit = 13
+  tk_thresh_limit = 45
 
   altazradec = 'ALTAZ'
 
