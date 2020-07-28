@@ -83,10 +83,11 @@ class CV2Helper :
         ni = 0
         dist = 999999.9
         for (i, p) in enumerate(self.centers):
-            d = (p[0] - self.ref0[0]) * (p[0] - self.ref0[0]) + (p[1] - self.ref0[1]) * (p[1] - self.ref0[1])
-            if d < dist : 
-                ni = i
-                dist = d
+            if self.radius[i] <= 30:   #ignore points with radius greater than 30
+              d = (p[0] - self.ref0[0]) * (p[0] - self.ref0[0]) + (p[1] - self.ref0[1]) * (p[1] - self.ref0[1])
+              if d < dist : 
+                  ni = i
+                  dist = d
 
         if mark == True :
             cv2.line(self.image, (int(self.ref0[0]), int(self.ref0[1])), (int(self.ref1[0]), int(self.ref1[1])), (0, 100, 100), 1)

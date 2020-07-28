@@ -1,7 +1,7 @@
 import time
 import math
 import os
-import sys
+import sys, traceback
 import cv2
 import queue
 import picamera
@@ -81,7 +81,7 @@ class RaspiShellCamera(Camera):
                      + ' -w ' + str(ControlPackage.width) \
                      + ' -h ' + str(ControlPackage.height) + roistr \
                      + ' -br ' + str(ControlPackage.brightness) \
-                     + (' -ex night -ag 12.0 -dg 8.0 -ss ' if ControlPackage.cmode == 'night' else ' -ss ') + str(ss) \
+                     + (' -ex night -ag 12.0 -dg 3.0 -ss ' if ControlPackage.cmode == 'night' else ' -ss ') + str(ss) \
                      + (' -ISO auto ' if ControlPackage.cmode == 'night' else (' -ISO ' + str(ControlPackage.iso))) \
                      + ' -sh ' + str(ControlPackage.sharpness) + ' -co ' + str(ControlPackage.contrast) \
                      + ' -sa ' + str(ControlPackage.saturation)
@@ -120,10 +120,24 @@ class RaspiShellCamera(Camera):
             ControlPackage.tk_queue.popleft()
         ControlPackage.tk_queue.append([localtime, ControlPackage.tk_delta_ra, ControlPackage.tk_delta_dec, cntr[0], cntr[1]])
 
+        #Auto detect pos/neg dir for Dec
+        if ControlPackage.isTracking.is_set() and ControlPackage.altazradec != "ALTAZ" and len(ControlPackage.tk_queue) >= 3:
+            if (ControlPackage.tk_queue[len-3][2] > 0 and \
+             ControlPackage.tk_queue[len-1][2] > ControlPackage.tk_queue[len-2][2] and \
+             ControlPackage.tk_queue[len-2][2] > ControlPackage.tk_queue[len-3][2]) \
+            or (ControlPackage.tk_queue[len-3][2] < 0 and \
+             ControlPackage.tk_queue[len-1][2] < ControlPackage.tk_queue[len-2][2] and \
+             ControlPackage.tk_queue[len-2][2] < ControlPackage.tk_queue[len-3][2]) :
+                tmp_dir = ControlPackage.tk_pos_dir 
+                ControlPackage.tk_pos_dir = ControlPackage.tk_neg_dir
+                ControlPackage.tk_neg_dir = tmp_dir
+          
+
         ret, buf = cv2.imencode( '.jpg', img )
         imgstr = base64.b64encode( np.array(buf) ).decode("utf-8") 
 
       except:
+        traceback.print_exc()
         img = Image.open(fname)
 
         #basewidth = 800
