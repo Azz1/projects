@@ -122,12 +122,13 @@ class RaspiShellCamera(Camera):
 
         #Auto detect pos/neg dir for Dec
         if ControlPackage.isTracking.is_set() and ControlPackage.altazradec != "ALTAZ" and len(ControlPackage.tk_queue) >= 3:
-            if (ControlPackage.tk_queue[len-3][2] > 0 and \
-             ControlPackage.tk_queue[len-1][2] > ControlPackage.tk_queue[len-2][2] and \
-             ControlPackage.tk_queue[len-2][2] > ControlPackage.tk_queue[len-3][2]) \
-            or (ControlPackage.tk_queue[len-3][2] < 0 and \
-             ControlPackage.tk_queue[len-1][2] < ControlPackage.tk_queue[len-2][2] and \
-             ControlPackage.tk_queue[len-2][2] < ControlPackage.tk_queue[len-3][2]) :
+            ll = len(ControlPackage.tk_queue)
+            if (ControlPackage.tk_queue[ll-3][2] > 0 and \
+             ControlPackage.tk_queue[ll-1][2] > ControlPackage.tk_queue[ll-2][2] and \
+             ControlPackage.tk_queue[ll-2][2] > ControlPackage.tk_queue[ll-3][2]) \
+            or (ControlPackage.tk_queue[ll-3][2] < 0 and \
+             ControlPackage.tk_queue[ll-1][2] < ControlPackage.tk_queue[ll-2][2] and \
+             ControlPackage.tk_queue[ll-2][2] < ControlPackage.tk_queue[ll-3][2]) :
                 tmp_dir = ControlPackage.tk_pos_dir 
                 ControlPackage.tk_pos_dir = ControlPackage.tk_neg_dir
                 ControlPackage.tk_neg_dir = tmp_dir
