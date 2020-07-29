@@ -109,20 +109,20 @@ class EQStarTracking(ITracking):
           h_dir = ""
           if avg_d_ra > thresh_limit : 
             h_dir = "LEFT"
-            new_h_speed = ControlPackage.hspeed * 2
+            new_h_speed = ControlPackage.hspeed * 4
           elif avg_d_ra < -thresh_limit : 
             h_dir = "LEFT"
-            new_h_speed = ControlPackage.hspeed / 2
-          hsteps = abs(int(avg_d_ra*2))
+            new_h_speed = ControlPackage.hspeed / 4
+          hsteps = abs(int(avg_d_ra*4))
 
 
           if v_dir != "" :	# Dec Motor control
             ControlPackage.v_cmdqueue.put((v_dir, ControlPackage.vspeed, ControlPackage.vadj, vsteps))
-            time.sleep(1.0)
+            time.sleep(2.0)
 
           if h_dir != "": 	# RA Motor control
             ControlPackage.h_cmdqueue.put((h_dir, new_h_speed, ControlPackage.hadj, hsteps))
-            time.sleep(3.0)
+            time.sleep(6.0)
           
           # Default motion RA Left with default speed
           ControlPackage.h_cmdqueue.put(("LEFT", ControlPackage.hspeed, ControlPackage.hadj, 10000))

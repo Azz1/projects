@@ -81,7 +81,7 @@ class RaspiShellCamera(Camera):
                      + ' -w ' + str(ControlPackage.width) \
                      + ' -h ' + str(ControlPackage.height) + roistr \
                      + ' -br ' + str(ControlPackage.brightness) \
-                     + (' -ex night -ag 12.0 -dg 3.0 -ss ' if ControlPackage.cmode == 'night' else ' -ss ') + str(ss) \
+                     + (' -ex night -ag 12.0 -dg 4.0 -ss ' if ControlPackage.cmode == 'night' else ' -ss ') + str(ss) \
                      + (' -ISO auto ' if ControlPackage.cmode == 'night' else (' -ISO ' + str(ControlPackage.iso))) \
                      + ' -sh ' + str(ControlPackage.sharpness) + ' -co ' + str(ControlPackage.contrast) \
                      + ' -sa ' + str(ControlPackage.saturation)
