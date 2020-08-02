@@ -98,7 +98,8 @@ $( "#btn_refresh" ).click(function() {
                            "hflip": ($('input[type=checkbox][name=hflip]').is(':checked')? 'true':'false'),
 		           "refpoints": $('#refsel').val(),
                            "tk_blur_limit": (typeof trackingwin === 'undefined')? '' : $('#blurlimit', trackingwin.document).val(),
-                           "tk_thresh_limit": (typeof trackingwin === 'undefined')? '' : $('#thresh', trackingwin.document).val()
+                           "tk_thresh_limit": (typeof trackingwin === 'undefined')? '' : $('#thresh', trackingwin.document).val(),
+			   "eqposdir": $("#eqposdir").val()
 			   }, function(msg) {
     })
     .done(function(msg) {
@@ -314,7 +315,8 @@ $('input[type=checkbox][name=tracking]').click( function(){
 		"hspeed": $( "#hspeed" ).val(), 
 		"hadj": $( "#hadj" ).val(), 
 		"hsteps": $("#hsteps").val(),
-		"refpoints": $('#refsel').val()
+		"refpoints": $('#refsel').val(),
+	   	"eqposdir": $("#eqposdir").val()
 		}, function(data) {
         })
         .done(function(data) {

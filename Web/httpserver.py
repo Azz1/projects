@@ -64,6 +64,8 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
       ControlPackage.rawmode = data['rawmode'][0]
       ControlPackage.vflip = data['vflip'][0]
       ControlPackage.hflip = data['hflip'][0]
+      ControlPackage.tk_pos_dir = data['eqposdir'][0]
+      ControlPackage.tk_neg_dir = ('DOWN' if ControlPackage.tk_pos_dir == 'UP' else 'UP')
 
       if data['refpoints'][0] != "":
         x = data['refpoints'][0].split(",")
@@ -266,6 +268,8 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
         ControlPackage.hspeed = int(data['hspeed'][0])
         ControlPackage.hsteps = int(data['hsteps'][0])
         ControlPackage.hadj = int(data['hadj'][0])
+        ControlPackage.tk_pos_dir = data['eqposdir'][0]
+        ControlPackage.tk_neg_dir = ('DOWN' if ControlPackage.tk_pos_dir == 'UP' else 'UP')
 
         #tr = AccStarTracking(ControlPackage.myloclat, ControlPackage.myloclong, ControlPackage.altazradec,
         #                ControlPackage.tgrah, ControlPackage.tgram, ControlPackage.tgras, ControlPackage.tgdecdg, ControlPackage.tgdecm, ControlPackage.tgdecs,

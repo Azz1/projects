@@ -163,8 +163,8 @@ class ControlPackage :
   tk_delta_dec = 0.0
   tk_blur_limit = 13
   tk_thresh_limit = 45
-  tk_pos_dir = "DOWN"
-  tk_neg_dir = "UP"
+  tk_pos_dir = "UP"
+  tk_neg_dir = "DOWN"
 
   altazradec = 'ALTAZ'
 

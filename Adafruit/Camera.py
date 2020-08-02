@@ -120,20 +120,6 @@ class RaspiShellCamera(Camera):
             ControlPackage.tk_queue.popleft()
         ControlPackage.tk_queue.append([localtime, ControlPackage.tk_delta_ra, ControlPackage.tk_delta_dec, cntr[0], cntr[1]])
 
-        #Auto detect pos/neg dir for Dec
-        if ControlPackage.isTracking.is_set() and ControlPackage.altazradec != "ALTAZ" and len(ControlPackage.tk_queue) >= 3:
-            ll = len(ControlPackage.tk_queue)
-            if (ControlPackage.tk_queue[ll-3][2] > 0 and \
-             ControlPackage.tk_queue[ll-1][2] > ControlPackage.tk_queue[ll-2][2] and \
-             ControlPackage.tk_queue[ll-2][2] > ControlPackage.tk_queue[ll-3][2]) \
-            or (ControlPackage.tk_queue[ll-3][2] < 0 and \
-             ControlPackage.tk_queue[ll-1][2] < ControlPackage.tk_queue[ll-2][2] and \
-             ControlPackage.tk_queue[ll-2][2] < ControlPackage.tk_queue[ll-3][2]) :
-                tmp_dir = ControlPackage.tk_pos_dir 
-                ControlPackage.tk_pos_dir = ControlPackage.tk_neg_dir
-                ControlPackage.tk_neg_dir = tmp_dir
-          
-
         ret, buf = cv2.imencode( '.jpg', img )
         imgstr = base64.b64encode( np.array(buf) ).decode("utf-8") 
 
