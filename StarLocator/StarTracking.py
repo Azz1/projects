@@ -118,14 +118,14 @@ class EQStarTracking(ITracking):
 
           if v_dir != "" :	# Dec Motor control
             ControlPackage.v_cmdqueue.put((v_dir, ControlPackage.vspeed, ControlPackage.vadj, vsteps))
-            time.sleep(2.0)
+            time.sleep(1.0)
 
           if h_dir != "": 	# RA Motor control
             ControlPackage.h_cmdqueue.put((h_dir, new_h_speed, ControlPackage.hadj, hsteps))
             time.sleep(6.0)
           
           # Default motion RA Left with default speed
-          ControlPackage.h_cmdqueue.put(("LEFT", ControlPackage.hspeed, ControlPackage.hadj, 10000))
+          ControlPackage.h_cmdqueue.put(("LEFT", ControlPackage.hspeed, ControlPackage.hadj, 1000))
 
 
 class AccStarTracking(ITracking):
