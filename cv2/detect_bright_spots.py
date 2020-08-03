@@ -118,9 +118,14 @@ class CV2Helper :
         S = math.sqrt( A * A + B * B )
         print("R0 = ", R0, "  R1 = ", R1)
 	
+        S0 = math.sqrt( R0 * R0 - d * d )
         S1 = math.sqrt( R1 * R1 - d * d )
-        print("S = ", S, " S1 = ", S1)
-        r = S - S1
+        print("S = ", S, " S0 = ", S0, " S1 = ", S1)
+	
+        if S0 + S1 <= S or S1 > S0: 	
+          r = S - S1
+        else : 
+          r = S + S1
 
         return r, d		
 		
