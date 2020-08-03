@@ -105,6 +105,7 @@ class CV2Helper :
             print("Point ", "#{}".format(i+1), "- (", int(p[0]), ",", int(p[1]), ")   radius:", self.radius[i])
 
     def calc_offset(self, x, y):
+        print("Ref Points = (", self.ref0[0], ", ", self.ref0[1], ")  --> (", self.ref1[0], ", ", self.ref1[1], ")")
         A = self.ref1[1] - self.ref0[1]		# A = y1 - y0
         B = self.ref0[0] - self.ref1[0] 	# B = x0 - x1
         C = -B * self.ref0[1] - A * self.ref0[0] # C = -B * y0 - A * x0
@@ -122,9 +123,9 @@ class CV2Helper :
         S1 = math.sqrt( R1 * R1 - d * d )
         print("S = ", S, " S0 = ", S0, " S1 = ", S1)
 	
-        if S0 + S1 <= S or S1 > S0: 	
+        if S0 + S1 <= S or S1 > S0: 	# Star behind Ref Point #1
           r = S - S1
-        else : 
+        else :                          # Star beyond Ref Point #1
           r = S + S1
 
         return r, d		
