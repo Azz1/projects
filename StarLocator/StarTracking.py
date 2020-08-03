@@ -113,7 +113,7 @@ class EQStarTracking(ITracking):
           elif avg_d_ra < -thresh_limit : 
             h_dir = "LEFT"
             new_h_speed = ControlPackage.hspeed / 4
-          hsteps = abs(int(avg_d_ra*4))
+          hsteps = abs(int(avg_d_ra*3))
 
 
           if v_dir != "" :	# Dec Motor control
