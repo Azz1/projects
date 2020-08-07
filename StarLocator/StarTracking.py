@@ -41,7 +41,7 @@ class EQStarTracking(ITracking):
 
     def Track(self): 	# Track is called after each time refresh is done
         thresh_limit = 5
-        trace_ref_cnt = 5
+        trace_ref_cnt = 3
         ControlPackage.move_method = "MICROSTEP"
 
         #get average delta RA and DEC
@@ -109,10 +109,10 @@ class EQStarTracking(ITracking):
           h_dir = ""
           if avg_d_ra > thresh_limit : 
             h_dir = "LEFT"
-            new_h_speed = ControlPackage.hspeed * 4
+            new_h_speed = int(ControlPackage.hspeed * (avg_d_ra / (thresh_limit * 2)))
           elif avg_d_ra < -thresh_limit : 
             h_dir = "LEFT"
-            new_h_speed = ControlPackage.hspeed / 4
+            new_h_speed = int(ControlPackage.hspeed / (avg_d_ra / (-thresh_limit * 2)))
           hsteps = abs(int(avg_d_ra*3))
 
 
@@ -121,8 +121,9 @@ class EQStarTracking(ITracking):
             time.sleep(1.0)
 
           if h_dir != "": 	# RA Motor control
-            ControlPackage.h_cmdqueue.put((h_dir, new_h_speed, ControlPackage.hadj, hsteps))
-            time.sleep(6.0)
+            if new_h_speed > 0 :
+              ControlPackage.h_cmdqueue.put((h_dir, new_h_speed, ControlPackage.hadj, hsteps))
+            time.sleep(int(math.ceil(hsteps / 10.0)))
           
           # Default motion RA Left with default speed
           ControlPackage.h_cmdqueue.put(("LEFT", ControlPackage.hspeed, ControlPackage.hadj, 1000))
