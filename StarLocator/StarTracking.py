@@ -123,7 +123,11 @@ class EQStarTracking(ITracking):
           if h_dir != "": 	# RA Motor control
             if new_h_speed > 0 :
               ControlPackage.h_cmdqueue.put((h_dir, new_h_speed, ControlPackage.hadj, hsteps))
-            time.sleep(int(math.ceil(hsteps / 10.0)))
+              hsleep = int(math.ceil(hsteps / 10))
+              #hsleep = int(math.ceil(hsteps / ( new_h_speed / (ControlPackage.hspeed * 1.0) * 3)))
+              if hsleep > 20 : hsleep = 20
+              print("Sleep time (s): ", hsleep)
+              if hsleep > 0 : time.sleep(hsleep)
           
           # Default motion RA Left with default speed
           ControlPackage.h_cmdqueue.put(("LEFT", ControlPackage.hspeed, ControlPackage.hadj, 1000))
