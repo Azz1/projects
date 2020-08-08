@@ -270,8 +270,8 @@ class MotorControlThread (threading.Thread):
         print( "***", self.threadName + ' ' + dir + ' Speed: ' + str(speed) + ' Adj: ' + str(adj) + ' Steps: ' + str(steps))
 
         if self.threadName == "H-Motor":
-          ControlPackage.motorH.release() 
-          ControlPackage.motorV.release() 
+          #ControlPackage.motorH.release() 
+          #ControlPackage.motorV.release() 
 
 	  # LEFT-FWD, RIGHT-BKWD
           self.motor.setSpeed(speed, adj)
@@ -288,8 +288,8 @@ class MotorControlThread (threading.Thread):
             print( "***", 'Horizontal rightmost limit reached!')
       	
         elif self.threadName == "V-Motor":
-          ControlPackage.motorH.release() 
-          ControlPackage.motorV.release() 
+          #ControlPackage.motorH.release() 
+          #ControlPackage.motorV.release() 
 
           # UP-FWD, DOWN-BKWD
           self.motor.setSpeed(speed, adj)
