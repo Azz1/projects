@@ -115,9 +115,13 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
 
       self.wfile.write(bytes('{"seq": ' + str(ControlPackage.imageseq) + ', "timestamp": "'+  time.strftime("%Y%m%d-%H%M%S", localtime) +'", ' + pstr + ' "image": "' + imgstr + '"}', 'UTF-8'))
 
-      if ControlPackage.isTracking.is_set():	# tracking mode
+      if ControlPackage.isTracking.is_set() and (not ControlPackage.ipTracking.is_set()):	# tracking mode
         tr = EQStarTracking()
-        tr.Track()
+        t = threading.Thread(target=tr.Track, args = ())
+        t.daemon = True
+        t.start()
+        ControlPackage.ipTracking.set()
+
 
     elif None != re.search('/api/motor/*', self.path): # motor control
       ControlPackage.isTracking.clear()

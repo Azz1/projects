@@ -104,6 +104,7 @@ class ControlPackage :
   # initialize step motors
   exitFlag = threading.Event()
   isTracking = threading.Event()
+  ipTracking = threading.Event()
   threadLock = threading.Lock()
   #queue of objects (dir=UP/DOWN, speed, steps) UP-FWD, DOWN-BKWD
   v_cmdqueue = queue.Queue()      
@@ -266,37 +267,43 @@ class MotorControlThread (threading.Thread):
       ControlPackage.threadLock.release()
 	   
       if dir != "" : 
-        print( self.threadName + ' ' + dir + ' Speed: ' + str(speed) + ' Adj: ' + str(adj) + ' Steps: ' + str(steps))
+        print( "***", self.threadName + ' ' + dir + ' Speed: ' + str(speed) + ' Adj: ' + str(adj) + ' Steps: ' + str(steps))
 
         if self.threadName == "H-Motor":
+          ControlPackage.motorH.release() 
+          ControlPackage.motorV.release() 
+
 	  # LEFT-FWD, RIGHT-BKWD
           self.motor.setSpeed(speed, adj)
           if dir == "LEFT":
             self.motor.step(steps, "BACKWARD", "MICROSTEP")
           else:
             self.motor.step(steps, "FORWARD", "MICROSTEP")
-          self.motor.release()
+          #self.motor.release()
 
           if dir.upper() == 'LEFT' and GPIO.input(ControlPackage.HL_pin):
-            print( 'Horizontal leftmost limit reached!')
+            print( "***", 'Horizontal leftmost limit reached!')
 
           if dir.upper() == 'RIGHT' and GPIO.input(ControlPackage.HR_pin):
-            print( 'Horizontal rightmost limit reached!')
+            print( "***", 'Horizontal rightmost limit reached!')
       	
         elif self.threadName == "V-Motor":
+          ControlPackage.motorH.release() 
+          ControlPackage.motorV.release() 
+
           # UP-FWD, DOWN-BKWD
           self.motor.setSpeed(speed, adj)
           if dir == "UP":
             self.motor.step(steps, "FORWARD", ControlPackage.move_method)
           else:
             self.motor.step(steps, "BACKWARD", ControlPackage.move_method)
-          self.motor.release()
+          #self.motor.release()
 
           if dir.upper() == 'UP' and GPIO.input(ControlPackage.VH_pin):
-            print( 'Vertical highest limit reached!')
+            print( "***", 'Vertical highest limit reached!')
 
           if dir.upper() == 'DOWN' and GPIO.input(ControlPackage.VL_pin):
-            print( 'Vertical lowest limit reached!')
+            print( "***", 'Vertical lowest limit reached!')
         else:
           # IN-FWD, OUT-BKWD
           self.motor.setSpeed(speed, adj)

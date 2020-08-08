@@ -42,7 +42,7 @@ class EQStarTracking(ITracking):
     def Track(self): 	# Track is called after each time refresh is done
         thresh_limit = 5
         trace_ref_cnt = 3
-        ControlPackage.move_method = "MICROSTEP"
+        #ControlPackage.move_method = "MICROSTEP"
 
         #get average delta RA and DEC
         avg_d_ra = 0
@@ -109,30 +109,31 @@ class EQStarTracking(ITracking):
           h_dir = ""
           if avg_d_ra > thresh_limit : 
             h_dir = "LEFT"
-            new_h_speed = int(ControlPackage.hspeed * 15)
+            new_h_speed = int(ControlPackage.hspeed * 20)
             #new_h_speed = int(ControlPackage.hspeed * (avg_d_ra / (thresh_limit * 2)))
           elif avg_d_ra < -thresh_limit : 
             h_dir = "LEFT"
-            new_h_speed = int(ControlPackage.hspeed / 10)
-            #new_h_speed = int(ControlPackage.hspeed / (avg_d_ra / (-thresh_limit * 2)))
+            #new_h_speed = int(ControlPackage.hspeed / 10)
+            new_h_speed = int(ControlPackage.hspeed / (avg_d_ra / (-thresh_limit * 2)))
           hsteps = abs(int(avg_d_ra*3))
 
 
           if v_dir != "" :	# Dec Motor control
             ControlPackage.v_cmdqueue.put((v_dir, ControlPackage.vspeed, ControlPackage.vadj, vsteps))
-            time.sleep(1.0)
+            time.sleep(5)
 
           if h_dir != "": 	# RA Motor control
             if new_h_speed > 0 :
               ControlPackage.h_cmdqueue.put((h_dir, new_h_speed, ControlPackage.hadj, hsteps))
-              #hsleep = int(math.ceil(hsteps / 10))
-              hsleep = int(math.ceil(hsteps / ( new_h_speed / (ControlPackage.hspeed * 1.0) * 5)))
+              hsleep = int(math.ceil(hsteps / 10))
+              #hsleep = int(math.ceil(hsteps / ( new_h_speed / (ControlPackage.hspeed * 1.0) * 5)))
               if hsleep > 20 : hsleep = 20
-              print("Sleep time (s): ", hsleep)
+              print("*** RA action time(s):", hsleep)
               if hsleep > 0 : time.sleep(hsleep)
           
           # Default motion RA Left with default speed
           ControlPackage.h_cmdqueue.put(("LEFT", ControlPackage.hspeed, ControlPackage.hadj, 1000))
+          ControlPackage.ipTracking.clear()
 
 
 class AccStarTracking(ITracking):
