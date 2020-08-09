@@ -127,7 +127,7 @@ class EQStarTracking(ITracking):
           if h_dir != "": 	# RA Motor control
             if new_h_speed > 0 :
               ControlPackage.h_cmdqueue.put((h_dir, new_h_speed, ControlPackage.hadj, hsteps))
-              hsleep = int(math.ceil(hsteps / 10))
+              hsleep = int(math.ceil(hsteps / 5))
               #hsleep = int(math.ceil(hsteps / ( new_h_speed / (ControlPackage.hspeed * 1.0) * 5)))
               if hsleep > 20 : hsleep = 20
               print("*** RA action time(s):", hsleep)
