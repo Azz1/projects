@@ -104,18 +104,20 @@ class EQStarTracking(ITracking):
           v_dir = ""
           if avg_d_dec > thresh_limit : v_dir = ControlPackage.tk_pos_dir
           elif avg_d_dec < -thresh_limit: v_dir = ControlPackage.tk_neg_dir
-          vsteps = abs(int(avg_d_dec/5))
+          vsteps = abs(int(avg_d_dec/3))
 
           h_dir = ""
+          hsteps = 0
           if avg_d_ra > thresh_limit : 
             h_dir = "LEFT"
             new_h_speed = int(ControlPackage.hspeed * 20)
             #new_h_speed = int(ControlPackage.hspeed * (avg_d_ra / (thresh_limit * 2)))
+            hsteps = abs(int(avg_d_ra))
           elif avg_d_ra < -thresh_limit : 
             h_dir = "LEFT"
             #new_h_speed = int(ControlPackage.hspeed / 10)
             new_h_speed = int(ControlPackage.hspeed / (avg_d_ra / (-thresh_limit * 2)))
-          hsteps = abs(int(avg_d_ra*3))
+            hsteps = abs(int(avg_d_ra*3))
 
 
           if v_dir != "" :	# Dec Motor control

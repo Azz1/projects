@@ -105,6 +105,8 @@ class ControlPackage :
   exitFlag = threading.Event()
   isTracking = threading.Event()
   ipTracking = threading.Event()
+  isTracking.clear()
+  ipTracking.clear()
   threadLock = threading.Lock()
   #queue of objects (dir=UP/DOWN, speed, steps) UP-FWD, DOWN-BKWD
   v_cmdqueue = queue.Queue()      
