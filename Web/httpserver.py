@@ -116,6 +116,7 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
       self.wfile.write(bytes('{"seq": ' + str(ControlPackage.imageseq) + ', "timestamp": "'+  time.strftime("%Y%m%d-%H%M%S", localtime) +'", ' + pstr + ' "image": "' + imgstr + '"}', 'UTF-8'))
 
       if ControlPackage.isTracking.is_set() and (not ControlPackage.ipTracking.is_set()):	# tracking mode
+        print( "Tracking function ..........." )
         tr = EQStarTracking()
         t = threading.Thread(target=tr.Track, args = ())
         t.daemon = True
