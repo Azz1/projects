@@ -110,14 +110,14 @@ class EQStarTracking(ITracking):
           hsteps = 0
           if avg_d_ra > thresh_limit : 
             h_dir = "LEFT"
-            new_h_speed = int(ControlPackage.hspeed * 20)
+            new_h_speed = int(ControlPackage.hspeed * 15)
             #new_h_speed = int(ControlPackage.hspeed * (avg_d_ra / (thresh_limit * 2)))
             hsteps = abs(int(avg_d_ra))
           elif avg_d_ra < -thresh_limit : 
             h_dir = "LEFT"
-            #new_h_speed = int(ControlPackage.hspeed / 10)
-            new_h_speed = int(ControlPackage.hspeed / (avg_d_ra / (-thresh_limit * 1)))
-            hsteps = 4		# move 4 steps then stop and wait
+            new_h_speed = int(ControlPackage.hspeed / 5)
+            #new_h_speed = int(ControlPackage.hspeed / (avg_d_ra / (-thresh_limit * 1)))
+            hsteps = 1		# move 4 steps then stop and wait
 
 
           if v_dir != "" :	# Dec Motor control
@@ -130,6 +130,7 @@ class EQStarTracking(ITracking):
               hsleep = int(math.ceil(hsteps / 5))
               #hsleep = int(math.ceil(hsteps / ( new_h_speed / (ControlPackage.hspeed * 1.0) * 5)))
               if hsleep > 20 : hsleep = 20
+              if hsleep < 5 : hsleep = 5
               print("*** RA action time(s):", hsleep)
               if hsleep > 0 : time.sleep(hsleep)
           
