@@ -46,37 +46,44 @@ class EQStarTracking(ITracking):
 
         #get average delta RA and DEC
         avg_d_ra = 0
+        wcnt = 0
         cnt = 0
         for i in range(len(ControlPackage.tk_queue), 0, -1) :
-          avg_d_ra += ControlPackage.tk_queue[i-1][1]
+          avg_d_ra += ControlPackage.tk_queue[i-1][1] * (trace_ref_cnt-cnt)
+          wcnt += (trace_ref_cnt-cnt)
           cnt += 1
           if cnt == trace_ref_cnt: break
-        if cnt > 0: avg_d_ra /= cnt
+        if cnt > 0: avg_d_ra /= wcnt
         
         avg_d_dec = 0
+        wcnt = 0
         cnt = 0
         for i in range(len(ControlPackage.tk_queue), 0, -1) :
-          avg_d_dec += ControlPackage.tk_queue[i-1][2]
+          avg_d_dec += ControlPackage.tk_queue[i-1][2] * (trace_ref_cnt-cnt)
+          wcnt += (trace_ref_cnt-cnt)
           cnt += 1
           if cnt == trace_ref_cnt: break
-        if cnt > 0: avg_d_dec /= cnt
+        if cnt > 0: avg_d_dec /= wcnt
 
         #get average delta x - y offset
         avg_d_x = 0
         cnt = 0
+        wcnt = 0
         for i in range(len(ControlPackage.tk_queue), 0, -1) :
-          avg_d_x += ControlPackage.tk_queue[i-1][3] - ControlPackage.ref0_x
+          avg_d_x += (ControlPackage.tk_queue[i-1][3] - ControlPackage.ref0_x) * (trace_ref_cnt-cnt)
+          wcnt += (trace_ref_cnt-cnt)
           cnt += 1
           if cnt == trace_ref_cnt: break
-        if cnt > 0: avg_d_x /= cnt
+        if cnt > 0: avg_d_x /= wcnt
         
         avg_d_y = 0
         cnt = 0
         for i in range(len(ControlPackage.tk_queue), 0, -1) :
-          avg_d_y += ControlPackage.tk_queue[i-1][4] - ControlPackage.ref0_y
+          avg_d_y += (ControlPackage.tk_queue[i-1][4] - ControlPackage.ref0_y) * (trace_ref_cnt-cnt)
+          wcnt += (trace_ref_cnt-cnt)
           cnt += 1
           if cnt == trace_ref_cnt: break
-        if cnt > 0: avg_d_y /= cnt
+        if cnt > 0: avg_d_y /= wcnt
         
         #determine move directions
         if ControlPackage.altazradec == "ALTAZ":   #ALT-AZ mode
@@ -105,6 +112,8 @@ class EQStarTracking(ITracking):
           if avg_d_dec > thresh_limit : v_dir = ControlPackage.tk_pos_dir
           elif avg_d_dec < -thresh_limit: v_dir = ControlPackage.tk_neg_dir
           vsteps = abs(int(avg_d_dec/3))
+          vsleep = vsteps 
+          if vsleep > 5: vsleep = 5
 
           h_dir = ""
           hsteps = 0
@@ -112,7 +121,7 @@ class EQStarTracking(ITracking):
             h_dir = "LEFT"
             new_h_speed = int(ControlPackage.hspeed * 15)
             #new_h_speed = int(ControlPackage.hspeed * (avg_d_ra / (thresh_limit * 2)))
-            hsteps = abs(int(avg_d_ra))
+            hsteps = abs(int(avg_d_ra/1.5))
           elif avg_d_ra < -thresh_limit : 
             h_dir = "LEFT"
             new_h_speed = int(ControlPackage.hspeed / 5)
@@ -122,7 +131,7 @@ class EQStarTracking(ITracking):
 
           if v_dir != "" :	# Dec Motor control
             ControlPackage.v_cmdqueue.put((v_dir, ControlPackage.vspeed, ControlPackage.vadj, vsteps))
-            time.sleep(5)
+            time.sleep(vsleep)
 
           if h_dir != "": 	# RA Motor control
             if new_h_speed > 0 :
@@ -135,7 +144,7 @@ class EQStarTracking(ITracking):
               if hsleep > 0 : time.sleep(hsleep)
           
           # Default motion RA Left with default speed
-          ControlPackage.h_cmdqueue.put(("LEFT", ControlPackage.hspeed, ControlPackage.hadj, 200))
+          ControlPackage.h_cmdqueue.put(("LEFT", ControlPackage.hspeed, ControlPackage.hadj, 400))
           time.sleep(20)	
           ControlPackage.ipTracking.clear()
 
