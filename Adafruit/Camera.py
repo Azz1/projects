@@ -59,6 +59,7 @@ class RaspiShellCamera(Camera):
 
     if videostarted: return
 
+    track_err = False
     try:
       ControlPackage.imageseq = ControlPackage.imageseq + 1
       localtime   = time.localtime()
@@ -137,6 +138,7 @@ class RaspiShellCamera(Camera):
         img.save(output, format='JPEG')
         imgstr = base64.b64encode(output.getvalue()).decode("utf-8") 
         del img
+        track_err = True
 
     else :
       img = Image.open(fname)
@@ -156,7 +158,7 @@ class RaspiShellCamera(Camera):
       os.system('rm -f temp/image-' + str(ControlPackage.imageseq-ControlPackage.max_keep_snapshots) + '-*.jpg')
 
 
-    return localtime, imgstr
+    return localtime, imgstr, track_err
 
   def snapshot_full(self) : 
     global camera_lock

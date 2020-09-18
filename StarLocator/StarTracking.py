@@ -144,7 +144,7 @@ class EQStarTracking(ITracking):
               if hsleep > 0 : time.sleep(hsleep)
           
           # Default motion RA Left with default speed
-          ControlPackage.h_cmdqueue.put(("LEFT", ControlPackage.hspeed, ControlPackage.hadj, 800))
+          ControlPackage.h_cmdqueue.put(("LEFT", ControlPackage.hspeed, ControlPackage.hadj, 8000))
           time.sleep(20)	
           ControlPackage.ipTracking.clear()
 
