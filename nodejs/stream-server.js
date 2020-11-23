@@ -20,16 +20,16 @@ var socketServer = new (require('ws').Server)({port: WEBSOCKET_PORT});
 socketServer.on('connection', function(socket) {
 	// Send magic bytes and video size to the newly connected socket
 	// struct { char magic[4]; unsigned short width, height;}
-	var streamHeader = new Buffer(8);
+	var streamHeader = new Buffer.alloc(8);
 	streamHeader.write(STREAM_MAGIC_BYTES);
 	streamHeader.writeUInt16BE(width, 4);
 	streamHeader.writeUInt16BE(height, 6);
 	socket.send(streamHeader, {binary:true});
 
-	console.log( 'New WebSocket Connection ('+socketServer.clients.length+' total)' );
+	console.log( 'New WebSocket Connection ('+socketServer.clients.size+' total)' );
 	
 	socket.on('close', function(code, message){
-		console.log( 'Disconnected WebSocket ('+socketServer.clients.length+' total)' );
+		console.log( 'Disconnected WebSocket ('+socketServer.clients.size+' total)' );
 	});
 });
 

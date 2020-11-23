@@ -252,8 +252,14 @@ $('input[type=checkbox][name=norefresh]').click( function(){
 	    //context.scale(2.1875, 2.1875);
     
             // Setup the WebSocket connection and start the player
-            var client = new WebSocket( 'ws://[IPADDRESS]:8084/' );
-            var player = new jsmpeg(client, {canvas:canvas});
+
+	    // nodejs 8 + jsmpg
+            //var client = new WebSocket( 'ws://[IPADDRESS]:8084/' );
+            //var player = new jsmpeg(client, {canvas:canvas}); 
+
+	    // nodejs 10 + JSMpeg
+            var url = 'ws://[IPADDRESS]:8084/';
+            var player = new JSMpeg.Player(url, {canvas:canvas, audio:false, disableGl:true});
 
 	});
 

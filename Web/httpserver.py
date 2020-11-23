@@ -32,7 +32,7 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
     if "Cookie" in self.headers:
       self.cookie = http.cookies.SimpleCookie(self.headers["Cookie"])
     else:
-      self.cookie = http.cookie.SimpleCookie()
+      self.cookie = http.cookies.SimpleCookie()
       self.cookie['refined'] = 'false'
       self.cookie['norefresh'] = 'false'
       self.cookie['cmode'] = 'day'
