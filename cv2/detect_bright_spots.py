@@ -83,10 +83,11 @@ class CV2Helper :
         ni = 0
         dist = 999999.9
         for (i, p) in enumerate(self.centers):
-            d = (p[0] - self.ref0[0]) * (p[0] - self.ref0[0]) + (p[1] - self.ref0[1]) * (p[1] - self.ref0[1])
-            if d < dist : 
-                ni = i
-                dist = d
+            if self.radius[i] <= 30:   #ignore points with radius greater than 30
+              d = (p[0] - self.ref0[0]) * (p[0] - self.ref0[0]) + (p[1] - self.ref0[1]) * (p[1] - self.ref0[1])
+              if d < dist : 
+                  ni = i
+                  dist = d
 
         if mark == True :
             cv2.line(self.image, (int(self.ref0[0]), int(self.ref0[1])), (int(self.ref1[0]), int(self.ref1[1])), (0, 100, 100), 1)
@@ -104,6 +105,7 @@ class CV2Helper :
             print("Point ", "#{}".format(i+1), "- (", int(p[0]), ",", int(p[1]), ")   radius:", self.radius[i])
 
     def calc_offset(self, x, y):
+        print("Ref Points = (", self.ref0[0], ", ", self.ref0[1], ")  --> (", self.ref1[0], ", ", self.ref1[1], ")")
         A = self.ref1[1] - self.ref0[1]		# A = y1 - y0
         B = self.ref0[0] - self.ref1[0] 	# B = x0 - x1
         C = -B * self.ref0[1] - A * self.ref0[0] # C = -B * y0 - A * x0
@@ -117,9 +119,14 @@ class CV2Helper :
         S = math.sqrt( A * A + B * B )
         print("R0 = ", R0, "  R1 = ", R1)
 	
+        S0 = math.sqrt( R0 * R0 - d * d )
         S1 = math.sqrt( R1 * R1 - d * d )
-        print("S = ", S, " S1 = ", S1)
-        r = S - S1
+        print("S = ", S, " S0 = ", S0, " S1 = ", S1)
+	
+        if S0 + S1 <= S or S1 > S0: 	# Star behind Ref Point #1
+          r = S - S1
+        else :                          # Star beyond Ref Point #1
+          r = S + S1
 
         return r, d		
 		

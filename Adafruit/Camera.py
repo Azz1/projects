@@ -1,7 +1,7 @@
 import time
 import math
 import os
-import sys
+import sys, traceback
 import cv2
 import queue
 import picamera
@@ -12,6 +12,7 @@ from PIL import Image
 import base64
 from io import BytesIO
 from StepMotor import ControlPackage
+from collections import deque
 from abc import ABCMeta, abstractmethod
 
 cv2lib_path = os.path.abspath('../cv2')
@@ -58,6 +59,7 @@ class RaspiShellCamera(Camera):
 
     if videostarted: return
 
+    track_err = False
     try:
       ControlPackage.imageseq = ControlPackage.imageseq + 1
       localtime   = time.localtime()
@@ -80,7 +82,8 @@ class RaspiShellCamera(Camera):
                      + ' -w ' + str(ControlPackage.width) \
                      + ' -h ' + str(ControlPackage.height) + roistr \
                      + ' -br ' + str(ControlPackage.brightness) \
-                     + (' -ex night -ss ' if ControlPackage.cmode == 'night' else ' -ss ') + str(ss) + ' -ISO ' + str(ControlPackage.iso) \
+                     + (' -ex night -ag 12.0 -dg 4.0 -ss ' if ControlPackage.cmode == 'night' else ' -ss ') + str(ss) \
+                     + (' -ISO auto ' if ControlPackage.cmode == 'night' else (' -ISO ' + str(ControlPackage.iso))) \
                      + ' -sh ' + str(ControlPackage.sharpness) + ' -co ' + str(ControlPackage.contrast) \
                      + ' -sa ' + str(ControlPackage.saturation)
       print( cmdstr)
@@ -98,21 +101,44 @@ class RaspiShellCamera(Camera):
 
     #READ IMAGE AND PUT ON SCREEN
     imgstr = ""
-    if ControlPackage.isTracking.is_set():	#tracking mode, show tracking config
-      cvhelper = CV2Helper( blur_limit = 9, thresh_limit = 35 )
-      # load the image, convert it to grayscale, and blur it
-      img = cvhelper.loadimage(fname)
-      [centers, radius, img] = cvhelper.processimage(mark = True)
-      cvhelper.printcenters()
-      cvhelper.setref(ControlPackage.ref0_x, ControlPackage.ref0_y, ControlPackage.ref1_x, ControlPackage.ref1_y)
-      [idx, cntr, img] = cvhelper.find_nearest_point(True)
-      print("Nearest Point ", "#{}".format(idx+1), "- (", int(cntr[0]), ",", int(cntr[1]), ") ")
+    #if ControlPackage.isTracking.is_set():	#tracking mode, show tracking config
+    if ControlPackage.ref0_x != ControlPackage.ref1_x or ControlPackage.ref0_y != ControlPackage.ref1_y:
+                                                #Ref point defined, show tracking config
+      try:
+        print("Blur Limit: ", "{}".format(ControlPackage.tk_blur_limit), " Thresh Limit: ", "{}".format(ControlPackage.tk_thresh_limit))
+        cvhelper = CV2Helper( blur_limit = ControlPackage.tk_blur_limit, thresh_limit = ControlPackage.tk_thresh_limit )
+        # load the image, convert it to grayscale, and blur it
+        img = cvhelper.loadimage(fname)
+        [centers, radius, img] = cvhelper.processimage(mark = True)
+        cvhelper.printcenters()
+        cvhelper.setref(ControlPackage.ref0_x, ControlPackage.ref0_y, ControlPackage.ref1_x, ControlPackage.ref1_y)
+        [idx, cntr, img] = cvhelper.find_nearest_point(True)
+        print("Nearest Point ", "#{}".format(idx+1), "- (", int(cntr[0]), ",", int(cntr[1]), ") ")
 
-      ControlPackage.tk_delta_ra, ControlPackage.tk_delta_dec = cvhelper.calc_offset(cntr[0], cntr[1])
-      print("\nDelta-RA:", ControlPackage.tk_delta_ra, " Delta-Dec:", ControlPackage.tk_delta_dec)
+        ControlPackage.tk_delta_ra, ControlPackage.tk_delta_dec = cvhelper.calc_offset(cntr[0], cntr[1])
+        print("\nDelta-RA:", ControlPackage.tk_delta_ra, " Delta-Dec:", ControlPackage.tk_delta_dec)
+        if len(ControlPackage.tk_queue) >= ControlPackage.tk_queue.maxlen:
+            ControlPackage.tk_queue.popleft()
+        ControlPackage.tk_queue.append([localtime, ControlPackage.tk_delta_ra, ControlPackage.tk_delta_dec, cntr[0], cntr[1]])
 
-      ret, buf = cv2.imencode( '.jpg', img )
-      imgstr = base64.b64encode( np.array(buf) ).decode("utf-8") 
+        ret, buf = cv2.imencode( '.jpg', img )
+        imgstr = base64.b64encode( np.array(buf) ).decode("utf-8") 
+
+      except:
+        traceback.print_exc()
+        img = Image.open(fname)
+
+        #basewidth = 800
+        #wpercent = (basewidth/float(img.size[0]))
+        #hsize = int((float(img.size[1])*float(wpercent)))
+        #img = img.resize((basewidth,hsize), PIL.Image.ANTIALIAS)
+        #img = img.transpose(Image.ROTATE_180)
+
+        output = BytesIO()
+        img.save(output, format='JPEG')
+        imgstr = base64.b64encode(output.getvalue()).decode("utf-8") 
+        del img
+        track_err = True
 
     else :
       img = Image.open(fname)
@@ -132,7 +158,7 @@ class RaspiShellCamera(Camera):
       os.system('rm -f temp/image-' + str(ControlPackage.imageseq-ControlPackage.max_keep_snapshots) + '-*.jpg')
 
 
-    return localtime, imgstr
+    return localtime, imgstr, track_err
 
   def snapshot_full(self) : 
     global camera_lock
@@ -160,7 +186,7 @@ class RaspiShellCamera(Camera):
       #ControlPackage.camera.capture(fname, format='jpeg', resize=(ControlPackage.width,ControlPackage.height))
 
       ts = ''
-      tl = ControlPackage.ss/2000 + 2000
+      tl = ControlPackage.ss/1000 + 2000
       tt = tl * (ControlPackage.timelapse-1)
       if ControlPackage.timelapse > 1:
         ts = '-tl ' + str(tl) + ' -t ' +  str(tt)
@@ -170,9 +196,14 @@ class RaspiShellCamera(Camera):
 		     + (' -vf ' if ControlPackage.vflip == 'true' else '') \
 		     + (' -hf ' if ControlPackage.hflip == 'true' else '') \
 		     + ' -br ' + str(ControlPackage.brightness) + roistr \
-                     + (' -ex night -ss ' if ControlPackage.cmode == 'night' else ' -ss ') + str(ControlPackage.ss) + ' -ISO ' + str(ControlPackage.iso) \
+                     + (' -ex night -ss ' if ControlPackage.cmode == 'night' else ' -ss ') + str(ControlPackage.ss) \
+                     + ' -ISO ' + str(ControlPackage.iso) \
                      + ' -sh ' + str(ControlPackage.sharpness) + ' -co ' + str(ControlPackage.contrast) \
                      + ' -sa ' + str(ControlPackage.saturation) + ' ' + ts
+
+                     #replacement parameters
+                     #+ (' -ex night -ag 12.0 -dg 4.0 -ss ' if ControlPackage.cmode == 'night' else ' -ss ') + str(ControlPackage.ss) \
+                     #+ (' -ISO auto ' if ControlPackage.cmode == 'night' else (' -ISO ' + str(ControlPackage.iso))) \
       print( cmdstr)
       os.system( cmdstr )
 

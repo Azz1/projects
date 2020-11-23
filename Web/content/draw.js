@@ -39,21 +39,34 @@ $(function() {
     });
 
     $('#canvas').mousedown(function(e) {
-        drawLine = true;
-        ctx.strokeStyle = 'red';
-        ctx.lineWidth = 1;
-        ctx.lineCap = 'round';
-        ctx.beginPath();
-        startPos = { x: e.pageX - canvasOffset.left, y: e.pageY - canvasOffset.top};
+        switch (event.which) {
+        case 1:	//Left click
+            drawLine = true;
+            ctx.strokeStyle = 'red';
+            ctx.lineWidth = 1;
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+            startPos = { x: e.pageX - canvasOffset.left, y: e.pageY - canvasOffset.top};
+	    break;
+        case 3:	//Right click
+            drawLine = false;
+	    break;
+        }
     });
 
     $('#canvas').mouseup(function() {
-        clearCanvas();
-        // Replace with var that is second canvas
-        line(ctx);
-	$('#refsel').val(startPos.x.toString() + "," + startPos.y.toString() + "," + finalPos.x.toString() + "," + finalPos.y.toString());
-        finalPos = {x:0, y:0};
-        startPos = {x:0, y:0};
-        drawLine = false;
+        switch (event.which) {
+        case 1:	//Left click
+            clearCanvas();
+            // Replace with var that is second canvas
+            line(ctx);
+	    $('#refsel').val(startPos.x.toString() + "," + startPos.y.toString() + "," + finalPos.x.toString() + "," + finalPos.y.toString());
+            //finalPos = {x:0, y:0};
+            //startPos = {x:0, y:0};
+            drawLine = false;
+	    break;
+        case 3:	//Right click
+	    break;
+        }
     });
 });

@@ -13,6 +13,7 @@ import threading
 import queue
 from array import *
 from StarLocator import StarLocator
+from abc import ABCMeta, abstractmethod
 
 motorlib_path = os.path.abspath('../Adafruit')
 sys.path.append(motorlib_path)
@@ -23,7 +24,132 @@ lsm303lib_path = os.path.abspath('../Adafruit/Adafruit_LSM303')
 sys.path.append(lsm303lib_path)
 from Adafruit_LSM303 import Adafruit_LSM303
 
-class StarTracking:
+# Abstract base class for stepper motor
+class ITracking :
+
+    __metaclass__ = ABCMeta
+
+    @abstractmethod
+    def Track(self): pass
+
+class EQStarTracking(ITracking):
+    
+    def __init__(self):
+        ControlPackage.exitFlag.set()
+        self.motor_h = ControlPackage.motorH
+        self.motor_v = ControlPackage.motorV
+
+    def Track(self): 	# Track is called after each time refresh is done
+        thresh_limit = 5
+        trace_ref_cnt = 3
+        #ControlPackage.move_method = "MICROSTEP"
+
+        #get average delta RA and DEC
+        avg_d_ra = 0
+        wcnt = 0
+        cnt = 0
+        for i in range(len(ControlPackage.tk_queue), 0, -1) :
+          avg_d_ra += ControlPackage.tk_queue[i-1][1] * (trace_ref_cnt-cnt)
+          wcnt += (trace_ref_cnt-cnt)
+          cnt += 1
+          if cnt == trace_ref_cnt: break
+        if cnt > 0: avg_d_ra /= wcnt
+        
+        avg_d_dec = 0
+        wcnt = 0
+        cnt = 0
+        for i in range(len(ControlPackage.tk_queue), 0, -1) :
+          avg_d_dec += ControlPackage.tk_queue[i-1][2] * (trace_ref_cnt-cnt)
+          wcnt += (trace_ref_cnt-cnt)
+          cnt += 1
+          if cnt == trace_ref_cnt: break
+        if cnt > 0: avg_d_dec /= wcnt
+
+        #get average delta x - y offset
+        avg_d_x = 0
+        cnt = 0
+        wcnt = 0
+        for i in range(len(ControlPackage.tk_queue), 0, -1) :
+          avg_d_x += (ControlPackage.tk_queue[i-1][3] - ControlPackage.ref0_x) * (trace_ref_cnt-cnt)
+          wcnt += (trace_ref_cnt-cnt)
+          cnt += 1
+          if cnt == trace_ref_cnt: break
+        if cnt > 0: avg_d_x /= wcnt
+        
+        avg_d_y = 0
+        cnt = 0
+        for i in range(len(ControlPackage.tk_queue), 0, -1) :
+          avg_d_y += (ControlPackage.tk_queue[i-1][4] - ControlPackage.ref0_y) * (trace_ref_cnt-cnt)
+          wcnt += (trace_ref_cnt-cnt)
+          cnt += 1
+          if cnt == trace_ref_cnt: break
+        if cnt > 0: avg_d_y /= wcnt
+        
+        #determine move directions
+        if ControlPackage.altazradec == "ALTAZ":   #ALT-AZ mode
+          h_dir = ""
+          if avg_d_x > thresh_limit : h_dir = "RIGHT"
+          elif avg_d_x < -thresh_limit: h_dir = "LEFT"
+
+          hsteps = math.ceil(abs(avg_d_x/50))
+          
+          v_dir = ""
+          if avg_d_y > thresh_limit : v_dir = "DOWN"
+          elif avg_d_y < -thresh_limit: v_dir = "UP"
+          
+          vsteps = abs(int(avg_d_y*10))
+
+          if v_dir != "" :	# Vertical Motor control
+            ControlPackage.v_cmdqueue.put((v_dir, ControlPackage.vspeed, ControlPackage.vadj, vsteps))
+            time.sleep(2.0)
+
+          if h_dir != "": 	# Horizontal Motor control
+            ControlPackage.h_cmdqueue.put((h_dir, ControlPackage.hspeed, ControlPackage.hadj, hsteps))
+            time.sleep(2.0)
+          
+        else :      # EQ mode
+          v_dir = ""
+          if avg_d_dec > thresh_limit : v_dir = ControlPackage.tk_pos_dir
+          elif avg_d_dec < -thresh_limit: v_dir = ControlPackage.tk_neg_dir
+          vsteps = abs(int(avg_d_dec/3))
+          vsleep = vsteps 
+          if vsleep > 5: vsleep = 5
+
+          h_dir = ""
+          hsteps = 0
+          if avg_d_ra > thresh_limit : 
+            h_dir = "LEFT"
+            new_h_speed = int(ControlPackage.hspeed * 15)
+            #new_h_speed = int(ControlPackage.hspeed * (avg_d_ra / (thresh_limit * 2)))
+            hsteps = abs(int(avg_d_ra/1.5))
+          elif avg_d_ra < -thresh_limit : 
+            h_dir = "LEFT"
+            new_h_speed = int(ControlPackage.hspeed / 5)
+            #new_h_speed = int(ControlPackage.hspeed / (avg_d_ra / (-thresh_limit * 1)))
+            hsteps = 1		# move 4 steps then stop and wait
+
+
+          if v_dir != "" :	# Dec Motor control
+            ControlPackage.v_cmdqueue.put((v_dir, ControlPackage.vspeed, ControlPackage.vadj, vsteps))
+            time.sleep(vsleep)
+
+          if h_dir != "": 	# RA Motor control
+            if new_h_speed > 0 :
+              ControlPackage.h_cmdqueue.put((h_dir, new_h_speed, ControlPackage.hadj, hsteps))
+              hsleep = int(math.ceil(hsteps / 5))
+              #hsleep = int(math.ceil(hsteps / ( new_h_speed / (ControlPackage.hspeed * 1.0) * 5)))
+              if hsleep > 20 : hsleep = 20
+              if hsleep < 5 : hsleep = 5
+              print("*** RA action time(s):", hsleep)
+              if hsleep > 0 : time.sleep(hsleep)
+          
+          # Default motion RA Left with default speed
+          ControlPackage.h_cmdqueue.put(("LEFT", ControlPackage.hspeed, ControlPackage.hadj, 8000))
+          time.sleep(20)	
+          ControlPackage.ipTracking.clear()
+
+
+class AccStarTracking(ITracking):
 
     # Parameters:
     #   Self Location:
@@ -37,7 +163,7 @@ class StarTracking:
     #     az   - AZ in degree	azadj - AZ adjustment
     #     alt  - ALT in degree	altadj - ALT adjustment
 
-    def __init__(self, lat, long, mode, ra_h, ra_m, ra_s, dec_dg, dec_m, dec_s, az, alt, v_speed, v_steps, h_speed, h_steps):
+    def __init__(self, lat, long, mode, ra_h, ra_m, ra_s, dec_dg, dec_m, dec_s, az, alt):
         self.locator = StarLocator(lat, long)
         self.position = Adafruit_LSM303()
         self.mode = mode
@@ -50,13 +176,16 @@ class StarTracking:
         self.az = az		# target AZ & ALT if mode = ALTAZ
         self.alt = alt
 
-        self.v_steps = v_steps	# initial motor params
-        self.v_speed = v_speed
-        self.h_steps = h_steps
-        self.h_speed = h_speed
+        self.v_steps = ControlPackage.vsteps
+        self.v_adj = ControlPackage.vadj
+        self.v_speed = ControlPackage.vspeed
 
-        if v_steps > 300: self.v_steps = 300
-        if h_steps > 20: self.h_steps = 20
+        self.h_steps = ControlPackage.hsteps
+        self.h_adj = ControlPackage.hadj
+        self.h_speed = ControlPackage.hspeed
+
+        if self.v_steps > 300: self.v_steps = 300
+        if self.h_steps > 20: self.h_steps = 20
 
         ControlPackage.exitFlag.set()
         self.motor_h = ControlPackage.motorH
@@ -166,11 +295,11 @@ class StarTracking:
 
                  if math.fabs(v_offset) >= min_v_offset :
                     ControlPackage.threadLock.acquire()
-                    ControlPackage.v_cmdqueue.put((v_dir, self.v_speed, v_steps))
+                    ControlPackage.v_cmdqueue.put((v_dir, self.v_speed, self.v_adj, v_steps))
                     ControlPackage.threadLock.release()
                  if h_offset >= 2 * min_h_offset or h_offset <= - min_h_offset: 
                     ControlPackage.threadLock.acquire()
-                    ControlPackage.h_cmdqueue.put((h_dir, self.h_speed, h_steps))
+                    ControlPackage.h_cmdqueue.put((h_dir, self.h_speed, self.h_adj, h_steps))
                     ControlPackage.threadLock.release()
 
               last_v_offset = v_offset

@@ -3,6 +3,7 @@
 #from BaseHTTPServer import BaseHTTPRequestHandler,HTTPServer
 from http.server import BaseHTTPRequestHandler,HTTPServer
 from socketserver import ThreadingMixIn
+from collections import deque
 import threading
 import queue
 import argparse
@@ -23,7 +24,8 @@ trackinglib_path = os.path.abspath('../StarLocator')
 sys.path.append(trackinglib_path)
 
 from StepMotor import ControlPackage
-from StarTracking import StarTracking
+from StarTracking import AccStarTracking
+from StarTracking import EQStarTracking
 import Camera
  
 class HTTPRequestHandler(BaseHTTPRequestHandler):
@@ -33,7 +35,7 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
       self.cookie = http.cookies.SimpleCookie(self.headers["Cookie"])
     else:
       self.cookie = http.cookies.SimpleCookie()
-      self.cookie['refined'] = 'false'
+      self.cookie['refined'] = 'true'
       self.cookie['norefresh'] = 'false'
       self.cookie['cmode'] = 'day'
       self.cookie['rawmode'] = 'false'
@@ -62,27 +64,65 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
       ControlPackage.rawmode = data['rawmode'][0]
       ControlPackage.vflip = data['vflip'][0]
       ControlPackage.hflip = data['hflip'][0]
+      ControlPackage.tk_pos_dir = data['eqposdir'][0]
+      ControlPackage.tk_neg_dir = ('DOWN' if ControlPackage.tk_pos_dir == 'UP' else 'UP')
 
       if data['refpoints'][0] != "":
         x = data['refpoints'][0].split(",")
-        ControlPackage.ref0_x = float(x[0])
-        ControlPackage.ref0_y = float(x[1])
-        ControlPackage.ref1_x = float(x[2])
-        ControlPackage.ref1_y = float(x[3])
-        #print( 'Star tracking Ref Point ('+ str(ControlPackage.ref0_x) + ',' 
-        #                                  + str(ControlPackage.ref0_y) + ') - ('
-        #                                  + str(ControlPackage.ref1_x) + ','
-        #                                  + str(ControlPackage.ref1_y) + ')' )
+        if abs(float(x[0]) - float(x[2])) > 1.0 or abs(float(x[1]) - float(x[3])) > 1.0 :
+          ref0_x = float(x[0])
+          ref0_y = float(x[1])
+          ref1_x = float(x[2])
+          ref1_y = float(x[3])
+
+          if ref0_x != ControlPackage.ref0_x or \
+             ref0_y != ControlPackage.ref0_y or \
+             ref1_x != ControlPackage.ref1_x or \
+             ref1_y != ControlPackage.ref1_y :      #ref point changed, update and clear queue
+
+             ControlPackage.tk_queue.clear() 
+             ControlPackage.ref0_x = ref0_x
+             ControlPackage.ref0_y = ref0_y
+             ControlPackage.ref1_x = ref1_x
+             ControlPackage.ref1_y = ref1_y
+             #print( 'Star tracking Ref Point ('+ str(ControlPackage.ref0_x) + ',' 
+             #                                  + str(ControlPackage.ref0_y) + ') - ('
+             #                                  + str(ControlPackage.ref1_x) + ','
+             #                                  + str(ControlPackage.ref1_y) + ')' )
+
+      if data['tk_blur_limit'][0] != "":
+          ControlPackage.tk_blur_limit = int(data['tk_blur_limit'][0])
+      if data['tk_thresh_limit'][0] != "":
+          ControlPackage.tk_thresh_limit = int(data['tk_thresh_limit'][0])
 
       ControlPackage.Validate()
 
-      localtime, imgstr = ControlPackage.camera.snapshot()
+      localtime, imgstr, err = ControlPackage.camera.snapshot()
 
       self.send_response(200)
       self.send_header('Content-Type', 'application/json')
       self.__sendCookie()
       self.end_headers()
-      self.wfile.write(bytes('{"seq": ' + str(ControlPackage.imageseq) + ', "timestamp": "'+  time.strftime("%Y%m%d-%H%M%S", localtime) +'", "image": "' + imgstr + '"}', 'UTF-8'))
+
+      pstr = '"trackinghistory": ['
+      fst = True
+      for p in ControlPackage.tk_queue :
+        if not fst : pstr += ", "
+        else: fst = False
+
+        pstr += '{"timestamp": "' + time.strftime("%Y%m%d-%H%M%S", p[0]) + '", "d_ra": ' + "{:.2f}".format(p[1]) +  ', "d_dec": ' + "{:.2f}".format(p[2]) + '}'
+      pstr += '], '
+
+      self.wfile.write(bytes('{"seq": ' + str(ControlPackage.imageseq) + ', "timestamp": "'+  time.strftime("%Y%m%d-%H%M%S", localtime) +'", ' + pstr + ' "image": "' + imgstr + '"}', 'UTF-8'))
+
+      if (not err) and ControlPackage.isTracking.is_set() and (not ControlPackage.ipTracking.is_set()):	# tracking mode
+        print( "Tracking function ..........." )
+        tr = EQStarTracking()
+        t = threading.Thread(target=tr.Track, args = ())
+        t.daemon = True
+        t.start()
+        ControlPackage.ipTracking.set()
+
 
     elif None != re.search('/api/motor/*', self.path): # motor control
       ControlPackage.isTracking.clear()
@@ -98,13 +138,13 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
       status = True	# move success
       statstr = 'Motor move complete.'
 
-      move_method = 'DOUBLE'
+      ControlPackage.move_method = 'DOUBLE'
       if motorid.lower() == 'v':
         try:
           if self.cookie['refined'].value == 'true':
-      	    move_method = 'MICROSTEP'
+      	    ControlPackage.move_method = 'MICROSTEP'
         except:
-      	    move_method = 'DOUBLE'
+      	    ControlPackage.move_method = 'DOUBLE'
 
         ControlPackage.vspeed = speed
         ControlPackage.vadj = adj
@@ -167,11 +207,23 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
 
       if data['refpoints'][0] != "":
         x = data['refpoints'][0].split(",")
-        ControlPackage.ref0_x = float(x[0])
-        ControlPackage.ref0_y = float(x[1])
-        ControlPackage.ref1_x = float(x[2])
-        ControlPackage.ref1_y = float(x[3])
-        print( 'Star tracking Ref Point ('+ str(ControlPackage.ref0_x) + ',' 
+        if abs(float(x[0]) - float(x[2])) > 1.0 or abs(float(x[1]) - float(x[3])) > 1.0 :
+          ref0_x = float(x[0])
+          ref0_y = float(x[1])
+          ref1_x = float(x[2])
+          ref1_y = float(x[3])
+
+          if ref0_x != ControlPackage.ref0_x or \
+             ref0_y != ControlPackage.ref0_y or \
+             ref1_x != ControlPackage.ref1_x or \
+             ref1_y != ControlPackage.ref1_y :      #ref point changed, update and clear queue
+
+             ControlPackage.tk_queue.clear() 
+             ControlPackage.ref0_x = ref0_x
+             ControlPackage.ref0_y = ref0_y
+             ControlPackage.ref1_x = ref1_x
+             ControlPackage.ref1_y = ref1_y
+             print( 'Star tracking Ref Point ('+ str(ControlPackage.ref0_x) + ',' 
                                           + str(ControlPackage.ref0_y) + ') - ('
                                           + str(ControlPackage.ref1_x) + ','
                                           + str(ControlPackage.ref1_y) + ')' )
@@ -183,7 +235,7 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
          and ( data['tgaz'][0] == "" or data['tgalt'][0] == "" )) \
         or (data['altazradec'][0] == "RADEC" \
          and ( data['tgrah'][0] == "" or data['tgram'][0] == "" or data['tgras'][0] == "" \
-          or data['tgdecdg'][0] == "" or data['tgdecm'][0] == "" or data['tgdecs'][0] == "")): 
+          or data['tgdecdg'][0] == "" or data['tgdecm'][0] == "" or data['tgdecs'][0] == "") ) : 
         status = False	
         statstr = 'Star Tacking not started, check parameters!'
 
@@ -215,17 +267,20 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
            ControlPackage.tgdecm = float(data['tgdecm'][0])
            ControlPackage.tgdecs = float(data['tgdecs'][0])
 
-        vspeed = int(data['vspeed'][0])
-        vsteps = int(data['vsteps'][0])
-        hspeed = int(data['hspeed'][0])
-        hsteps = int(data['hsteps'][0])
+        ControlPackage.vspeed = int(data['vspeed'][0])
+        ControlPackage.vsteps = int(data['vsteps'][0])
+        ControlPackage.vadj = int(data['vadj'][0])
+        ControlPackage.hspeed = int(data['hspeed'][0])
+        ControlPackage.hsteps = int(data['hsteps'][0])
+        ControlPackage.hadj = int(data['hadj'][0])
+        ControlPackage.tk_pos_dir = data['eqposdir'][0]
+        ControlPackage.tk_neg_dir = ('DOWN' if ControlPackage.tk_pos_dir == 'UP' else 'UP')
 
-        #tr = StarTracking(ControlPackage.myloclat, ControlPackage.myloclong, ControlPackage.altazradec,
+        #tr = AccStarTracking(ControlPackage.myloclat, ControlPackage.myloclong, ControlPackage.altazradec,
         #                ControlPackage.tgrah, ControlPackage.tgram, ControlPackage.tgras, ControlPackage.tgdecdg, ControlPackage.tgdecm, ControlPackage.tgdecs,
-        #                ControlPackage.tgaz, ControlPackage.tgalt, 
-        #                vspeed, vsteps, hspeed, hsteps)
+        #                ControlPackage.tgaz, ControlPackage.tgalt)
 
-        #print( 'Start star tracking ...' )
+        print( 'Start star tracking ...' )
         #t = threading.Thread(target=tr.Track, args = ())
         #t.daemon = True
         #t.start()
@@ -284,11 +339,10 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
         if s != "": ControlPackage.tgaltadj = float(s)
    
         if not ControlPackage.isTracking.is_set():
-          tr = StarTracking(ControlPackage.myloclat, ControlPackage.myloclong, ControlPackage.altazradec,
+          tr = AccStarTracking(ControlPackage.myloclat, ControlPackage.myloclong, ControlPackage.altazradec,
                         ControlPackage.tgrah, ControlPackage.tgram, ControlPackage.tgras, 
                         ControlPackage.tgdecdg, ControlPackage.tgdecm, ControlPackage.tgdecs,
-                        ControlPackage.tgaz, ControlPackage.tgalt, 
-                        0, 0, 0, 0)
+                        ControlPackage.tgaz, ControlPackage.tgalt)
           ControlPackage.tgaz, ControlPackage.tgalt = tr.GetTarget()
           ControlPackage.curalt, ControlPackage.curaz = tr.read()
           ControlPackage.curalt += ControlPackage.tgaltadj
@@ -477,7 +531,7 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
       with open(filepath, 'r') as content_file:
         content = content_file.read()
         content = content.replace('[IPADDRESS]', ControlPackage.ip)
-        self.wfile.write(content.encode('utf-8'))
+        self.wfile.write(content.encode('iso-8859-1'))
         return True
     else :
       self.send_response(403)

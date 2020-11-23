@@ -48,13 +48,21 @@
 	  	 </tr>
 	  	 <tr>
 	    	   <td><span class="param_name">垂直速度: </span></td>
-	    	   <td><span class="param_value"><input type="text" name="vspeed" id="vspeed" tabindex="2" value="10" /> rpm</span></td>
+	    	   <td><span class="param_value"><input type="text" name="vspeed" id="vspeed" tabindex="2" value="1000" /> rpm</span></td>
 	    	   <td><span class="param_name">水平速度: </span></td>
 	    	   <td><span class="param_value">
 			<select name="hspeed" id="hspeed" tabindex="3">
+                                <option value="20">4'60''</option>
+                                <option value="30">4'50''</option>
+				<option value="40">4'40''</option>
+                                <option value="45">4'30''</option>
+                                <option value="48">4'20''</option>
                                 <option value="50">4'15''</option>
-				<option value="54">3'56''</option>
-				<option value="55">3'53'' **</option>
+				<option value="51">4'05''</option>
+				<option value="52">4'02''</option>
+				<option value="53">3'59''</option>
+				<option value="54">3'56'' **</option>
+				<option value="55">3'53''</option>
 				<option value="56">3'49''</option>
 				<option value="60">3'35''</option>
 				<option value="70">3'06''</option>
@@ -76,7 +84,7 @@
 	  	 </tr>
 	  	 <tr>
 	    	   <td><span class="param_name">垂直步数: </span></td>
-	    	   <td><span class="param_value"><input type="text" name="vsteps" id="vsteps" tabindex="4" value="200" /> 步</span></td>
+	    	   <td><span class="param_value"><input type="text" name="vsteps" id="vsteps" tabindex="4" value="50" /> 步</span></td>
 	    	   <td><span class="param_name">水平步数: </span></td>
 	    	   <td><span class="param_value">
                         <select name="hsteps" id="hsteps" tabindex="5" >
@@ -96,7 +104,7 @@
 			</select> 步</span></td>
 	  	 </tr>
 	  	 <tr>
-	    	   <td colspan="4"><span class="param_name"><input type="checkbox" name="refined">精细控制</span>&nbsp;&nbsp;
+	    	   <td colspan="4"><span class="param_name"><input type="checkbox" name="refined" checked>精细控制</span>&nbsp;&nbsp;
 	    	   <span class="param_name"><input type="checkbox" name="norefresh">视频模式</span>&nbsp;&nbsp;
                    <span class="param_name"><input type="checkbox" name="rawmode">原始图像</span>
                    </td>
@@ -177,7 +185,7 @@
                    </td>
                  </tr>
                  <tr>
-                   <td><span class="param_name"></span></td>
+                   <td><span class="param_name">EQ+DIR:</span></td>
                    <td>
                         <span class="param_value">RA: </span>
                    </td><td colspan="2">
@@ -185,7 +193,11 @@
                    </td>
                  </tr>
                  <tr>
-                   <td><span class="param_name"></span></td>
+                   <td><span class="param_name">
+			<select id="eqposdir">
+                                <option value="UP" selected>UP</option>
+                                <option value="DOWN">DOWN</option>
+                        </select></span></td>
                    <td>
                         <span class="param_value"><input type="text" name="tgrah" id="tgrah" tabindex="18" value="" /> 时</span>
                    </td><td colspan="2">
@@ -257,6 +269,3 @@
   <script src='control.js'></script>
 </body>
 </html>
-
-
-

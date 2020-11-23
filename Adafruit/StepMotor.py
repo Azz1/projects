@@ -4,6 +4,7 @@ import math
 import threading
 import queue
 import serial
+from collections import deque
 from abc import ABCMeta, abstractmethod
 
 # Abstract base class for stepper motor
@@ -42,8 +43,8 @@ class ControlPackage :
   try:
     SerialData = serial.Serial(
                #port='/dev/ttyACM0',
-               port='/dev/ttyAMA0',
-               #port='/dev/ttyUSB0',
+               #port='/dev/ttyAMA0',
+               port='/dev/ttyUSB0',
                baudrate = 9600,
                parity=serial.PARITY_NONE,
                stopbits=serial.STOPBITS_ONE,
@@ -83,7 +84,7 @@ class ControlPackage :
 #picamera v1.3
   roi_l = 0
 #picamera v2
-  roi_l = 0.2
+  #roi_l = 0.2
   roi_w = (1 - roi_l)**2
 
   brightness = 50	#0-100 50 default
@@ -103,6 +104,9 @@ class ControlPackage :
   # initialize step motors
   exitFlag = threading.Event()
   isTracking = threading.Event()
+  ipTracking = threading.Event()
+  isTracking.clear()
+  ipTracking.clear()
   threadLock = threading.Lock()
   #queue of objects (dir=UP/DOWN, speed, steps) UP-FWD, DOWN-BKWD
   v_cmdqueue = queue.Queue()      
@@ -110,11 +114,14 @@ class ControlPackage :
   h_cmdqueue = queue.Queue()      
   #queue of objects (dir=IN/OUT, speed, steps) IN-FWD, OUT-BKWD
   f_cmdqueue = queue.Queue()      
+  #queue of tracking points (time, d-RA, d-Dec) 
+  tk_queue = deque(maxlen = 20)      
 
   # initialize vertical step motor
-  vspeed = 10
+  vspeed = 1000
   vadj = 0
-  vsteps = 200
+  vsteps = 50
+  move_method = "MICROSTEP"
 
   # initialize horizontal step motor
   hspeed = 80000
@@ -157,6 +164,10 @@ class ControlPackage :
   ref1_y = 0.0
   tk_delta_ra = 0.0
   tk_delta_dec = 0.0
+  tk_blur_limit = 13
+  tk_thresh_limit = 45
+  tk_pos_dir = "UP"
+  tk_neg_dir = "DOWN"
 
   altazradec = 'ALTAZ'
 
@@ -180,7 +191,7 @@ class ControlPackage :
     elif ControlPackage.contrast > 100: ControlPackage.contrast = 100
     if ControlPackage.saturation < -100: ControlPackage.saturation = -100
     elif ControlPackage.saturation > 100: ControlPackage.saturation = 100
-    if ControlPackage.iso < 100: ControlPackage.iso = 100
+    if ControlPackage.iso < 60: ControlPackage.iso = 60
     elif ControlPackage.iso > 1600: ControlPackage.iso = 1600
     if ControlPackage.ss < 100 : ControlPackage.ss = 100
 
@@ -258,37 +269,43 @@ class MotorControlThread (threading.Thread):
       ControlPackage.threadLock.release()
 	   
       if dir != "" : 
-        print( self.threadName + ' ' + dir + ' Speed: ' + str(speed) + ' Adj: ' + str(adj) + ' Steps: ' + str(steps))
+        print( "***", self.threadName + ' ' + dir + ' Speed: ' + str(speed) + ' Adj: ' + str(adj) + ' Steps: ' + str(steps))
 
         if self.threadName == "H-Motor":
+          #ControlPackage.motorH.release() 
+          #ControlPackage.motorV.release() 
+
 	  # LEFT-FWD, RIGHT-BKWD
           self.motor.setSpeed(speed, adj)
           if dir == "LEFT":
             self.motor.step(steps, "BACKWARD", "MICROSTEP")
           else:
             self.motor.step(steps, "FORWARD", "MICROSTEP")
-          self.motor.release()
+          #self.motor.release()
 
           if dir.upper() == 'LEFT' and GPIO.input(ControlPackage.HL_pin):
-            print( 'Horizontal leftmost limit reached!')
+            print( "***", 'Horizontal leftmost limit reached!')
 
           if dir.upper() == 'RIGHT' and GPIO.input(ControlPackage.HR_pin):
-            print( 'Horizontal rightmost limit reached!')
+            print( "***", 'Horizontal rightmost limit reached!')
       	
         elif self.threadName == "V-Motor":
+          #ControlPackage.motorH.release() 
+          #ControlPackage.motorV.release() 
+
           # UP-FWD, DOWN-BKWD
           self.motor.setSpeed(speed, adj)
           if dir == "UP":
-            self.motor.step(steps, "FORWARD", "DOUBLE")
+            self.motor.step(steps, "FORWARD", ControlPackage.move_method)
           else:
-            self.motor.step(steps, "BACKWARD", "DOUBLE")
-          self.motor.release()
+            self.motor.step(steps, "BACKWARD", ControlPackage.move_method)
+          #self.motor.release()
 
           if dir.upper() == 'UP' and GPIO.input(ControlPackage.VH_pin):
-            print( 'Vertical highest limit reached!')
+            print( "***", 'Vertical highest limit reached!')
 
           if dir.upper() == 'DOWN' and GPIO.input(ControlPackage.VL_pin):
-            print( 'Vertical lowest limit reached!')
+            print( "***", 'Vertical lowest limit reached!')
         else:
           # IN-FWD, OUT-BKWD
           self.motor.setSpeed(speed, adj)
