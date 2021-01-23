@@ -43,8 +43,8 @@ class ControlPackage :
   try:
     SerialData = serial.Serial(
                #port='/dev/ttyACM0',
-               #port='/dev/ttyAMA0',
-               port='/dev/ttyUSB0',
+               port='/dev/ttyAMA0',
+               #port='/dev/ttyUSB0',
                baudrate = 9600,
                parity=serial.PARITY_NONE,
                stopbits=serial.STOPBITS_ONE,
@@ -116,6 +116,7 @@ class ControlPackage :
   f_cmdqueue = queue.Queue()      
   #queue of tracking points (time, d-RA, d-Dec) 
   tk_queue = deque(maxlen = 20)      
+  ref_pattern = []
 
   # initialize vertical step motor
   vspeed = 1000

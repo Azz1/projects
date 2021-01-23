@@ -16,7 +16,7 @@ while getopts "h?c" opt; do
     esac
 done
 
-myip=`python ./getip.py`
+myip=`python3 ./getip.py`
 echo "current ip: " $myip
 #sudo nodejs  ../nodejs/stream-server.js soul &
 sudo nodejs  ../nodejs/websocket-relay.js soul &

@@ -85,6 +85,7 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
              ControlPackage.ref0_y = ref0_y
              ControlPackage.ref1_x = ref1_x
              ControlPackage.ref1_y = ref1_y
+             ControlPackage.ref_pattern.clear()
              #print( 'Star tracking Ref Point ('+ str(ControlPackage.ref0_x) + ',' 
              #                                  + str(ControlPackage.ref0_y) + ') - ('
              #                                  + str(ControlPackage.ref1_x) + ','

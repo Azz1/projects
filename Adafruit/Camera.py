@@ -112,17 +112,21 @@ class RaspiShellCamera(Camera):
         [centers, radius, img] = cvhelper.processimage(mark = True)
         cvhelper.printcenters()
         cvhelper.setref(ControlPackage.ref0_x, ControlPackage.ref0_y, ControlPackage.ref1_x, ControlPackage.ref1_y)
-        [idx, cntr, img] = cvhelper.find_nearest_point(True)
-        print("Nearest Point ", "#{}".format(idx+1), "- (", int(cntr[0]), ",", int(cntr[1]), ") ")
+        [idx, cntr, img] = cvhelper.find_tracking_point()
+        if idx >= 0 :
+          print("Tracking Point ", "#{}".format(idx+1), "- (", int(cntr[0]), ",", int(cntr[1]), ") ")
 
-        ControlPackage.tk_delta_ra, ControlPackage.tk_delta_dec = cvhelper.calc_offset(cntr[0], cntr[1])
-        print("\nDelta-RA:", ControlPackage.tk_delta_ra, " Delta-Dec:", ControlPackage.tk_delta_dec)
-        if len(ControlPackage.tk_queue) >= ControlPackage.tk_queue.maxlen:
+          ControlPackage.tk_delta_ra, ControlPackage.tk_delta_dec = cvhelper.calc_offset(cntr[0], cntr[1])
+          print("\nDelta-RA:", ControlPackage.tk_delta_ra, " Delta-Dec:", ControlPackage.tk_delta_dec)
+          if len(ControlPackage.tk_queue) >= ControlPackage.tk_queue.maxlen:
             ControlPackage.tk_queue.popleft()
-        ControlPackage.tk_queue.append([localtime, ControlPackage.tk_delta_ra, ControlPackage.tk_delta_dec, cntr[0], cntr[1]])
+          ControlPackage.tk_queue.append([localtime, ControlPackage.tk_delta_ra, ControlPackage.tk_delta_dec, cntr[0], cntr[1]])
 
-        ret, buf = cv2.imencode( '.jpg', img )
-        imgstr = base64.b64encode( np.array(buf) ).decode("utf-8") 
+          ret, buf = cv2.imencode( '.jpg', img )
+          imgstr = base64.b64encode( np.array(buf) ).decode("utf-8") 
+
+        else :
+          raise Exception("Sorry, failed to find tracking point.")
 
       except:
         traceback.print_exc()

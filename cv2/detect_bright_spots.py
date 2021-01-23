@@ -1,6 +1,7 @@
 # import the necessary packages
 from imutils import contours
 from skimage import measure
+from StepMotor import ControlPackage
 import numpy as np
 import argparse
 import imutils
@@ -12,6 +13,7 @@ class CV2Helper :
     def __init__(self, thresh_limit, blur_limit):
         self.thresh_limit = thresh_limit
         self.blur_limit = blur_limit
+        self.max_radius = 30
 
     def setref(self, x0, y0, x1, y1) :
         self.ref0 = (x0, y0)
@@ -79,30 +81,122 @@ class CV2Helper :
 
         return [self.centers, self.radius, self.image]
 
+    def draw_mark(self, ni) :
+        cv2.line(self.image, (int(self.ref0[0]), int(self.ref0[1])), (int(self.ref1[0]), int(self.ref1[1])), (0, 100, 100), 1)
+        cv2.line(self.image, (int(self.ref0[0]-5), int(self.ref0[1])), (int(self.ref0[0]+5), int(self.ref0[1])), (0, 250, 150), 1)
+        cv2.line(self.image, (int(self.ref0[0]), int(self.ref0[1]-5)), (int(self.ref0[0]), int(self.ref0[1]+5)), (0, 250, 150), 1)
+        cv2.circle(self.image, (int(self.ref1[0]), int(self.ref1[1])), int(2), (0, 250, 255), 1)
+
+        cv2.circle(self.image, (int(self.centers[ni][0]), int(self.centers[ni][1])), int(self.radius[ni]), (0, 250, 255), 1)
+        cv2.putText(self.image, "#{}".format(ni + 1), (int(self.centers[ni][0]+5), int(self.centers[ni][1]) - 15), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 250, 255), 1)
+
+
     def find_nearest_point(self, mark = True ) :
         ni = 0
         dist = 999999.9
         for (i, p) in enumerate(self.centers):
-            if self.radius[i] <= 30:   #ignore points with radius greater than 30
+            if self.radius[i] <= self.max_radius:   #ignore points with radius greater than max_radius
               d = (p[0] - self.ref0[0]) * (p[0] - self.ref0[0]) + (p[1] - self.ref0[1]) * (p[1] - self.ref0[1])
               if d < dist : 
                   ni = i
                   dist = d
 
         if mark == True :
-            cv2.line(self.image, (int(self.ref0[0]), int(self.ref0[1])), (int(self.ref1[0]), int(self.ref1[1])), (0, 100, 100), 1)
-            cv2.line(self.image, (int(self.ref0[0]-5), int(self.ref0[1])), (int(self.ref0[0]+5), int(self.ref0[1])), (0, 250, 150), 1)
-            cv2.line(self.image, (int(self.ref0[0]), int(self.ref0[1]-5)), (int(self.ref0[0]), int(self.ref0[1]+5)), (0, 250, 150), 1)
-            cv2.circle(self.image, (int(self.ref1[0]), int(self.ref1[1])), int(2), (0, 250, 255), 1)
-
-            cv2.circle(self.image, (int(self.centers[ni][0]), int(self.centers[ni][1])), int(self.radius[ni]), (0, 250, 255), 1)
-            cv2.putText(self.image, "#{}".format(ni + 1), (int(self.centers[ni][0]+5), int(self.centers[ni][1]) - 15), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 250, 255), 1)
+            self.draw_mark(ni)
 
         return [ni, self.centers[ni], self.image]
+
+    def find_tracking_point(self) :
+        ni = 0
+        if len(ControlPackage.ref_pattern) == 0 :
+          [ni, cntr, img] = self.find_nearest_point( False )
+          self.build_ref_pattern(ni)
+
+        elif len(self.centers) >= 2 and len(self.centers) <= 20 :
+          star_array = self.build_star_array()
+          length = len(star_array)
+
+          #find match pairs
+          for i in range(length) :
+            for [dts, cos_ts] in ControlPackage.ref_pattern :
+              for [dtr, cos_tr] in star_array[i][0] :
+                if abs(dts - dtr) < 1.0 and abs(cos_ts - cos_tr) < 0.01 :
+                  star_array[i][1] += 1
+                elif dts < dtr :
+                  break
+          
+          #find max match
+          max_score = 0
+          ni = -1
+          for i in range(length) :
+            if max_score < star_array[i][1] :
+              max_score = star_array[i][1]
+              ni = i
+
+        elif len(self.centers) == 1 :
+          ni = 0
+
+        else :
+          ni = -1
+
+        if ni >= 0 : 
+          self.draw_mark(ni)
+          return [ni, self.centers[ni], self.image]
+        else :
+          return [ni, [], self.image]
+
+    def add_in_order(self, list, item) :
+        length = len(list)
+        if length > 0 :
+          for i in range(length) :
+            if item[0] <= list[i][0] :
+              list.insert(i, item)
+              return 
+
+        list.append(item)
+
+
+    def build_ref_pattern(self, ts_idx) :
+        for (i, p) in enumerate(self.centers):
+          if self.radius[i] <= self.max_radius and i != ts_idx:   #ignore points with radius greater than max_radius
+            d, cos_val = self.calc_pattern_one(ts_idx, i)
+            self.add_in_order(ControlPackage.ref_pattern, [d, cos_val])
+              
+
+    def build_star_array(self) :
+        array_star = []
+        length = len(self.centers)
+        for i in range(length) :
+          array_star.append([[], 0])
+
+        for i in range(length) :
+          for j in range(i+1, length) :
+            if self.radius[i] <= self.max_radius and self.radius[j] <= self.max_radius :   #ignore points with radius greater than max_radius
+              d, cos_val = self.calc_pattern_one(i, j)
+              lst = array_star[i][0]
+              self.add_in_order(lst, [d, cos_val])
+              lst = array_star[j][0]
+              self.add_in_order(lst, [d, -cos_val])
+
+        return(array_star)
 
     def printcenters(self):
         for (i, p) in enumerate(self.centers):
             print("Point ", "#{}".format(i+1), "- (", int(p[0]), ",", int(p[1]), ")   radius:", self.radius[i])
+
+    def calc_pattern_one(self, ts, tr) :
+        d = math.sqrt((self.centers[ts][0] - self.centers[tr][0])*(self.centers[ts][0] - self.centers[tr][0]) + (self.centers[ts][1] - self.centers[tr][1])*(self.centers[ts][1] - self.centers[tr][1]))
+
+        A = self.ref1[1] - self.ref0[1]		# A = y1 - y0
+        B = self.ref0[0] - self.ref1[0] 	# B = x0 - x1
+        C = -B * self.ref0[1] - A * self.ref0[0] # C = -B * y0 - A * x0
+
+        A1 = self.centers[tr][1] - self.centers[ts][1]         # A = y1 - y0
+        B1 = self.centers[ts][0] - self.centers[tr][0]         # B = x0 - x1
+        C1 = -B1 * self.centers[ts][1] - A1 * self.centers[ts][0] # C = -B * y0 - A * x0
+
+        cos_v = (A*A1 + B*B1) / (math.sqrt(A*A + B*B) * math.sqrt(A1*A1 + B1*B1))
+        return d, cos_v
 
     def calc_offset(self, x, y):
         print("Ref Points = (", self.ref0[0], ", ", self.ref0[1], ")  --> (", self.ref1[0], ", ", self.ref1[1], ")")
