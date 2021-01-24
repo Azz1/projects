@@ -133,7 +133,7 @@ class CV2Helper :
               max_score = star_array[i][1]
               ni = i
 
-        elif len(self.centers) == 1 :
+        elif len(self.centers) == 1 and len(ControlPackage.ref_pattern) == 0 :
           ni = 0
 
         else :

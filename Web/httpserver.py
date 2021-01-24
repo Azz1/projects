@@ -205,6 +205,7 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
       print( 'POST /api/statrtracking' )
       length = int(self.headers['content-length'])
       data = cgi.parse_qs(self.rfile.read(length).decode('utf-8'), keep_blank_values=1)
+      ControlPackage.ref_pattern.clear()
 
       if data['refpoints'][0] != "":
         x = data['refpoints'][0].split(",")
