@@ -120,7 +120,7 @@ class CV2Helper :
           for i in range(length) :
             for [dts, cos_ts] in ControlPackage.ref_pattern :
               for [dtr, cos_tr] in star_array[i][0] :
-                if abs(dts - dtr) < 1.0 and abs(cos_ts - cos_tr) < 0.01 :
+                if abs(dts - dtr) < 3.0 and abs(cos_ts - cos_tr) < 0.02 :
                   star_array[i][1] += 1
                 elif dts < dtr :
                   break
