@@ -132,6 +132,9 @@ class CV2Helper :
             if max_score < star_array[i][1] :
               max_score = star_array[i][1]
               ni = i
+		
+	  if ni >= 0 :
+	    self.enhance_pattern(ni, star_array)
 
         elif len(self.centers) == 1 and len(ControlPackage.ref_pattern) == 0 :
           ni = 0
@@ -145,6 +148,19 @@ class CV2Helper :
         else :
           return [ni, [], self.image]
 
+    def enhance_pattern(self, ni, star_array) :
+        for [dtr, cos_tr] in star_array[ni][0] :
+	  is_included = False
+	  for [dts, cos_ts] in ControlPackage.ref_pattern :
+            if abs(dts - dtr) < 3.0 and abs(cos_ts - cos_tr) < 0.02 :
+	      is_included = True
+	      break
+		
+	  if is_included == False :
+	    self.add_in_order(ControlPackage.ref_pattern, [dtr, cos_tr])
+	    if len(ControlPackage.ref_pattern) > 30 :
+	      ControlPackage.ref_pattern.pop()		
+		
     def add_in_order(self, list, item) :
         length = len(list)
         if length > 0 :
