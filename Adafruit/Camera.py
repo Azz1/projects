@@ -84,7 +84,7 @@ class RaspiShellCamera(Camera):
                      + ' -br ' + str(ControlPackage.brightness) \
                      + (' -ex night -ag 12.0 -dg 4.0 -ss ' if ControlPackage.cmode == 'night' else ' -ss ') + str(ss) \
                      + (' -ISO auto ' if ControlPackage.cmode == 'night' else (' -ISO ' + str(ControlPackage.iso))) \
-                     + ' -sh ' + str(ControlPackage.sharpness) + ' -co ' + str(ControlPackage.contrast) \
+                     + ' --nopreview -sh ' + str(ControlPackage.sharpness) + ' -co ' + str(ControlPackage.contrast) \
                      + ' -sa ' + str(ControlPackage.saturation)
       print( cmdstr)
       os.system( cmdstr )
@@ -202,7 +202,7 @@ class RaspiShellCamera(Camera):
                      + (' -ex night -ss ' if ControlPackage.cmode == 'night' else ' -ss ') + str(ControlPackage.ss) \
                      + ' -ISO ' + str(ControlPackage.iso) \
                      + ' -sh ' + str(ControlPackage.sharpness) + ' -co ' + str(ControlPackage.contrast) \
-                     + ' -sa ' + str(ControlPackage.saturation) + ' ' + ts
+                     + ' --nopreview -sa ' + str(ControlPackage.saturation) + ' ' + ts
 
                      #replacement parameters
                      #+ (' -ex night -ag 12.0 -dg 4.0 -ss ' if ControlPackage.cmode == 'night' else ' -ss ') + str(ControlPackage.ss) \
@@ -244,7 +244,7 @@ class RaspiShellCamera(Camera):
                      + ' -br ' + str(ControlPackage.brightness) + roistr \
                      + ' -ss ' + str(ControlPackage.ss) + ' -ISO ' + str(ControlPackage.iso) \
                      + ' -sh ' + str(ControlPackage.sharpness) + ' -co ' + str(ControlPackage.contrast) \
-                     + ' -sa ' + str(ControlPackage.saturation) + ' -t ' + str(ControlPackage.videolen*1000)
+                     + ' --nopreview -sa ' + str(ControlPackage.saturation) + ' -t ' + str(ControlPackage.videolen*1000)
       print( cmdstr)
       os.system( cmdstr )
 
