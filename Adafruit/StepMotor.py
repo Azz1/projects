@@ -119,7 +119,7 @@ class ControlPackage :
   ref_pattern = []
 
   # initialize vertical step motor
-  vspeed = 1000
+  vspeed = 200
   vadj = 0
   vsteps = 50
   move_method = "MICROSTEP"
