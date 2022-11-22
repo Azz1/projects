@@ -199,7 +199,7 @@ class RaspiShellCamera(Camera):
 		     + (' -vf ' if ControlPackage.vflip == 'true' else '') \
 		     + (' -hf ' if ControlPackage.hflip == 'true' else '') \
 		     + ' -br ' + str(ControlPackage.brightness) + roistr \
-                     + (' -bm -ex off -ag {:.0f} -dg 3.0 -ss '.format(ControlPackage.iso/100) if ControlPackage.cmode == 'night' else ' -ss ') + str(ControlPackage.ss) \
+                     + (' -bm -ex off -ag {:.0f} -dg 1.0 -ss '.format(ControlPackage.iso/100) if ControlPackage.cmode == 'night' else ' -ss ') + str(ControlPackage.ss) \
                      + (' -ISO auto ' if ControlPackage.cmode == 'night' else (' -ISO ' + str(ControlPackage.iso))) \
                      + ' -sh ' + str(ControlPackage.sharpness) + ' -co ' + str(ControlPackage.contrast) \
                      + ' -st --nopreview -sa ' + str(ControlPackage.saturation) + ' ' + ts
