@@ -98,7 +98,7 @@ class ControlPackage :
   imageseq = 0		#sequence id of refresh image
   simageseq = 0		#sequence id of snapshot image
   videoseq = 0		#sequence id of video snapshots
-  max_keep_snapshots = 10	#max number of snapsnots keep in cache
+  max_keep_snapshots = 100	#max number of snapsnots keep in cache
   max_keep_videoshots = 5	#max number of videosnots keep in cache
 
   # initialize step motors
