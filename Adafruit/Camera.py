@@ -82,7 +82,7 @@ class RaspiShellCamera(Camera):
                      + ' -w ' + str(ControlPackage.width) \
                      + ' -h ' + str(ControlPackage.height) + roistr \
                      + ' -bm -br ' + str(ControlPackage.brightness) \
-                     + (' -ex off -ag {:.0f} -dg 3.0 -ss '.format(ControlPackage.iso/100) if ControlPackage.cmode == 'night' else ' -ss ') + str(ss) \
+                     + (' -awb off -awbg 2.1,2.3 -ex off -ag {:.0f} -dg 3.0 -ss '.format(ControlPackage.iso/100) if ControlPackage.cmode == 'night' else ' -ss ') + str(ss) \
                      + (' -drc high -ev 10 -md 3 -ISO auto ' if ControlPackage.cmode == 'night' else (' -ISO ' + str(ControlPackage.iso))) \
                      + ' -st --nopreview -sh ' + str(ControlPackage.sharpness) + ' -co ' + str(ControlPackage.contrast) \
                      + ' -sa ' + str(ControlPackage.saturation)
@@ -199,7 +199,7 @@ class RaspiShellCamera(Camera):
 		     + (' -vf ' if ControlPackage.vflip == 'true' else '') \
 		     + (' -hf ' if ControlPackage.hflip == 'true' else '') \
 		     + ' -bm -br ' + str(ControlPackage.brightness) + roistr \
-                     + (' -ex off -ag {:.0f} -dg 1.0 -ss '.format(ControlPackage.iso/100) if ControlPackage.cmode == 'night' else ' -ss ') + str(ControlPackage.ss) \
+                     + (' -awb off -awbg 2.1,2.3 -ex off -ag {:.0f} -dg 1.0 -ss '.format(ControlPackage.iso/100) if ControlPackage.cmode == 'night' else ' -ss ') + str(ControlPackage.ss) \
                      + (' -drc high -ev 10 -md 3 -ISO auto ' if ControlPackage.cmode == 'night' else (' -ISO ' + str(ControlPackage.iso))) \
                      + ' -sh ' + str(ControlPackage.sharpness) + ' -co ' + str(ControlPackage.contrast) \
                      + ' -st --nopreview -sa ' + str(ControlPackage.saturation) + ' ' + ts
