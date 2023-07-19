@@ -73,7 +73,7 @@ class RaspiShellCamera(Camera):
 
       # to enable -ss option, which is shutter speed, update the firmware sudo rpi-update
       ss = ControlPackage.ss 
-      if ss > 2000000: ss = 2000000
+      if ss > 4000000: ss = 4000000
 
       roistr = ' -roi ' + str(ControlPackage.roi_l) + ',' + str(ControlPackage.roi_l) + ',' + str(ControlPackage.roi_w) + ',' + str(ControlPackage.roi_w) 
       cmdstr = 'raspistill -o ' + fname \
@@ -82,8 +82,8 @@ class RaspiShellCamera(Camera):
                      + ' -w ' + str(ControlPackage.width) \
                      + ' -h ' + str(ControlPackage.height) + roistr \
                      + ' -bm -br ' + str(ControlPackage.brightness) \
-                     + (' -awb off -awbg 2.1,2.3 -ex off -ag {:.0f} -dg 3.0 -ss '.format(ControlPackage.iso/100) if ControlPackage.cmode == 'night' else ' -ss ') + str(ss) \
-                     + (' -drc high -ev 10 -md 3 -ISO auto ' if ControlPackage.cmode == 'night' else (' -ISO ' + str(ControlPackage.iso))) \
+                     + (' -awb off -awbg 2.1,1.7 -ex off -ag {:.0f} -dg 3.0 -ss '.format(ControlPackage.iso/100) if ControlPackage.cmode == 'night' else ' -ss ') + str(ss) \
+                     + (' -drc high -ev 10 -md 2 -ISO auto ' if ControlPackage.cmode == 'night' else (' -ISO ' + str(ControlPackage.iso))) \
                      + ' -st --nopreview -sh ' + str(ControlPackage.sharpness) + ' -co ' + str(ControlPackage.contrast) \
                      + ' -sa ' + str(ControlPackage.saturation)
       print( cmdstr)
@@ -199,8 +199,8 @@ class RaspiShellCamera(Camera):
 		     + (' -vf ' if ControlPackage.vflip == 'true' else '') \
 		     + (' -hf ' if ControlPackage.hflip == 'true' else '') \
 		     + ' -bm -br ' + str(ControlPackage.brightness) + roistr \
-                     + (' -awb off -awbg 2.1,2.3 -ex off -ag {:.0f} -dg 1.0 -ss '.format(ControlPackage.iso/100) if ControlPackage.cmode == 'night' else ' -ss ') + str(ControlPackage.ss) \
-                     + (' -drc high -ev 10 -md 3 -ISO auto ' if ControlPackage.cmode == 'night' else (' -ISO ' + str(ControlPackage.iso))) \
+                     + (' -awb off -awbg 2.1,1.7 -ex off -ag {:.0f} -dg 1.0 -ss '.format(ControlPackage.iso/100) if ControlPackage.cmode == 'night' else ' -ss ') + str(ControlPackage.ss) \
+                     + (' -drc high -ev 10 -md 2 -ISO auto ' if ControlPackage.cmode == 'night' else (' -ISO ' + str(ControlPackage.iso))) \
                      + ' -sh ' + str(ControlPackage.sharpness) + ' -co ' + str(ControlPackage.contrast) \
                      + ' -st --nopreview -sa ' + str(ControlPackage.saturation) + ' ' + ts
 
