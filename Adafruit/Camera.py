@@ -4,7 +4,7 @@ import os
 import sys, traceback
 import cv2
 import queue
-import picamera
+import picamera2
 import threading
 import PIL
 import numpy as np
@@ -48,7 +48,7 @@ class Camera :
   @abstractmethod
   def release(self): pass
 
-# Camera using raspistill and raspivid commandline
+# Camera using rpicam-still and rpicam-vid commandline
 class RaspiShellCamera(Camera):
 
   def init(self): pass
@@ -75,17 +75,18 @@ class RaspiShellCamera(Camera):
       ss = ControlPackage.ss 
       if ss > 4000000: ss = 4000000
 
-      roistr = ' -roi ' + str(ControlPackage.roi_l) + ',' + str(ControlPackage.roi_l) + ',' + str(ControlPackage.roi_w) + ',' + str(ControlPackage.roi_w) 
-      cmdstr = 'raspistill -o ' + fname \
-                     + (' -vf ' if ControlPackage.vflip == 'true' else '') \
-                     + (' -hf ' if ControlPackage.hflip == 'true' else '') \
-                     + ' -w ' + str(ControlPackage.width) \
-                     + ' -h ' + str(ControlPackage.height) + roistr \
-                     + ' -bm -br ' + str(ControlPackage.brightness) \
-                     + (' -awb off -awbg 2.1,1.7 -ex off -ag {:.0f} -dg 3.0 -ss '.format(ControlPackage.iso/100) if ControlPackage.cmode == 'night' else ' -ss ') + str(ss) \
-                     + (' -drc high -ev 10 -md 2 -ISO auto ' if ControlPackage.cmode == 'night' else (' -ISO ' + str(ControlPackage.iso))) \
-                     + ' -st --nopreview -sh ' + str(ControlPackage.sharpness) + ' -co ' + str(ControlPackage.contrast) \
-                     + ' -sa ' + str(ControlPackage.saturation)
+      roistr = ' --roi ' + str(ControlPackage.roi_l) + ',' + str(ControlPackage.roi_l) + ',' + str(ControlPackage.roi_w) + ',' + str(ControlPackage.roi_w) 
+      cmdstr = 'rpicam-still -o ' + fname \
+                     + (' --vflip ' if ControlPackage.vflip == 'true' else '') \
+                     + (' --hflip ' if ControlPackage.hflip == 'true' else '') \
+                     + ' --width ' + str(ControlPackage.width) \
+                     + ' --height ' + str(ControlPackage.height) + roistr \
+                     + ' --brightness ' + '{:.2f}'.format(ControlPackage.brightness/100) \
+                     + ' --analoggain {:.0f} '.format(ControlPackage.iso/100) \
+                     + (' --ev 10 --awb custom --awbgains 2.63,1.62 --exposure normal --shutter ' if ControlPackage.cmode == 'night' else ' --shutter ') + str(ss) \
+                     + ' --sharpness ' + '{:.2f}'.format(ControlPackage.sharpness/20) + ' --contrast ' + '{:.2f}'.format(ControlPackage.contrast/20) \
+                     + ' --saturation ' + '{:.2f}'.format(ControlPackage.saturation/100) \
+                     + ' --immediate '
       print( cmdstr)
       os.system( cmdstr )
 
@@ -174,10 +175,10 @@ class RaspiShellCamera(Camera):
       localtime   = time.localtime()
 
       fname = 'temp/snapshot-' + str(ControlPackage.simageseq) + '-' + time.strftime("%Y%m%d-%H%M%S", localtime) 
-      if  ControlPackage.timelapse > 1:
-        fname = fname + '-%02d'
       if ControlPackage.rawmode == 'true' :
         fname = fname + '-raw'
+      if  ControlPackage.timelapse > 1:
+        fname = fname + '-%02d'
       fname = fname + '.jpg'
 
 
@@ -192,21 +193,18 @@ class RaspiShellCamera(Camera):
       tl = ControlPackage.ss/1000 + 2000
       tt = tl * (ControlPackage.timelapse-1)
       if ControlPackage.timelapse > 1:
-        ts = '-tl ' + str(tl) + ' -t ' +  str(tt)
+        ts = ' --timelapse ' + str(tl) + ' --timeout ' +  str(tt)
         
-      roistr = ' -roi ' + str(ControlPackage.roi_l) + ',' + str(ControlPackage.roi_l) + ',' + str(ControlPackage.roi_w) + ',' + str(ControlPackage.roi_w) 
-      cmdstr = 'raspistill ' + (' --raw ' if ControlPackage.rawmode == 'true' else '') + ' -o ' + fname \
-		     + (' -vf ' if ControlPackage.vflip == 'true' else '') \
-		     + (' -hf ' if ControlPackage.hflip == 'true' else '') \
-		     + ' -bm -br ' + str(ControlPackage.brightness) + roistr \
-                     + (' -awb off -awbg 2.1,1.7 -ex off -ag {:.0f} -dg 1.0 -ss '.format(ControlPackage.iso/100) if ControlPackage.cmode == 'night' else ' -ss ') + str(ControlPackage.ss) \
-                     + (' -drc high -ev 10 -md 2 -ISO auto ' if ControlPackage.cmode == 'night' else (' -ISO ' + str(ControlPackage.iso))) \
-                     + ' -sh ' + str(ControlPackage.sharpness) + ' -co ' + str(ControlPackage.contrast) \
-                     + ' -st --nopreview -sa ' + str(ControlPackage.saturation) + ' ' + ts
-
-                     #replacement parameters
-                     #+ (' -ex night -ag 12.0 -dg 4.0 -ss ' if ControlPackage.cmode == 'night' else ' -ss ') + str(ControlPackage.ss) \
-                     #+ (' -ISO auto ' if ControlPackage.cmode == 'night' else (' -ISO ' + str(ControlPackage.iso))) \
+      roistr = ' --roi ' + str(ControlPackage.roi_l) + ',' + str(ControlPackage.roi_l) + ',' + str(ControlPackage.roi_w) + ',' + str(ControlPackage.roi_w) 
+      cmdstr = 'rpicam-still ' + (' --raw ' if ControlPackage.rawmode == 'true' else '') + ' -o ' + fname \
+                     + (' --vflip ' if ControlPackage.vflip == 'true' else '') \
+                     + (' --hflip ' if ControlPackage.hflip == 'true' else '') \
+                     + ' --brightness ' + '{:.2f}'.format(ControlPackage.brightness/100) + ' ' + roistr \
+                     + ' --analoggain {:.0f} '.format(ControlPackage.iso/100) \
+                     + (' --ev 10 --awb custom --awbgains 2.63,1.62 --exposure normal --shutter ' if ControlPackage.cmode == 'night' else ' --shutter ') + str(ControlPackage.ss) \
+                     + ' --sharpness ' + '{:.2f}'.format(ControlPackage.sharpness/20) + ' --contrast ' + '{:.2f}'.format(ControlPackage.contrast/20) \
+                     + ' --saturation ' + '{:.2f}'.format(ControlPackage.saturation/100) \
+                     + (' --immediate ' if ControlPackage.timelapse <= 1 else ts)
       print( cmdstr)
       os.system( cmdstr )
 
@@ -222,7 +220,7 @@ class RaspiShellCamera(Camera):
     if ControlPackage.simageseq > ControlPackage.max_keep_snapshots:
       os.system('rm -f temp/snapshot-' + str(ControlPackage.simageseq-ControlPackage.max_keep_snapshots) + '-*.jpg')
 
-    fname = fname.replace('-%02d', '-01')
+    fname = fname.replace('-%02d', '-00')
     return fname
 
   def videoshot(self): 
@@ -232,19 +230,21 @@ class RaspiShellCamera(Camera):
     try:
       ControlPackage.videoseq = ControlPackage.videoseq + 1
       localtime   = time.localtime()
-      fname = 'temp/videoshot-' + str(ControlPackage.videoseq) + '-' + time.strftime("%Y%m%d-%H%M%S", localtime) + '.h264'
+      fname = 'temp/videoshot-' + str(ControlPackage.videoseq) + '-' + time.strftime("%Y%m%d-%H%M%S", localtime) + '.mp4'
 
       # TAKE A PHOTO OF HIGH RESOLUTION
       camera_lock.acquire();
 
-      roistr = ' -roi ' + str(ControlPackage.roi_l) + ',' + str(ControlPackage.roi_l) + ',' + str(ControlPackage.roi_w) + ',' + str(ControlPackage.roi_w) 
-      cmdstr = 'raspivid -o ' + fname \
-                     + (' -vf ' if ControlPackage.vflip == 'true' else '') \
-                     + (' -hf ' if ControlPackage.hflip == 'true' else '') \
-                     + ' -br ' + str(ControlPackage.brightness) + roistr \
-                     + ' -ss ' + str(ControlPackage.ss) + ' -ISO ' + str(ControlPackage.iso) \
-                     + ' -sh ' + str(ControlPackage.sharpness) + ' -co ' + str(ControlPackage.contrast) \
-                     + ' --nopreview -sa ' + str(ControlPackage.saturation) + ' -t ' + str(ControlPackage.videolen*1000)
+      roistr = ' --roi ' + str(ControlPackage.roi_l) + ',' + str(ControlPackage.roi_l) + ',' + str(ControlPackage.roi_w) + ',' + str(ControlPackage.roi_w) 
+      cmdstr = 'rpicam-vid --codec libav -o ' + fname \
+                     + (' --vflip ' if ControlPackage.vflip == 'true' else '') \
+                     + (' --hflip ' if ControlPackage.hflip == 'true' else '') \
+                     + ' --brightness ' + '{:.2f}'.format(ControlPackage.brightness/100) + ' ' + roistr \
+                     + ' --analoggain {:.0f} '.format(ControlPackage.iso/100) \
+                     + ' --shutter ' + str(ControlPackage.ss) \
+                     + ' --sharpness ' + '{:.2f}'.format(ControlPackage.sharpness/20) + ' --contrast ' + '{:.2f}'.format(ControlPackage.contrast/20) \
+                     + ' --saturation ' + '{:.2f}'.format(ControlPackage.saturation/100) \
+                     + ' -t ' + str(ControlPackage.videolen*1000)
       print( cmdstr)
       os.system( cmdstr )
 
@@ -252,7 +252,7 @@ class RaspiShellCamera(Camera):
       camera_lock.release();
 
     if ControlPackage.videoseq > ControlPackage.max_keep_videoshots:
-      os.system('rm -f temp/videoshot-' + str(ControlPackage.videoseq-ControlPackage.max_keep_videoshots) + '-*.h264')
+      os.system('rm -f temp/videoshot-' + str(ControlPackage.videoseq-ControlPackage.max_keep_videoshots) + '-*.mp4')
 
     return fname
 
@@ -262,16 +262,16 @@ class RaspiShellCamera(Camera):
       try:
         camera_lock.acquire();
         time.sleep(5)
-        cmdstr = 'sh runvideo.sh ' + str(int(ControlPackage.width/2.1875*2)) \
-                     + ' ' + str(int(ControlPackage.height/2.1875*2)) \
-                     + ' ' + str(ControlPackage.ss) + ' ' + str(ControlPackage.iso) \
-                     + ' ' + str(ControlPackage.brightness) \
-                     + ' ' + str(ControlPackage.sharpness) + ' ' + str(ControlPackage.contrast) \
-                     + ' ' + str(ControlPackage.saturation) \
+        cmdstr = 'sh runvideo.sh ' + str(int(ControlPackage.width/2.1875)*2) \
+                     + ' ' + str(int(ControlPackage.height/2.1875)*2) \
+                     + ' ' + str(ControlPackage.ss) + ' ' + str(ControlPackage.iso/100) \
+                     + ' ' + '{:.2f}'.format(ControlPackage.brightness/100) \
+                     + ' ' + '{:.2f}'.format(ControlPackage.sharpness/20) + ' ' + '{:.2f}'.format(ControlPackage.contrast/20) \
+                     + ' ' + '{:.2f}'.format(ControlPackage.saturation/100) \
                      + ' ' + str(ControlPackage.roi_l) \
                      + ' ' + str(ControlPackage.roi_w) \
-                     + (' -vf ' if ControlPackage.vflip == 'true' else '') \
-                     + (' -hf ' if ControlPackage.hflip == 'true' else '')
+                     + (' --vflip ' if ControlPackage.vflip == 'true' else '') \
+                     + (' --hflip ' if ControlPackage.hflip == 'true' else '')
         print( cmdstr)
         os.system( cmdstr )
         videostarted = True

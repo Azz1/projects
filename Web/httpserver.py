@@ -13,7 +13,7 @@ import time, datetime
 import re
 import os
 import glob
-import cgi
+from urllib import parse as cgi
 import sys
 
 import RPi.GPIO as GPIO
@@ -533,7 +533,7 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
       with open(filepath, 'r') as content_file:
         content = content_file.read()
         content = content.replace('[IPADDRESS]', ControlPackage.ip)
-        self.wfile.write(content.encode('iso-8859-1'))
+        self.wfile.write(content.encode('utf-8'))
         return True
     else :
       self.send_response(403)

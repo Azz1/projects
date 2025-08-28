@@ -79,7 +79,7 @@ class ControlPackage :
   cmode = 'day'
 
   width = 700
-  height = 525
+  height = 524
 
 #picamera v1.3
   roi_l = 0
@@ -87,10 +87,10 @@ class ControlPackage :
   #roi_l = 0.2
   roi_w = (1 - roi_l)**2
 
-  brightness = 50	#0-100 50 default
-  sharpness = 20	#-100-100 0 default
-  contrast = 20		#-100-100 0 default
-  saturation = 20	#-100-100 0 default
+  brightness = 50	#-100-100 50 default
+  sharpness = 20	#0-100 10 default
+  contrast = 20		#0-100 10 default
+  saturation = 100	#0-100 100 default
   ss = 4000		#microsecond
   iso = 400		#100-800 400 default
   videolen = 20		#video length

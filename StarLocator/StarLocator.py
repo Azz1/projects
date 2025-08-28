@@ -2,7 +2,7 @@
 
 # Python library for Star Locator and tracking
 
-from dateutil.parser import tz
+from dateutil import tz
 import datetime
 import math
 

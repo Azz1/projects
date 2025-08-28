@@ -1,6 +1,4 @@
-#!/usr/bin/python
-
-import smbus
+import smbus2 as smbus
 
 # ===========================================================================
 # Adafruit_I2C Class
