@@ -87,7 +87,7 @@ class ControlPackage :
   #roi_l = 0.2
   roi_w = (1 - roi_l)**2
 
-  brightness = 50	#-100-100 50 default
+  brightness = 10	#-100-100 10 default
   sharpness = 20	#0-100 10 default
   contrast = 20		#0-100 10 default
   saturation = 100	#0-100 100 default

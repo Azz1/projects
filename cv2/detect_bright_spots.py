@@ -19,6 +19,14 @@ class CV2Helper :
         self.ref0 = (x0, y0)
         self.ref1 = (x1, y1)
 
+    def setimage(self, img) :
+        opencv_image = np.array(img)
+        opencv_image = cv2.cvtColor(opencv_image, cv2.COLOR_RGB2BGR)
+
+        self.image = opencv_image
+        self.height, self.width, _ = self.image.shape
+        return self.image
+
     def loadimage(self, imgpath) :
         self.image = cv2.imread(imgpath)
         self.height, self.width, _ = self.image.shape
