@@ -99,7 +99,6 @@ class Adafruit_LSM303(Adafruit_I2C):
         #print( "\tZMIN: {0}".format(self.MZ_MIN))
         #print( "\tZMAX: {0}".format(self.MZ_MAX))
 
-
     # Interpret signed 12-bit acceleration component from list
     def accel12(self, list, idx):
         n = list[idx] | (list[idx+1] << 8) # Low, high bytes

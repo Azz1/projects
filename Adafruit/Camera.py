@@ -86,7 +86,7 @@ class RaspiShellCamera(Camera):
                      + (' --ev 10 --awb custom --awbgains 2.63,1.62 --exposure normal --shutter ' if ControlPackage.cmode == 'night' else ' --shutter ') + str(ss) \
                      + ' --sharpness ' + '{:.2f}'.format(ControlPackage.sharpness/20) + ' --contrast ' + '{:.2f}'.format(ControlPackage.contrast/20) \
                      + ' --saturation ' + '{:.2f}'.format(ControlPackage.saturation/100) \
-                     + ' --immediate '
+                     + ' --immediate --nopreview '
       print( cmdstr)
       os.system( cmdstr )
 
@@ -191,7 +191,7 @@ class RaspiShellCamera(Camera):
 
       ts = ''
       tl = ControlPackage.ss/1000 + 2000
-      tt = tl * (ControlPackage.timelapse-1)
+      tt = tl * (ControlPackage.timelapse+1)
       if ControlPackage.timelapse > 1:
         ts = ' --timelapse ' + str(tl) + ' --timeout ' +  str(tt)
         
@@ -203,7 +203,7 @@ class RaspiShellCamera(Camera):
                      + ' --analoggain {:.0f} '.format(ControlPackage.iso/100) \
                      + (' --ev 10 --awb custom --awbgains 2.63,1.62 --exposure normal --shutter ' if ControlPackage.cmode == 'night' else ' --shutter ') + str(ControlPackage.ss) \
                      + ' --sharpness ' + '{:.2f}'.format(ControlPackage.sharpness/20) + ' --contrast ' + '{:.2f}'.format(ControlPackage.contrast/20) \
-                     + ' --saturation ' + '{:.2f}'.format(ControlPackage.saturation/100) \
+                     + ' --nopreview --saturation ' + '{:.2f}'.format(ControlPackage.saturation/100) \
                      + (' --immediate ' if ControlPackage.timelapse <= 1 else ts)
       print( cmdstr)
       os.system( cmdstr )

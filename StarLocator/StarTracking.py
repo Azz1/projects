@@ -321,7 +321,7 @@ if __name__ == '__main__':
 
     from time import sleep
 
-    tr = StarTracking(42.27069402, -83.04411196, "ALTAZ", 
+    tr = AccStarTracking(42.27069402, -83.04411196, "ALTAZ", 
 			16.0, 41.0, 42.0, 36.0, 28.0, 0.0, 
 			250.0, 20.0, 
 			30, 100, 5, 50)

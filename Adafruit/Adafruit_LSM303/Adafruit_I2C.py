@@ -36,6 +36,9 @@ class Adafruit_I2C :
     #  busnum if busnum >= 0 else Adafruit_I2C.getPiI2CBusNumber())
     self.debug = debug
 
+  def __del__(self):
+    self.bus.close()
+
   def reverseByteOrder(self, data):
     "Reverses the byte order of an int (16-bit) or long (32-bit) value"
     # Courtesy Vishal Sapre
