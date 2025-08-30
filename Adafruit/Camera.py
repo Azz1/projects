@@ -7,6 +7,7 @@ import queue
 import libcamera 
 from picamera2 import Picamera2, Preview
 from libcamera import Transform
+from picamera2.encoders import H264Encoder, Quality
 import threading
 import PIL
 import numpy as np
@@ -427,8 +428,6 @@ class PiCamera(Camera):
       if self.picam2 is None:
         self.picam2 = Picamera2() 
 
-      #self.picam2.start_preview(Preview.NULL)
-      #preview_config = self.picam2.create_preview_configuration()
       capture_config = self.picam2.create_still_configuration(raw={}, display=None,
                                                       transform=Transform(
                                                         vflip=(True if ControlPackage.vflip == 'true' else False),
@@ -502,32 +501,42 @@ class PiCamera(Camera):
     try:
       ControlPackage.videoseq = ControlPackage.videoseq + 1
       localtime   = time.localtime()
-      fname = 'temp/videoshot-' + str(ControlPackage.videoseq) + '-' + time.strftime("%Y%m%d-%H%M%S", localtime) + '.mp4'
+      fname = 'temp/videoshot-' + str(ControlPackage.videoseq) + '-' + time.strftime("%Y%m%d-%H%M%S", localtime) + '.h264'
 
       # TAKE A PHOTO OF HIGH RESOLUTION
       camera_lock.acquire();
-      if self.picam2 is not None:
-        self.picam2 = None
+      if self.picam2 is None:
+        self.picam2 = Picamera2() 
 
+      capture_config = self.picam2.create_video_configuration(display=None,
+                                                      transform=Transform(
+                                                        vflip=(True if ControlPackage.vflip == 'true' else False),
+                                                        hflip=(True if ControlPackage.hflip == 'true' else False)
+                                                      ))
+      encoder = H264Encoder()
 
-      roistr = ' --roi ' + str(ControlPackage.roi_l) + ',' + str(ControlPackage.roi_l) + ',' + str(ControlPackage.roi_w) + ',' + str(ControlPackage.roi_w) 
-      cmdstr = 'rpicam-vid --codec libav -o ' + fname \
-                     + (' --vflip ' if ControlPackage.vflip == 'true' else '') \
-                     + (' --hflip ' if ControlPackage.hflip == 'true' else '') \
-                     + ' --brightness ' + '{:.2f}'.format(ControlPackage.brightness/100) + ' ' + roistr \
-                     + ' --analoggain {:.0f} '.format(ControlPackage.iso/100) \
-                     + ' --shutter ' + str(ControlPackage.ss) \
-                     + ' --sharpness ' + '{:.2f}'.format(ControlPackage.sharpness/20) + ' --contrast ' + '{:.2f}'.format(ControlPackage.contrast/20) \
-                     + ' --saturation ' + '{:.2f}'.format(ControlPackage.saturation/100) \
-                     + ' -t ' + str(ControlPackage.videolen*1000)
-      print( cmdstr)
-      os.system( cmdstr )
+      self.picam2.configure(capture_config)
+      with self.picam2.controls as controls:
+        controls.AeEnable = False
+        controls.ExposureTime = int(ControlPackage.ss)
+        controls.AnalogueGain = int(ControlPackage.iso/100)
+        controls.Brightness = ControlPackage.brightness/100
+        controls.Contrast = ControlPackage.contrast/20
+        controls.Sharpness = ControlPackage.sharpness/20
+        controls.Saturation = ControlPackage.saturation/100
+
+      self.picam2.start_recording(encoder, fname, quality=Quality.HIGH)
+      time.sleep(ControlPackage.videolen)
+      self.picam2.stop_recording()
 
     finally:
+      if self.picam2 is not None:
+        self.picam2.close()
+        self.picam2 = None
       camera_lock.release();
 
     if ControlPackage.videoseq > ControlPackage.max_keep_videoshots:
-      os.system('rm -f temp/videoshot-' + str(ControlPackage.videoseq-ControlPackage.max_keep_videoshots) + '-*.mp4')
+      os.system('rm -f temp/videoshot-' + str(ControlPackage.videoseq-ControlPackage.max_keep_videoshots) + '-*.h264')
 
     return fname
 
