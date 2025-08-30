@@ -5,7 +5,7 @@ import sys, traceback
 import cv2
 import queue
 import libcamera 
-from picamera2 import Picamera2
+from picamera2 import Picamera2, Preview
 from libcamera import Transform
 import threading
 import PIL
@@ -421,53 +421,79 @@ class PiCamera(Camera):
       fname = 'temp/snapshot-' + str(ControlPackage.simageseq) + '-' + time.strftime("%Y%m%d-%H%M%S", localtime) 
       if ControlPackage.rawmode == 'true' :
         fname = fname + '-raw'
-      if  ControlPackage.timelapse > 1:
-        fname = fname + '-%02d'
-      fname = fname + '.jpg'
-
 
       # TAKE A PHOTO OF HIGH RESOLUTION
       camera_lock.acquire();
-      if self.picam2 is not None:
-        self.picam2 = None
+      if self.picam2 is None:
+        self.picam2 = Picamera2() 
 
-      #ControlPackage.camera.start_preview()
-      #time.sleep(0.5)
-      #ControlPackage.camera.capture(fname, format='jpeg', resize=(ControlPackage.width,ControlPackage.height))
+      #self.picam2.start_preview(Preview.NULL)
+      #preview_config = self.picam2.create_preview_configuration()
+      capture_config = self.picam2.create_still_configuration(raw={}, display=None,
+                                                      transform=Transform(
+                                                        vflip=(True if ControlPackage.vflip == 'true' else False),
+                                                        hflip=(True if ControlPackage.hflip == 'true' else False)
+                                                      ))
 
-      ts = ''
-      tl = ControlPackage.ss/1000 + 2000
-      tt = tl * (ControlPackage.timelapse+1)
-      if ControlPackage.timelapse > 1:
-        ts = ' --timelapse ' + str(tl) + ' --timeout ' +  str(tt)
-        
-      roistr = ' --roi ' + str(ControlPackage.roi_l) + ',' + str(ControlPackage.roi_l) + ',' + str(ControlPackage.roi_w) + ',' + str(ControlPackage.roi_w) 
-      cmdstr = 'rpicam-still ' + (' --raw ' if ControlPackage.rawmode == 'true' else '') + ' -o ' + fname \
-                     + (' --vflip ' if ControlPackage.vflip == 'true' else '') \
-                     + (' --hflip ' if ControlPackage.hflip == 'true' else '') \
-                     + ' --brightness ' + '{:.2f}'.format(ControlPackage.brightness/100) + ' ' + roistr \
-                     + ' --analoggain {:.0f} '.format(ControlPackage.iso/100) \
-                     + (' --ev 10 --awb custom --awbgains 2.63,1.62 --exposure normal --shutter ' if ControlPackage.cmode == 'night' else ' --shutter ') + str(ControlPackage.ss) \
-                     + ' --sharpness ' + '{:.2f}'.format(ControlPackage.sharpness/20) + ' --contrast ' + '{:.2f}'.format(ControlPackage.contrast/20) \
-                     + ' --nopreview --saturation ' + '{:.2f}'.format(ControlPackage.saturation/100) \
-                     + (' --immediate ' if ControlPackage.timelapse <= 1 else ts)
-      print( cmdstr)
-      os.system( cmdstr )
+      self.picam2.configure(capture_config)
+      with self.picam2.controls as controls:
+        controls.AeEnable = False
+        controls.ExposureTime = int(ControlPackage.ss)
+        controls.AnalogueGain = int(ControlPackage.iso/100)
+        controls.Brightness = ControlPackage.brightness/100
+        controls.Contrast = ControlPackage.contrast/20
+        controls.Sharpness = ControlPackage.sharpness/20
+        controls.Saturation = ControlPackage.saturation/100
+
+        if ControlPackage.cmode == 'night' :
+          controls.AwbMode = libcamera.controls.AwbModeEnum.Custom
+          controls.ColourGains = (2.63,1.62)
+          controls.ExposureValue = 10
+
+      self.picam2.start()
+      time.sleep(2)
+
+      #self.picam2.start_and_capture_files(fname, initial_delay=2, delay=ControlPackage.ss/1000 + 2000, num_files=ControlPackage.timelapse)
+
+      if  ControlPackage.timelapse <= 1:
+        fnamedng = fname + '.dng'
+        fnamejpg = fname + '.jpg'
+
+        buffers, metadata = self.picam2.switch_mode_and_capture_buffers(capture_config, ["main", "raw"])
+        self.picam2.helpers.save(self.picam2.helpers.make_image(buffers[0], capture_config["main"]), metadata, fnamejpg)
+        if ControlPackage.rawmode == 'true' :
+          self.picam2.helpers.save_dng(buffers[1], metadata, capture_config["raw"], fnamedng)
+
+        fname_ret = fnamejpg
+      else :
+        for i in range(0, ControlPackage.timelapse):
+          fnamedng = fname + "-{:02d}".format(i) + '.dng'
+          fnamejpg = fname + "-{:02d}".format(i) + '.jpg'
+
+          if i == 0 :
+            fname_ret = fnamejpg
+            
+          buffers, metadata = self.picam2.switch_mode_and_capture_buffers(capture_config, ["main", "raw"])
+          self.picam2.helpers.save(self.picam2.helpers.make_image(buffers[0], capture_config["main"]), metadata, fnamejpg)
+          if ControlPackage.rawmode == 'true' :
+            self.picam2.helpers.save_dng(buffers[1], metadata, capture_config["raw"], fnamedng)
+
+          time.sleep(2)
+
+      self.picam2.stop()
+      self.picam2.stop_encoder()
 
     finally:
+      if self.picam2 is not None:
+        self.picam2.close()
+        self.picam2 = None
       camera_lock.release();
-
-    #READ IMAGE AND PUT ON SCREEN
-    #img = Image.open(fname)
-    #img = img.transpose(Image.ROTATE_180)
-
-    #img.save(fname, format='JPEG')
 
     if ControlPackage.simageseq > ControlPackage.max_keep_snapshots:
       os.system('rm -f temp/snapshot-' + str(ControlPackage.simageseq-ControlPackage.max_keep_snapshots) + '-*.jpg')
+      os.system('rm -f temp/snapshot-' + str(ControlPackage.simageseq-ControlPackage.max_keep_snapshots) + '-*.dng')
 
-    fname = fname.replace('-%02d', '-00')
-    return fname
+    return fname_ret
 
   def videoshot(self): 
     global camera_lock
