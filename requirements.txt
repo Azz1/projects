@@ -1,0 +1,13 @@
+# Telescope Project Dependencies
+# Install with: pip install -r requirements.txt
+
+# Core dependencies
+PyYAML>=6.0
+python-dateutil>=2.8
+
+# Raspberry Pi specific (uncomment when on Pi)
+# RPi.GPIO>=0.7.0
+
+# Optional: for development
+# pytest>=7.0
+# pytest-cov>=4.0

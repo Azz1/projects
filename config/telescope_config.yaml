@@ -1,0 +1,160 @@
+# Telescope Configuration File
+# All hardcoded values extracted and centralized here
+
+# =============================================================================
+# Location Settings
+# =============================================================================
+location:
+  latitude: 42.27069402      # Your latitude in degrees
+  longitude: -83.04411196    # Your longitude in degrees
+  timezone: "America/Detroit"
+
+# =============================================================================
+# Motor Configuration
+# =============================================================================
+motors:
+  # GPIO Pin assignments (BCM numbering)
+  vertical:
+    pins: [12, 16, 20, 21]   # Step, Dir, Enable, Reserved
+    speed: 120               # Default speed (RPM)
+    steps: 200               # Default steps per move
+    adjustment: 5            # Fine adjustment factor
+    
+  horizontal:
+    pins: [6, 13, 19, 26]
+    speed: 50
+    steps: 10
+    adjustment: 3
+    
+  focus:
+    pins: [4, 17, 27, 22]
+    speed: 100
+    steps: 50
+    adjustment: 3
+
+  # Limit switch pins
+  limit_switches:
+    vertical_low: 24
+    vertical_high: 23
+    horizontal_left: 25
+    horizontal_right: 8
+
+  # Movement settings
+  movement:
+    method: "DOUBLE"         # DOUBLE, MICROSTEP
+    refined_method: "MICROSTEP"
+
+# =============================================================================
+# Tracking Configuration
+# =============================================================================
+tracking:
+  # Threshold and sensitivity
+  threshold_limit: 5         # Minimum offset to trigger correction
+  trace_reference_count: 3   # Number of samples for averaging
+  min_vertical_offset: 0.2   # Minimum ALT offset (degrees)
+  min_horizontal_offset: 0.5 # Minimum AZ offset (degrees)
+  
+  # Step limits
+  max_vertical_steps: 300
+  max_horizontal_steps: 20
+  min_vertical_steps: 10
+  min_horizontal_steps: 2
+  
+  # Image processing thresholds
+  blur_limit: 13
+  thresh_limit: 45
+  
+  # Timing (seconds)
+  tracking_interval: 1.0
+  vertical_sleep: 2.0
+  horizontal_sleep: 2.0
+  default_ra_sleep: 20
+  
+  # EQ mount settings
+  eq_mode:
+    positive_direction: "UP"
+    negative_direction: "DOWN"
+    ra_speed_multiplier: 15
+    ra_speed_divisor: 5
+
+# =============================================================================
+# Camera Configuration
+# =============================================================================
+camera:
+  resolution:
+    width: 700
+    height: 524
+  
+  # Region of Interest
+  roi_left: 0
+  roi_width_factor: 1.0      # (1 - roi_left)^2
+  
+  # Default image settings
+  defaults:
+    brightness: 10           # -100 to 100
+    sharpness: 20            # 0 to 100
+    contrast: 20             # 0 to 100
+    saturation: 100          # 0 to 100
+    shutter_speed: 4000      # microseconds
+    iso: 400                 # 100 to 800
+    
+  # Video settings
+  video_length: 20           # seconds
+  timelapse_count: 1
+  
+  # Storage limits
+  max_keep_snapshots: 100    # max snapshots in cache
+  max_keep_videoshots: 5     # max video clips in cache
+
+  # Flip settings
+  horizontal_flip: true
+  vertical_flip: true
+  
+  # Mode
+  color_mode: "day"          # day, night
+  raw_mode: false
+
+# =============================================================================
+# Serial Communication
+# =============================================================================
+serial:
+  port: "/dev/ttyAMA0"       # Options: /dev/ttyACM0, /dev/ttyAMA0, /dev/ttyUSB0
+  baudrate: 9600
+  parity: "none"
+  stopbits: 1
+  bytesize: 8
+  timeout: 1
+
+# =============================================================================
+# Web Server Configuration
+# =============================================================================
+web_server:
+  host: "0.0.0.0"
+  port: 8080
+  content_dir: "content"
+  
+# =============================================================================
+# Sensor Calibration (LSM303 Magnetometer)
+# =============================================================================
+magnetometer:
+  calibration:
+    x_min: -652
+    x_max: 538
+    y_min: -656
+    y_max: 643
+    z_min: -563
+    z_max: 641
+  
+  # Reading settings
+  samples_per_read: 5
+  sample_interval: 0.1       # seconds
+
+# =============================================================================
+# Logging Configuration
+# =============================================================================
+logging:
+  level: "INFO"              # DEBUG, INFO, WARNING, ERROR
+  file: "logs/telescope.log"
+  max_bytes: 10485760        # 10MB
+  backup_count: 5
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"

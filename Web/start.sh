@@ -18,6 +18,15 @@ done
 
 myip=`python3 ./getip.py`
 echo "current ip: " $myip
-#sudo nodejs  ../nodejs/stream-server.js soul &
-sudo nodejs  ../nodejs/websocket-relay.js soul &
-sudo ~/env/bin/python3 httpserver.py 8080 $myip $cameraonly
+#sudo node  ../nodejs/stream-server.js soul &
+sudo node  ../nodejs/websocket-relay.js soul &
+
+# Use refactored server (server/app.py)
+if [ "$cameraonly" = "Y" ]; then
+    sudo ~/env/bin/python3 server/app.py 8080 $myip --camera-only
+else
+    sudo ~/env/bin/python3 server/app.py 8080 $myip
+fi
+
+# Legacy entry point (uncomment to use old httpserver.py):
+#sudo ~/env/bin/python3 httpserver.py 8080 $myip $cameraonly
